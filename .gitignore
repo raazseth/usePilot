@@ -1,0 +1,60 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build outputs
+dist/
+build/
+.next/
+out/
+
+# Turbo
+.turbo/
+
+# Rust / Tauri
+target/
+apps/desktop/src-tauri/target/
+
+# SQLite
+*.db
+*.sqlite
+*.sqlite-journal
+*.sqlite-wal
+*.sqlite-shm
+data/
+
+# Bun compiled binary
+apps/backend/bun-backend
+apps/backend/bun-backend.exe
+apps/desktop/src-tauri/binaries/
+
+# Env files
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor
+.vscode/
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+*.swp
+*.swo
+
+# Testing
+coverage/
+.vitest/
+
+# Misc
+*.tsbuildinfo
+.cache/

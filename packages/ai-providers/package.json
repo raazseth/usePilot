@@ -1,0 +1,35 @@
+{
+  "name": "@usepilot/ai-providers",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Concrete AI provider implementations (Ollama, LM Studio, OpenAI-compatible)",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src --ext .ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "clean": "rimraf dist"
+  },
+  "dependencies": {
+    "@usepilot/ai-core": "workspace:*",
+    "@usepilot/types": "workspace:*",
+    "@usepilot/utils": "workspace:*",
+    "@usepilot/config": "workspace:*"
+  },
+  "devDependencies": {
+    "@usepilot/typescript-config": "workspace:*",
+    "typescript": "^5.7.3",
+    "vitest": "^2.1.8",
+    "rimraf": "^6.0.1"
+  }
+}

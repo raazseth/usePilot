@@ -1,0 +1,10 @@
+{
+  "extends": "@usepilot/typescript-config/node",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "types": ["bun"],
+    "noEmit": true
+  },
+  "include": ["src"]
+}

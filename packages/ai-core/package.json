@@ -1,0 +1,33 @@
+{
+  "name": "@usepilot/ai-core",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AI provider interface and core streaming utilities",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src --ext .ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "clean": "rimraf dist"
+  },
+  "dependencies": {
+    "@usepilot/types": "workspace:*",
+    "@usepilot/utils": "workspace:*"
+  },
+  "devDependencies": {
+    "@usepilot/typescript-config": "workspace:*",
+    "typescript": "^5.7.3",
+    "vitest": "^2.1.8",
+    "rimraf": "^6.0.1"
+  }
+}

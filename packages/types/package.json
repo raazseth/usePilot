@@ -1,0 +1,26 @@
+{
+  "name": "@usepilot/types",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Shared domain types for usePilot",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src --ext .ts",
+    "clean": "rimraf dist"
+  },
+  "devDependencies": {
+    "@usepilot/typescript-config": "workspace:*",
+    "typescript": "^5.7.3",
+    "rimraf": "^6.0.1"
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "name": "@usepilot/backend",
+  "version": "0.1.0",
+  "private": true,
+  "description": "usePilot Bun backend sidecar — DDD architecture",
+  "type": "module",
+  "scripts": {
+    "dev": "bun run --watch src/index.ts",
+    "build": "bun build src/index.ts --compile --outfile bun-backend --target bun",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src --ext .ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "clean": "rimraf dist bun-backend bun-backend.exe"
+  },
+  "dependencies": {
+    "@usepilot/types": "workspace:*",
+    "@usepilot/utils": "workspace:*",
+    "@usepilot/config": "workspace:*",
+    "@usepilot/ai-core": "workspace:*",
+    "@usepilot/ai-providers": "workspace:*",
+    "@usepilot/database": "workspace:*"
+  },
+  "devDependencies": {
+    "@usepilot/typescript-config": "workspace:*",
+    "@types/bun": "latest",
+    "typescript": "^5.7.3",
+    "vitest": "^2.1.8",
+    "rimraf": "^6.0.1"
+  }
+}
