@@ -18,6 +18,10 @@ async function bootstrap() {
   const config = loadConfig()
   logger.info({ port: config.port, env: config.nodeEnv }, 'Configuration loaded')
 
+  // Ensure data directory exists
+  const { mkdirSync } = await import('fs')
+  mkdirSync(config.dataDir, { recursive: true })
+
   // Run database migrations
   const dbPath = join(config.dataDir, 'usepilot.db')
   logger.info({ dbPath }, 'Running database migrations...')

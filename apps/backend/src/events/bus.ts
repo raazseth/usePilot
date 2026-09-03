@@ -64,16 +64,43 @@ export class EventBus {
     }
   }
 
+  private readonly wildcardListeners = new Set<(event: { type: DomainEventType; payload: unknown }) => void | Promise<void>>()
+
   /**
-   * Emit a domain event. All handlers run concurrently.
+   * Subscribe to all events.
+   */
+  onAny(handler: (event: { type: DomainEventType; payload: unknown }) => void | Promise<void>): Unsubscribe {
+    this.wildcardListeners.add(handler)
+    return () => {
+      this.wildcardListeners.delete(handler)
+    }
+  }
+
+  /**
+   * Emit a domain event. All handlers run concurrently and errors are isolated.
    */
   async emit<T extends DomainEventType>(type: T, payload: DomainEventMap[T]): Promise<void> {
     const handlers = this.listeners.get(type)
-    if (!handlers || handlers.size === 0) return
 
-    await Promise.allSettled(
-      Array.from(handlers).map((handler) => handler(payload as DomainEventMap[DomainEventType]))
-    )
+    const promises: Promise<unknown>[] = []
+
+    if (handlers && handlers.size > 0) {
+      for (const handler of handlers) {
+        promises.push(
+          Promise.resolve().then(() => handler(payload as DomainEventMap[DomainEventType]))
+        )
+      }
+    }
+
+    if (this.wildcardListeners.size > 0) {
+      for (const wildcard of this.wildcardListeners) {
+        promises.push(
+          Promise.resolve().then(() => wildcard({ type, payload }))
+        )
+      }
+    }
+
+    await Promise.allSettled(promises)
   }
 
   /**

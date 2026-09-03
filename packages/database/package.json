@@ -13,10 +13,10 @@
     }
   },
   "scripts": {
-    "build": "tsc -p tsconfig.build.json",
+    "build": "tsc -p tsconfig.build.json && node copy-migrations.js",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src --ext .ts",
-    "test": "vitest run",
+    "test": "bun test",
     "test:watch": "vitest",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "bun run src/migrate.ts",

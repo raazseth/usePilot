@@ -1,4 +1,4 @@
-import { readFileSync, readdirSync } from 'fs'
+import { readFileSync, readdirSync, existsSync } from 'fs'
 import { join, dirname } from 'path'
 import { fileURLToPath } from 'url'
 import { Database } from 'bun:sqlite'
@@ -9,10 +9,20 @@ interface MigrationFile {
 }
 
 function getMigrationsDir(): string {
-  if (typeof import.meta.dir === 'string') {
-    return join(import.meta.dir, 'migrations')
-  }
-  return join(dirname(fileURLToPath(import.meta.url)), 'migrations')
+  const baseDir = typeof import.meta.dir === 'string'
+    ? import.meta.dir
+    : dirname(fileURLToPath(import.meta.url))
+
+  const candidate1 = join(baseDir, 'migrations')
+  if (existsSync(candidate1)) return candidate1
+
+  const candidate2 = join(baseDir, '..', 'src', 'migrations')
+  if (existsSync(candidate2)) return candidate2
+
+  const candidate3 = join(process.cwd(), 'packages', 'database', 'src', 'migrations')
+  if (existsSync(candidate3)) return candidate3
+
+  return candidate1
 }
 
 /**

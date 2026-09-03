@@ -35,9 +35,16 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   initialize: async () => {
     try {
-      // Get backend port from Tauri
-      const port = await invokeQuery(IPCQuery.GetBackendPort)
-      if (!port) throw new Error('Backend port not available')
+      // Get backend port from Tauri, with graceful dev fallback
+      let port: number | null = null
+      try {
+        port = await invokeQuery(IPCQuery.GetBackendPort)
+      } catch {
+        // Running in pure web / dev mode without Tauri IPC
+      }
+      if (!port) {
+        port = (window as unknown as { __BACKEND_PORT__?: number }).__BACKEND_PORT__ ?? 3001
+      }
 
       apiClient.updatePort(port)
 

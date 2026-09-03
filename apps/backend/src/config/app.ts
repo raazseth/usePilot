@@ -14,7 +14,8 @@ export interface BackendConfig {
  */
 export function loadConfig(): BackendConfig {
   const nodeEnv = (process.env['NODE_ENV'] ?? 'development') as BackendConfig['nodeEnv']
-  const port = parseInt(process.env['BACKEND_PORT'] ?? '0', 10)
+  const defaultPort = nodeEnv === 'development' ? '3001' : '0'
+  const port = parseInt(process.env['BACKEND_PORT'] ?? defaultPort, 10)
   const logLevel = (process.env['LOG_LEVEL'] ?? 'info') as BackendConfig['logLevel']
 
   // Data directory: APP_DATA_DIR env → ~/.usepilot
