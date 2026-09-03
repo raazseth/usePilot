@@ -13,17 +13,25 @@ export const EnvironmentSchema = z.object({
 
 export type Environment = z.infer<typeof EnvironmentSchema>
 
+function getEnv(): Record<string, string | undefined> {
+  if (typeof process !== 'undefined' && process?.env) {
+    return process.env as Record<string, string | undefined>
+  }
+  return {}
+}
+
 /**
  * Parse and validate environment variables.
  * Falls back to defaults for all optional fields.
  * Throws if required fields are missing or invalid.
  */
 function parseEnvironment(): Environment {
+  const env = getEnv()
   const result = EnvironmentSchema.safeParse({
-    NODE_ENV: process.env['NODE_ENV'],
-    BACKEND_PORT: process.env['BACKEND_PORT'],
-    LOG_LEVEL: process.env['LOG_LEVEL'],
-    APP_DATA_DIR: process.env['APP_DATA_DIR'],
+    NODE_ENV: env['NODE_ENV'],
+    BACKEND_PORT: env['BACKEND_PORT'],
+    LOG_LEVEL: env['LOG_LEVEL'],
+    APP_DATA_DIR: env['APP_DATA_DIR'],
   })
 
   if (!result.success) {
