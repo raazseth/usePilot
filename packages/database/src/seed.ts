@@ -36,7 +36,7 @@ export async function seed(dbPath: string): Promise<void> {
       theme: 'dark',
       activeProviderId: 'provider-ollama-default',
       activeProviderType: 'ollama',
-      defaultModel: 'llama3.2',
+      defaultModel: 'qwen2.5-coder:3b',
       streamingEnabled: true,
       temperature: '0.7',
       maxTokens: null,
@@ -53,7 +53,7 @@ export async function seed(dbPath: string): Promise<void> {
       id: conversationId,
       title: 'Welcome to usePilot',
       providerId: 'provider-ollama-default',
-      model: 'llama3.2',
+      model: 'qwen2.5-coder:3b',
       createdAt: toTimestamp(),
       updatedAt: toTimestamp(),
     })

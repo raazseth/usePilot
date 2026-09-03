@@ -34,6 +34,19 @@ export function providersRouter(
       return json(enriched)
     }
 
+    // GET /providers/models
+    if (req.method === 'GET' && path === '/providers/models') {
+      const active = providerManager.getActive()
+      if (!active) return json([])
+      try {
+        const models = await active.listModels()
+        return json(models)
+      } catch (err) {
+        logger.warn({ err }, 'Failed to fetch provider models')
+        return json([])
+      }
+    }
+
     // POST /providers
     if (req.method === 'POST' && path === '/providers') {
       const body = (await req.json().catch(() => ({}))) as Record<string, unknown>

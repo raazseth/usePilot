@@ -115,6 +115,28 @@ export class WebSocketHandler {
       return
     }
 
+    // Resolve model to use — fallback to provider's installed model if requested model is missing
+    let targetModel = model || conversation.model || undefined
+    try {
+      const availableModels = await provider.listModels()
+      if (availableModels.length > 0) {
+        const match = targetModel ? availableModels.find((m) => m.id === targetModel || m.name === targetModel) : null
+        if (!match) {
+          logger.warn(
+            { requested: targetModel, fallback: availableModels[0]?.id },
+            `Model "${targetModel}" not installed in ${provider.name}. Falling back to "${availableModels[0]?.id}".`
+          )
+          targetModel = availableModels[0]?.id
+        }
+      }
+    } catch {
+      // Best effort fallback
+    }
+
+    if (!targetModel) {
+      targetModel = 'qwen2.5-coder:3b'
+    }
+
     // Save user message
     await this.msgRepo.create({
       conversationId,
@@ -139,14 +161,14 @@ export class WebSocketHandler {
       payload: {
         messageId,
         conversationId,
-        model: model ?? conversation.model ?? 'unknown',
+        model: targetModel,
       },
     })
 
     await this.eventBus.emit('message.streaming.started', {
       id: messageId,
       conversationId,
-      model: model ?? conversation.model ?? 'unknown',
+      model: targetModel,
     })
 
     // Build message history for context
@@ -166,7 +188,7 @@ export class WebSocketHandler {
     try {
       const stream = provider.streamChat({
         messages,
-        model: model ?? conversation.model ?? '',
+        model: targetModel,
         temperature: temperature ?? undefined,
         maxTokens: maxTokens ?? undefined,
         signal: abortController.signal,
@@ -202,7 +224,7 @@ export class WebSocketHandler {
             content: fullContent,
             status: 'complete',
             metadata: {
-              model: model ?? conversation.model ?? undefined,
+              model: targetModel,
               finishReason: chunk.finishReason ?? 'stop',
               usage: chunk.usage ?? undefined,
               provider: provider.name,

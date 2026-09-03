@@ -1,20 +1,48 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { useAppStore } from '../shared/store/appStore'
 import { apiClient } from '../shared/api/client'
 import { useToast } from '../components/ui/Toast'
-import type { Settings } from '@usepilot/types'
+import type { Settings, AIModel } from '@usepilot/types'
 import './settings.css'
 
 export function SettingsRoute() {
   const { settings, updateSettings } = useAppStore()
   const { toast } = useToast()
   const [saving, setSaving] = useState(false)
+  const [availableModels, setAvailableModels] = useState<AIModel[]>([])
   const [form, setForm] = useState({
     theme: settings?.theme ?? 'dark',
-    defaultModel: settings?.defaultModel ?? '',
+    defaultModel: settings?.defaultModel ?? 'qwen2.5-coder:3b',
     temperature: settings?.temperature ?? '0.7',
     streamingEnabled: settings?.streamingEnabled ?? true,
   })
+
+  // Load installed models dynamically from active provider
+  useEffect(() => {
+    apiClient
+      .get<AIModel[]>('/providers/models')
+      .then((models) => {
+        if (models && models.length > 0) {
+          setAvailableModels(models)
+          setForm((f) => {
+            const valid = models.some((m) => m.id === f.defaultModel)
+            return valid ? f : { ...f, defaultModel: models[0]?.id ?? 'qwen2.5-coder:3b' }
+          })
+        } else {
+          // Fallback to installed local models
+          setAvailableModels([
+            { id: 'qwen2.5-coder:3b', name: 'qwen2.5-coder:3b' },
+            { id: 'deepseek-v4-flash:cloud', name: 'deepseek-v4-flash:cloud' },
+          ])
+        }
+      })
+      .catch(() => {
+        setAvailableModels([
+          { id: 'qwen2.5-coder:3b', name: 'qwen2.5-coder:3b' },
+          { id: 'deepseek-v4-flash:cloud', name: 'deepseek-v4-flash:cloud' },
+        ])
+      })
+  }, [])
 
   const handleSave = useCallback(async () => {
     setSaving(true)
@@ -60,17 +88,21 @@ export function SettingsRoute() {
           <section className="settings-section">
             <h2 className="settings-section-title">AI Model</h2>
             <div className="settings-field">
-              <label className="settings-label" htmlFor="model-input">Default Model</label>
-              <input
-                id="model-input"
-                className="settings-input"
-                type="text"
-                placeholder="e.g. llama3.2, phi4, qwen2.5"
+              <label className="settings-label" htmlFor="model-select">Default Model</label>
+              <select
+                id="model-select"
+                className="settings-select"
                 value={form.defaultModel}
                 onChange={(e) => setForm((f) => ({ ...f, defaultModel: e.target.value }))}
-              />
+              >
+                {availableModels.map((model) => (
+                  <option key={model.id} value={model.id}>
+                    {model.name || model.id}
+                  </option>
+                ))}
+              </select>
               <p className="settings-hint">
-                Enter the model name exactly as it appears in Ollama or LM Studio
+                Select from installed models available in your active provider
               </p>
             </div>
 
