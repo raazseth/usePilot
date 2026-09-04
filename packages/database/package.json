@@ -25,6 +25,7 @@
   },
   "dependencies": {
     "@usepilot/config": "workspace:*",
+    "@usepilot/planner-types": "workspace:*",
     "@usepilot/types": "workspace:*",
     "@usepilot/utils": "workspace:*",
     "drizzle-orm": "^0.38.3"

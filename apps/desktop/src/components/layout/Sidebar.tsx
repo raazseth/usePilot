@@ -27,6 +27,19 @@ export function Sidebar() {
     }
   }, [navigate, setConversations])
 
+  const handlePlanTask = useCallback(async () => {
+    try {
+      const conversation = await apiClient.post<ConversationSummary>('/conversations', {
+        title: 'Task Plan',
+      })
+      const all = await apiClient.get<ConversationSummary[]>('/conversations')
+      setConversations(all)
+      navigate(`/chat/${conversation.id}`)
+    } catch (error) {
+      console.error('Failed to create task plan conversation:', error)
+    }
+  }, [navigate, setConversations])
+
   const handleDelete = useCallback(
     async (e: React.MouseEvent, id: string) => {
       e.stopPropagation()
@@ -85,6 +98,20 @@ export function Sidebar() {
           </svg>
           <span>Search conversations...</span>
           <kbd>⌘K</kbd>
+        </button>
+      </div>
+
+      {/* Quick Action: Plan a Task */}
+      <div className="sidebar__action-row">
+        <button
+          id="plan-task-btn"
+          className="sidebar__plan-btn"
+          onClick={handlePlanTask}
+          title="Plan an automation task with AI"
+        >
+          <span className="sidebar__plan-icon">🧠</span>
+          <span className="sidebar__plan-text">Plan a Task</span>
+          <span className="sidebar__plan-badge">AI Plan</span>
         </button>
       </div>
 

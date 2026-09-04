@@ -1,0 +1,446 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   Planner Component Styles
+   All planner UI is scoped under .planner-* to avoid Phase 1 interference.
+───────────────────────────────────────────────────────────────────────────── */
+
+/* ── PlanCard ────────────────────────────────────────────────────────────── */
+.plan-card {
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin: 12px 0;
+  transition: border-color 0.2s ease;
+}
+
+.plan-card:hover {
+  border-color: var(--color-primary);
+}
+
+.plan-card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.plan-card-header-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 16px;
+}
+
+.plan-card-header-meta {
+  flex: 1;
+  min-width: 0;
+}
+
+.plan-card-objective {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  line-height: 1.4;
+  margin-bottom: 6px;
+}
+
+.plan-card-badges {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.plan-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.plan-badge-complexity-low    { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
+.plan-badge-complexity-medium { background: rgba(234, 179, 8, 0.15); color: #eab308; }
+.plan-badge-complexity-high   { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+.plan-badge-complexity-unknown { background: rgba(148, 163, 184, 0.15); color: #94a3b8; }
+
+.plan-badge-intent    { background: rgba(99, 102, 241, 0.15); color: #818cf8; }
+.plan-badge-risk-low  { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
+.plan-badge-risk-medium { background: rgba(234, 179, 8, 0.15); color: #eab308; }
+.plan-badge-risk-high { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+.plan-badge-risk-critical { background: rgba(239, 68, 68, 0.25); color: #ef4444; border: 1px solid #ef4444; }
+
+.plan-card-chevron {
+  color: var(--color-text-tertiary);
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.plan-card-chevron.expanded {
+  transform: rotate(180deg);
+}
+
+.plan-card-body {
+  border-top: 1px solid var(--color-border);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ── Success Criteria ─────────────────────────────────────────────────────── */
+.plan-criteria {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.plan-criteria-title {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--color-text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.plan-criteria-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+
+.plan-criteria-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #22c55e;
+  flex-shrink: 0;
+  margin-top: 6px;
+}
+
+/* ── Approval Warning ─────────────────────────────────────────────────────── */
+.plan-approval-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px;
+  background: rgba(234, 179, 8, 0.08);
+  border: 1px solid rgba(234, 179, 8, 0.3);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  color: #eab308;
+}
+
+/* ── Execute Button ───────────────────────────────────────────────────────── */
+.plan-execute-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  cursor: not-allowed;
+  opacity: 0.5;
+  width: 100%;
+}
+
+.plan-execute-hint {
+  font-size: 11px;
+  color: var(--color-text-tertiary);
+  text-align: center;
+}
+
+/* ── PlanningProgress ─────────────────────────────────────────────────────── */
+.planning-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  margin: 12px 0;
+}
+
+.planning-progress-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.planning-progress-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.planning-progress-label {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.planning-progress-sub {
+  font-size: var(--text-xs);
+  color: var(--color-text-tertiary);
+  margin-top: 1px;
+}
+
+.planning-progress-bar-wrap {
+  height: 3px;
+  background: var(--color-border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.planning-progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #6366f1, #8b5cf6);
+  border-radius: 2px;
+  transition: width 0.4s ease;
+}
+
+.planning-stages {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.planning-stage-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-border);
+  transition: background 0.3s ease;
+}
+
+.planning-stage-dot.active  { background: #8b5cf6; }
+.planning-stage-dot.done    { background: #22c55e; }
+
+/* ── TaskCard ────────────────────────────────────────────────────────────── */
+.task-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.task-list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.task-list-title {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--color-text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.task-list-count {
+  font-size: var(--text-xs);
+  color: var(--color-text-tertiary);
+}
+
+.task-card {
+  background: var(--color-bg-base);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.task-card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  cursor: pointer;
+}
+
+.task-card-num {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}
+
+.task-card-title {
+  flex: 1;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--color-text-primary);
+  min-width: 0;
+}
+
+.task-card-badges {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.task-tool-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  background: rgba(99, 102, 241, 0.1);
+  color: #818cf8;
+}
+
+.task-approval-badge-automatic  { background: rgba(34, 197, 94, 0.1); color: #22c55e; }
+.task-approval-badge-optional   { background: rgba(234, 179, 8, 0.1); color: #eab308; }
+.task-approval-badge-mandatory  { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+.task-approval-badge-forbidden  { background: rgba(239, 68, 68, 0.25); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.5); }
+
+.task-card-body {
+  border-top: 1px solid var(--color-border);
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.task-conditions-section {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.task-conditions-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--color-text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.task-condition-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+}
+
+.task-condition-pre  { color: #94a3b8; }
+.task-condition-post { color: #22c55e; }
+
+/* ── ValidationReport ─────────────────────────────────────────────────────── */
+.validation-report {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.validation-layer {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.validation-layer-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+  background: var(--color-bg-base);
+}
+
+.validation-layer-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.validation-dot-pass { background: #22c55e; }
+.validation-dot-fail { background: #ef4444; }
+.validation-dot-skip { background: #475569; }
+
+.validation-layer-name {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  flex: 1;
+}
+
+.validation-layer-body {
+  padding: 8px 12px;
+  border-top: 1px solid var(--color-border);
+}
+
+.validation-issue {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  padding: 3px 0;
+}
+
+.validation-issue-error      { color: #ef4444; }
+.validation-issue-warning    { color: #eab308; }
+.validation-issue-suggestion { color: #94a3b8; }
+
+/* ── OptimizerSummary ─────────────────────────────────────────────────────── */
+.optimizer-summary {
+  background: rgba(99, 102, 241, 0.05);
+  border: 1px solid rgba(99, 102, 241, 0.15);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.optimizer-summary-title {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: #818cf8;
+  margin-bottom: 4px;
+}
+
+.optimizer-simplification {
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}

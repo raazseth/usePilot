@@ -19,7 +19,9 @@
     "@usepilot/config": "workspace:*",
     "@usepilot/ai-core": "workspace:*",
     "@usepilot/ai-providers": "workspace:*",
-    "@usepilot/database": "workspace:*"
+    "@usepilot/database": "workspace:*",
+    "@usepilot/planner-core": "workspace:*",
+    "@usepilot/planner-types": "workspace:*"
   },
   "devDependencies": {
     "@usepilot/typescript-config": "workspace:*",

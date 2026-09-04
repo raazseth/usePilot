@@ -1,5 +1,12 @@
 import { generateId } from '@usepilot/utils'
-import { ConversationRepository, MessageRepository, SettingsRepository, ProviderRepository } from '@usepilot/database'
+import {
+  ConversationRepository,
+  MessageRepository,
+  SettingsRepository,
+  ProviderRepository,
+  PlanRepository,
+  PlannerRunRepository,
+} from '@usepilot/database'
 import type { Logger } from '../../logger'
 import type { EventBus } from '../../events/bus'
 import type { ProviderManager } from '../ai/provider-manager'
@@ -8,6 +15,7 @@ import { messagesRouter } from './routes/messages'
 import { providersRouter } from './routes/providers'
 import { settingsRouter } from './routes/settings'
 import { healthRouter } from './routes/health'
+import { plannerRouter } from './routes/planner'
 
 type DB = ReturnType<typeof import('@usepilot/database').createDatabase>
 
@@ -35,7 +43,12 @@ export function createRouter(
     messages: new MessageRepository(db),
     settings: new SettingsRepository(db),
     providers: new ProviderRepository(db),
+    plans: new PlanRepository(db),
+    runs: new PlannerRunRepository(db),
   }
+
+  // Planner router (different interface — handle(req, pathname))
+  const plannerRoutes = plannerRouter({ plans: repos.plans, runs: repos.runs })
 
   const routes = [
     healthRouter(providerManager),
@@ -43,6 +56,8 @@ export function createRouter(
     messagesRouter(repos, providerManager, eventBus, logger),
     providersRouter(repos, providerManager, eventBus, logger),
     settingsRouter(repos, eventBus, logger),
+    // Planner routes adapter
+    async (req: Request, url: URL) => plannerRoutes.handle(req, url.pathname),
   ]
 
   return {

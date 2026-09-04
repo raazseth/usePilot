@@ -29,6 +29,9 @@ export type ClientEventType =
   | 'provider.setActive'
   | 'settings.update'
   | 'health.ping'
+  // ── Phase 2: Planner ─────────────────────────────────────────
+  | 'plan.create'
+  | 'plan.get'
 
 export interface ConversationCreatePayload {
   title?: string
@@ -66,6 +69,9 @@ export type ClientEvent =
   | AppEvent<ProviderSetActivePayload> & { type: 'provider.setActive' }
   | AppEvent<SettingsUpdatePayload> & { type: 'settings.update' }
   | AppEvent<Record<string, never>> & { type: 'health.ping' }
+  // ── Phase 2: Planner ──────────────────────────────────────────────
+  | AppEvent<{ conversationId: ID; text: string }> & { type: 'plan.create' }
+  | AppEvent<{ planId: ID }> & { type: 'plan.get' }
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Server → Client Events
@@ -83,6 +89,10 @@ export type ServerEventType =
   | 'settings.changed'
   | 'health.pong'
   | 'error'
+  // ── Phase 2: Planner ────────────────────────────────────────────
+  | 'plan.progress'
+  | 'plan.ready'
+  | 'plan.error'
 
 export interface ConversationCreatedPayload {
   conversationId: ID
@@ -146,6 +156,10 @@ export type ServerEvent =
   | AppEvent<{ key: string; value: unknown }> & { type: 'settings.changed' }
   | AppEvent<HealthPongPayload> & { type: 'health.pong' }
   | AppEvent<ErrorPayload> & { type: 'error' }
+  // ── Phase 2: Planner ────────────────────────────────────────────
+  | AppEvent<{ runId: string; stage: string; progressPct: number; message: string }> & { type: 'plan.progress' }
+  | AppEvent<{ runId: string; blueprint: unknown; planId: string; validation?: unknown }> & { type: 'plan.ready' }
+  | AppEvent<{ runId: string; code: string; message: string; retries: number }> & { type: 'plan.error' }
 
 /** Union of all event types */
 export type EventType = ClientEventType | ServerEventType

@@ -1,0 +1,37 @@
+{
+  "name": "@usepilot/planner-core",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Planning engine for usePilot — RequestClassifier, Normalizer, GoalExtractor, IntentAnalyzer, TaskGenerator, GraphBuilder, Validator, Optimizer, Serializer",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src --ext .ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "clean": "rimraf dist"
+  },
+  "dependencies": {
+    "@usepilot/planner-types": "workspace:*",
+    "@usepilot/types": "workspace:*",
+    "@usepilot/utils": "workspace:*",
+    "@usepilot/ai-core": "workspace:*",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@usepilot/typescript-config": "workspace:*",
+    "typescript": "^5.7.3",
+    "vitest": "^2.1.8",
+    "rimraf": "^6.0.1"
+  }
+}

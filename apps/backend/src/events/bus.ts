@@ -33,6 +33,13 @@ export type DomainEventMap = {
 
   // Settings events
   'settings.updated': { key: string; value: unknown }
+
+  // ── Phase 2: Planner events ───────────────────────────────────────────────
+  // Four events only — stage is in the payload, not in the event type name.
+  'planner.started':   { runId: string; goalId: string; conversationId: string }
+  'planner.progress':  { runId: string; stage: string; progressPct: number; message: string }
+  'planner.completed': { runId: string; blueprintId: string; taskCount: number; estimatedComplexity: string }
+  'planner.failed':    { runId: string; errorCode: string; stage: string; retries: number; message: string }
 }
 
 export type DomainEventType = keyof DomainEventMap

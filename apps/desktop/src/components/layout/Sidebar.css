@@ -118,11 +118,60 @@
 .sidebar__search-btn kbd {
   font-family: var(--font-sans);
   font-size: 10px;
-  padding: 1px 4px;
-  background: var(--color-bg-overlay);
-  border: 1px solid var(--color-border-default);
-  border-radius: 3px;
+  padding: 1px 5px;
+  border-radius: var(--radius-xs);
+  background: var(--color-bg-subtle);
+  border: 1px solid var(--color-border-subtle);
   color: var(--color-text-tertiary);
+}
+
+/* Plan a Task Action */
+.sidebar__action-row {
+  padding: 0 var(--space-3) var(--space-2);
+  flex-shrink: 0;
+}
+
+.sidebar__plan-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 7px var(--space-3);
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.12) 0%, rgba(139, 92, 246, 0.12) 100%);
+  border: 1px solid rgba(139, 92, 246, 0.28);
+  border-radius: var(--radius-md);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  font-family: var(--font-sans);
+  transition: all var(--transition-fast);
+  text-align: left;
+}
+
+.sidebar__plan-btn:hover {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%);
+  border-color: rgba(139, 92, 246, 0.5);
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.15);
+}
+
+.sidebar__plan-icon {
+  font-size: 14px;
+}
+
+.sidebar__plan-text {
+  flex: 1;
+}
+
+.sidebar__plan-badge {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 2px 6px;
+  border-radius: 9999px;
+  background: rgba(99, 102, 241, 0.25);
+  color: #a5b4fc;
 }
 
 /* Conversations list */

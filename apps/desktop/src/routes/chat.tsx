@@ -5,10 +5,12 @@ import { apiClient } from '../shared/api/client'
 import { useAppStore } from '../shared/store/appStore'
 import { generateId } from '@usepilot/utils'
 import type { Message } from '@usepilot/types'
+import type { ExecutionBlueprint, ValidationResult } from '@usepilot/planner-types'
 import { MessageBubble } from '../components/chat/MessageBubble'
 import { ChatInput } from '../components/chat/ChatInput'
 import { EmptyState } from '../components/chat/EmptyState'
 import { Spinner } from '../components/ui/Spinner'
+import { PlanCard, PlanningProgress } from '../components/planner'
 import './chat.css'
 
 interface StreamingMessage {
@@ -17,10 +19,16 @@ interface StreamingMessage {
   isStreaming: boolean
 }
 
+interface LoadedPlan {
+  blueprint: ExecutionBlueprint
+  validation?: ValidationResult | undefined
+}
+
 export function ChatRoute() {
   const { conversationId } = useParams<{ conversationId: string }>()
-  const { settings } = useAppStore()
+  const { settings, planningProgress, setPlanningProgress, setPlanningError } = useAppStore()
   const [messages, setMessages] = useState<Message[]>([])
+  const [blueprints, setBlueprints] = useState<LoadedPlan[]>([])
   const [streaming, setStreaming] = useState<StreamingMessage | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -40,6 +48,7 @@ export function ChatRoute() {
     setIsGenerating(false)
     userScrolledRef.current = false
 
+    // Load messages
     apiClient
       .get<Message[]>(`/conversations/${conversationId}/messages`)
       .then((msgs) => {
@@ -51,6 +60,28 @@ export function ChatRoute() {
         setError(err instanceof Error ? err.message : 'Failed to load messages')
         setIsLoading(false)
       })
+
+    // Load existing plans for this conversation
+    apiClient
+      .get<Array<{ id: string }>>(`/conversations/${conversationId}/plans`)
+      .then(async (planSummaries) => {
+        if (Array.isArray(planSummaries) && planSummaries.length > 0) {
+          const loaded = await Promise.all(
+            planSummaries.map((p) =>
+              apiClient.get<{ executionBlueprint: ExecutionBlueprint; validationResult?: ValidationResult }>(`/plans/${p.id}`)
+            )
+          )
+          setBlueprints(
+            loaded.map((item) => ({
+              blueprint: item.executionBlueprint,
+              validation: item.validationResult,
+            }))
+          )
+        } else {
+          setBlueprints([])
+        }
+      })
+      .catch(() => setBlueprints([]))
   }, [conversationId])
 
   // Auto-scroll
@@ -66,15 +97,15 @@ export function ChatRoute() {
     const distFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight
     const isNearBottom = distFromBottom < 120
     userScrolledRef.current = !isNearBottom
-    setShowScrollBtn(!isNearBottom && messages.length > 0)
-  }, [messages.length])
+    setShowScrollBtn(!isNearBottom && (messages.length > 0 || blueprints.length > 0))
+  }, [messages.length, blueprints.length])
 
-  // Auto-scroll during streaming
+  // Auto-scroll during streaming or planning
   useEffect(() => {
-    if (streaming && !userScrolledRef.current) {
+    if ((streaming || planningProgress) && !userScrolledRef.current) {
       scrollToBottom('instant')
     }
-  }, [streaming?.content, scrollToBottom])
+  }, [streaming?.content, planningProgress?.progressPct, scrollToBottom])
 
   // Subscribe to WebSocket events
   useEffect(() => {
@@ -116,10 +147,38 @@ export function ChatRoute() {
           setError(event.payload.message)
         }
       }),
+
+      // Phase 2: Planner event listeners
+      wsManager.on('plan.progress', (event) => {
+        setPlanningProgress({
+          stage: event.payload.stage as import('@usepilot/planner-types').PlanningStage,
+          message: event.payload.message,
+          progressPct: event.payload.progressPct,
+        })
+        setTimeout(() => scrollToBottom(), 50)
+      }),
+
+      wsManager.on('plan.ready', (event) => {
+        setPlanningProgress(null)
+        setBlueprints((prev) => [
+          ...prev,
+          {
+            blueprint: event.payload.blueprint as ExecutionBlueprint,
+            validation: event.payload.validation as ValidationResult | undefined,
+          },
+        ])
+        setTimeout(() => scrollToBottom(), 50)
+      }),
+
+      wsManager.on('plan.error', (event) => {
+        setPlanningProgress(null)
+        setPlanningError(event.payload.message)
+        setError(`Planning failed: ${event.payload.message}`)
+      }),
     ]
 
     return () => unsubs.forEach((u) => u())
-  }, [conversationId, scrollToBottom])
+  }, [conversationId, scrollToBottom, setPlanningProgress, setPlanningError])
 
   const handleSend = useCallback(
     (content: string) => {
@@ -179,12 +238,30 @@ export function ChatRoute() {
         className="chat-scroll-area"
         onScroll={handleScroll}
       >
-        {allMessages.length === 0 && !streaming ? (
+        {allMessages.length === 0 && !streaming && !planningProgress && blueprints.length === 0 ? (
           <EmptyState onPromptSelect={handleSend} />
         ) : (
           <div className="chat-messages">
             {allMessages.map((msg) => (
               <MessageBubble key={msg.id} message={msg} />
+            ))}
+
+            {/* In-flight planning progress */}
+            {planningProgress && (
+              <PlanningProgress
+                stage={planningProgress.stage}
+                message={planningProgress.message}
+                progressPct={planningProgress.progressPct}
+              />
+            )}
+
+            {/* Generated execution blueprints */}
+            {blueprints.map((item, idx) => (
+              <PlanCard
+                key={item.blueprint.id || idx}
+                blueprint={item.blueprint}
+                validation={item.validation}
+              />
             ))}
 
             {/* Streaming assistant message */}

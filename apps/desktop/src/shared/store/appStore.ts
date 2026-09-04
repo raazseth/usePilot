@@ -4,8 +4,15 @@ import { wsManager } from '../api/websocket'
 import { IPCQuery } from '@usepilot/types'
 import { invokeQuery } from '../api/tauri'
 import type { Settings, ConversationSummary } from '@usepilot/types'
+import type { PlanningStage, ExecutionBlueprint } from '@usepilot/planner-types'
 
 export type AppStatus = 'initializing' | 'ready' | 'error'
+
+export interface PlanningProgressState {
+  stage: PlanningStage
+  message: string
+  progressPct: number
+}
 
 interface AppState {
   status: AppStatus
@@ -16,12 +23,21 @@ interface AppState {
   activeConversationId: string | null
   wsStatus: import('../api/websocket').WebSocketStatus
 
+  // Phase 2: Planner state
+  planningProgress: PlanningProgressState | null
+  activeBlueprint: ExecutionBlueprint | null
+  planningError: string | null
+
   // Actions
   initialize: () => Promise<void>
   setActiveConversation: (id: string | null) => void
   setConversations: (conversations: ConversationSummary[]) => void
   updateSettings: (patch: Partial<Settings>) => void
   setWsStatus: (status: import('../api/websocket').WebSocketStatus) => void
+  setPlanningProgress: (progress: PlanningProgressState | null) => void
+  setActiveBlueprint: (blueprint: ExecutionBlueprint | null) => void
+  setPlanningError: (error: string | null) => void
+  resetPlanning: () => void
 }
 
 export const useAppStore = create<AppState>((set, get) => ({
@@ -32,6 +48,9 @@ export const useAppStore = create<AppState>((set, get) => ({
   conversations: [],
   activeConversationId: null,
   wsStatus: 'disconnected',
+  planningProgress: null,
+  activeBlueprint: null,
+  planningError: null,
 
   initialize: async () => {
     try {
@@ -83,4 +102,26 @@ export const useAppStore = create<AppState>((set, get) => ({
     })),
 
   setWsStatus: (wsStatus) => set({ wsStatus }),
+
+  setPlanningProgress: (planningProgress) => set({ planningProgress, planningError: null }),
+
+  setActiveBlueprint: (activeBlueprint) =>
+    set({
+      activeBlueprint,
+      planningProgress: null,
+      planningError: null,
+    }),
+
+  setPlanningError: (planningError) =>
+    set({
+      planningError,
+      planningProgress: null,
+    }),
+
+  resetPlanning: () =>
+    set({
+      planningProgress: null,
+      activeBlueprint: null,
+      planningError: null,
+    }),
 }))

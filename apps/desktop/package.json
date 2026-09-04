@@ -17,6 +17,7 @@
     "@tauri-apps/api": "^2",
     "@tauri-apps/plugin-opener": "^2",
     "@usepilot/config": "workspace:*",
+    "@usepilot/planner-types": "workspace:*",
     "@usepilot/types": "workspace:*",
     "@usepilot/utils": "workspace:*",
     "clsx": "^2.1.1",

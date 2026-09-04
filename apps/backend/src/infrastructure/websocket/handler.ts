@@ -6,6 +6,8 @@ import type { ClientEvent, MessageSendPayload, MessageStopPayload } from '@usepi
 import type { ProviderManager } from '../ai/provider-manager'
 import type { EventBus } from '../../events/bus'
 import type { Logger } from '../../logger'
+import type { PlannerService } from '../../planner/service'
+import { RequestClassifier } from '@usepilot/planner-core'
 
 type DB = ReturnType<typeof import('@usepilot/database').createDatabase>
 
@@ -32,7 +34,8 @@ export class WebSocketHandler {
     private readonly db: DB,
     private readonly providerManager: ProviderManager,
     private readonly eventBus: EventBus,
-    private readonly logger: Logger
+    private readonly logger: Logger,
+    private readonly plannerService?: PlannerService
   ) {
     this.convRepo = new ConversationRepository(this.db)
     this.msgRepo = new MessageRepository(this.db)
@@ -73,6 +76,30 @@ export class WebSocketHandler {
           case 'message.stop':
             await this.handleMessageStop(ws, event.payload as MessageStopPayload, childLogger)
             break
+
+          case 'plan.create': {
+            const payload = event.payload as { conversationId: string; text: string }
+            if (!this.plannerService) {
+              this.sendError(ws, { code: 'PLANNER_UNAVAILABLE', message: 'Planner service is not initialized' })
+              break
+            }
+            // Run async — progress events are streamed as they happen
+            void this.plannerService.createPlan(ws, payload.conversationId, payload.text)
+              .catch((err: unknown) => {
+                childLogger.error({ err }, 'PlannerService.createPlan threw unexpectedly')
+              })
+            break
+          }
+
+          case 'plan.get': {
+            const payload = event.payload as { planId: string }
+            if (!this.plannerService) {
+              this.sendError(ws, { code: 'PLANNER_UNAVAILABLE', message: 'Planner service is not initialized' })
+              break
+            }
+            await this.plannerService.getPlan(ws, payload.planId)
+            break
+          }
 
           case 'health.ping':
             this.send(ws, {
@@ -144,6 +171,46 @@ export class WebSocketHandler {
       content,
       status: 'complete',
     })
+
+    // Phase 2: Route request through RequestClassifier
+    if (this.plannerService) {
+      const classifier = new RequestClassifier(provider)
+      const classification = await classifier.classify(content, targetModel)
+
+      if (classification.type === 'planning') {
+        logger.info(
+          { signals: classification.signals, reason: classification.reason, confidence: classification.confidence },
+          'Natural language input classified as planning — dispatching to PlannerService'
+        )
+        void this.plannerService.createPlan(ws, conversationId, content)
+          .catch((err: unknown) => {
+            logger.error({ err }, 'PlannerService.createPlan threw')
+          })
+        return
+      }
+
+      if (classification.type === 'execution') {
+        const assistantMsg = await this.msgRepo.create({
+          conversationId,
+          role: 'assistant',
+          content: 'Execution Engine will be activated in Phase 3. Your blueprint is ready and validated for execution.',
+          status: 'complete',
+        })
+        this.send(ws, {
+          type: 'message.started',
+          payload: { messageId: assistantMsg.id, conversationId, model: targetModel },
+        })
+        this.send(ws, {
+          type: 'message.chunk',
+          payload: { messageId: assistantMsg.id, conversationId, token: assistantMsg.content, index: 0 },
+        })
+        this.send(ws, {
+          type: 'message.finished',
+          payload: { messageId: assistantMsg.id, conversationId, tokens: 18, durationMs: 10 },
+        })
+        return
+      }
+    }
 
     // Create assistant message (pending)
     const assistantMsg = await this.msgRepo.create({
