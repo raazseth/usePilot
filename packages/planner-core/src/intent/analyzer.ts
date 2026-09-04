@@ -1,9 +1,4 @@
-// ─────────────────────────────────────────────────────────────────────────────
 // IntentAnalyzer
-// Classifies the Goal into an intent type, risk level, and complexity.
-// Context-aware — receives PlannerContext so it can tailor its assessment
-// to the user's available tools and platform.
-// ─────────────────────────────────────────────────────────────────────────────
 
 import { z } from 'zod'
 import type { Goal, Intent, PlannerContext } from '@usepilot/planner-types'
@@ -12,7 +7,7 @@ import { PlannerError } from '../errors'
 
 const MAX_RETRIES = 3
 
-// ── Zod schema ────────────────────────────────────────────────────────────────
+// Zod schema
 
 const IntentResponseSchema = z.object({
   type: z.enum(['browser', 'desktop', 'filesystem', 'email', 'research', 'mixed', 'unknown']),
@@ -26,7 +21,7 @@ const IntentResponseSchema = z.object({
 
 type IntentResponse = z.infer<typeof IntentResponseSchema>
 
-// ── Prompt ────────────────────────────────────────────────────────────────────
+// Prompt
 
 const SYSTEM_PROMPT = `You are an intent analyzer for an AI task automation assistant.
 Given a user's goal, classify the type of automation required.
@@ -69,7 +64,7 @@ Available tools: ${toolsStr}`
   return prompt
 }
 
-// ── IntentAnalyzer class ──────────────────────────────────────────────────────
+// IntentAnalyzer class
 
 export class IntentAnalyzer {
   constructor(private readonly provider: AIProvider) {}

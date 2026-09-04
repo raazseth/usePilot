@@ -1,9 +1,4 @@
-// ─────────────────────────────────────────────────────────────────────────────
 // Request Classifier Types
-// The classifier runs before any other planner stage. It determines whether
-// a natural-language input should be routed to the conversation engine,
-// the planning engine, or a future execution engine.
-// ─────────────────────────────────────────────────────────────────────────────
 
 /**
  * All top-level request routing categories.

@@ -1,8 +1,4 @@
-// ─────────────────────────────────────────────────────────────────────────────
 // Structured Logger
-// Every log entry carries: level, message, timestamp, and contextual fields.
-// Never logs sensitive data (API keys, conversation content in prod).
-// ─────────────────────────────────────────────────────────────────────────────
 
 export type LogLevel = 'debug' | 'info' | 'warn' | 'error'
 

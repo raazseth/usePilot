@@ -1,8 +1,4 @@
-// ─────────────────────────────────────────────────────────────────────────────
 // IPC Platform Interface
-// Tauri IPC is exposed as typed Commands, Queries, and Events.
-// Never use raw string command names outside this file.
-// ─────────────────────────────────────────────────────────────────────────────
 
 /** Mutations — cause side effects */
 export const IPCCommand = {
@@ -37,9 +33,7 @@ export const IPCAppEvent = {
 
 export type IPCAppEvent = (typeof IPCAppEvent)[keyof typeof IPCAppEvent]
 
-// ─────────────────────────────────────────────────────────────────────────────
 // Typed payloads and return types for all IPC operations
-// ─────────────────────────────────────────────────────────────────────────────
 
 export interface IPCCommandPayloads {
   [IPCCommand.StoreSecret]: { key: string; value: string }

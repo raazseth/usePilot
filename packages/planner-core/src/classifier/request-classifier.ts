@@ -1,9 +1,4 @@
-// ─────────────────────────────────────────────────────────────────────────────
 // RequestClassifier
-// First stage of the pipeline. Routes natural-language input to the correct
-// subsystem: conversation, planner, or future execution engine.
-// Uses heuristic rules first; LLM fallback for ambiguous inputs.
-// ─────────────────────────────────────────────────────────────────────────────
 
 import type { ClassificationResult, RequestType } from '@usepilot/planner-types'
 import type { AIProvider, ChatRequest } from '@usepilot/ai-core'

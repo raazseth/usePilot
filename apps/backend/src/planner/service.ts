@@ -1,10 +1,4 @@
-// ─────────────────────────────────────────────────────────────────────────────
 // PlannerService
-// Backend facade that orchestrates the planning pipeline for a WebSocket
-// client. Decomposed into PlannerPersistence, PlannerEvents, and PlannerRunner.
-//
-// Isolation rule: this service never imports from chat services.
-// ─────────────────────────────────────────────────────────────────────────────
 
 import type { ServerWebSocket } from 'bun'
 import { PlannerContextBuilder } from '@usepilot/planner-core'
@@ -49,7 +43,7 @@ export class PlannerService {
     const childLogger = this.logger.child({ conversationId, action: 'createPlan' })
     childLogger.info({ text: text.slice(0, 80) }, 'Planning started')
 
-    // ── Resolve active provider + model ──────────────────────────────────────
+    // Resolve active provider + model
     const provider = this.providerManager.getActive()
     if (!provider) {
       this.events.send(ws, {
@@ -62,13 +56,13 @@ export class PlannerService {
     const settings = await this.persistence.getSettings()
     const model = settings?.defaultModel ?? 'qwen2.5-coder:3b'
 
-    // ── Persist goal & run ────────────────────────────────────────────────────
+    // Persist goal & run
     const goalRow = await this.persistence.createInitialGoal(conversationId, text)
     const runRow = await this.persistence.createRun(goalRow.id, conversationId)
 
     await this.events.emitStarted(runRow.id, goalRow.id, conversationId)
 
-    // ── Build context ─────────────────────────────────────────────────────────
+    // Build context
     const previousBlueprints = await this.persistence.getRecentBlueprints(conversationId, 5)
 
     const context = this.contextBuilder.build({
@@ -83,13 +77,13 @@ export class PlannerService {
       previousBlueprints,
     })
 
-    // ── Progress reporter callback ────────────────────────────────────────────
+    // Progress reporter callback
     const onProgress = async (stage: PlanningStage, progressPct: number, message: string) => {
       await this.persistence.updateRunStage(runRow.id, stage)
       await this.events.sendAndEmitProgress(ws, runRow.id, stage, progressPct, message)
     }
 
-    // ── Execute planning pipeline ─────────────────────────────────────────────
+    // Execute planning pipeline
     try {
       const result = await this.runner.run(provider, text, context, {
         model,

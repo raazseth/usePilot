@@ -1,8 +1,4 @@
-// ─────────────────────────────────────────────────────────────────────────────
 // PlannerContextBuilder
-// Assembles the PlannerContext from settings, platform info, and previous plans.
-// Called once at the start of each planning session.
-// ─────────────────────────────────────────────────────────────────────────────
 
 import type { PlannerContext, PlannerSettingsContext, TaskTool, BlueprintSummary } from '@usepilot/planner-types'
 

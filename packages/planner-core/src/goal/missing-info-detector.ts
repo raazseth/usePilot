@@ -1,9 +1,4 @@
-// ─────────────────────────────────────────────────────────────────────────────
 // MissingInformationDetector
-// Identifies when a goal is missing essential, non-inferrable parameters
-// (e.g. "Book a flight" without destination/dates, "Send email" without recipient).
-// Prevents the planner from hallucinating missing constraints.
-// ─────────────────────────────────────────────────────────────────────────────
 
 import type { Goal, MissingInformationItem } from '@usepilot/planner-types'
 import { generateId } from '@usepilot/utils'

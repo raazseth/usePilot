@@ -1,17 +1,13 @@
 import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core'
 
-// ─────────────────────────────────────────────────────────────────────────────
 // Schema Migrations version tracking
-// ─────────────────────────────────────────────────────────────────────────────
 
 export const schemaMigrations = sqliteTable('schema_migrations', {
   version: text('version').primaryKey(),
   appliedAt: integer('applied_at', { mode: 'number' }).notNull(),
 })
 
-// ─────────────────────────────────────────────────────────────────────────────
 // Providers
-// ─────────────────────────────────────────────────────────────────────────────
 
 export const providers = sqliteTable('providers', {
   id: text('id').primaryKey(),
@@ -24,9 +20,7 @@ export const providers = sqliteTable('providers', {
   updatedAt: integer('updated_at', { mode: 'number' }).notNull(),
 })
 
-// ─────────────────────────────────────────────────────────────────────────────
 // Conversations
-// ─────────────────────────────────────────────────────────────────────────────
 
 export const conversations = sqliteTable('conversations', {
   id: text('id').primaryKey(),
@@ -41,9 +35,7 @@ export const conversations = sqliteTable('conversations', {
   deletedAt: integer('deleted_at', { mode: 'number' }),
 })
 
-// ─────────────────────────────────────────────────────────────────────────────
 // Messages — future-proofed for Phase 3+ AI workflows
-// ─────────────────────────────────────────────────────────────────────────────
 
 export const messages = sqliteTable('messages', {
   id: text('id').primaryKey(),
@@ -84,9 +76,7 @@ export const messages = sqliteTable('messages', {
   deletedAt: integer('deleted_at', { mode: 'number' }),
 })
 
-// ─────────────────────────────────────────────────────────────────────────────
 // Settings (singleton row)
-// ─────────────────────────────────────────────────────────────────────────────
 
 export const settings = sqliteTable('settings', {
   /** Always 'default' — singleton row pattern */
@@ -109,9 +99,7 @@ export const settings = sqliteTable('settings', {
   updatedAt: integer('updated_at', { mode: 'number' }).notNull(),
 })
 
-// ─────────────────────────────────────────────────────────────────────────────
 // Application State (key-value store for misc persistent state)
-// ─────────────────────────────────────────────────────────────────────────────
 
 export const applicationState = sqliteTable('application_state', {
   key: text('key').primaryKey(),
@@ -120,9 +108,7 @@ export const applicationState = sqliteTable('application_state', {
   updatedAt: integer('updated_at', { mode: 'number' }).notNull(),
 })
 
-// ─────────────────────────────────────────────────────────────────────────────
 // Type exports for use in repositories
-// ─────────────────────────────────────────────────────────────────────────────
 
 export type ConversationRow = typeof conversations.$inferSelect
 export type NewConversationRow = typeof conversations.$inferInsert
@@ -133,9 +119,7 @@ export type ProviderRow = typeof providers.$inferSelect
 export type NewProviderRow = typeof providers.$inferInsert
 export type ApplicationStateRow = typeof applicationState.$inferSelect
 
-// ─────────────────────────────────────────────────────────────────────────────
 // Phase 2: Planner Tables
-// ─────────────────────────────────────────────────────────────────────────────
 
 export const goals = sqliteTable('goals', {
   id: text('id').primaryKey(),
@@ -260,9 +244,7 @@ export const planVersions = sqliteTable('plan_versions', {
   createdAt: integer('created_at', { mode: 'number' }).notNull(),
 })
 
-// ─────────────────────────────────────────────────────────────────────────────
 // Planner Type Exports
-// ─────────────────────────────────────────────────────────────────────────────
 
 export type GoalRow = typeof goals.$inferSelect
 export type NewGoalRow = typeof goals.$inferInsert

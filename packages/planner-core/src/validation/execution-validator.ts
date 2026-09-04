@@ -1,11 +1,4 @@
-// ─────────────────────────────────────────────────────────────────────────────
 // ExecutionValidator — Layer 3
-// Checks execution feasibility. Only runs if Semantic passes.
-// - Circular dependency detection (DFS)
-// - Forbidden task detection (causes plan rejection)
-// - Missing tool availability check
-// - Unreachable node detection
-// ─────────────────────────────────────────────────────────────────────────────
 
 import type {
   ExecutionBlueprint,

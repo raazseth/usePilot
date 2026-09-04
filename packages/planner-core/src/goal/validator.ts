@@ -1,8 +1,4 @@
-// ─────────────────────────────────────────────────────────────────────────────
 // GoalValidator
-// Post-extraction completeness check. Zod validates the LLM output shape;
-// this validates the domain semantics.
-// ─────────────────────────────────────────────────────────────────────────────
 
 import type { Goal } from '@usepilot/planner-types'
 import { PlannerError, PlannerErrorCode } from '../errors'

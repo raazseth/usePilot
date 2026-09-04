@@ -1,7 +1,4 @@
-// ─────────────────────────────────────────────────────────────────────────────
 // PlannerEvents
-// Responsible for WebSocket message formatting and EventBus emissions.
-// ─────────────────────────────────────────────────────────────────────────────
 
 import type { ServerWebSocket } from 'bun'
 import type { PlanningStage, ExecutionBlueprint, ValidationResult } from '@usepilot/planner-types'

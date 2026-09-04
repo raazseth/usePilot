@@ -1,8 +1,4 @@
-// ─────────────────────────────────────────────────────────────────────────────
 // Planner Runtime Types
-// Planning stages, status, and the context object that flows into every
-// LLM-powered stage of the pipeline.
-// ─────────────────────────────────────────────────────────────────────────────
 
 import type { TaskTool, TaskCapability } from './task'
 import type { BlueprintSummary } from './blueprint'

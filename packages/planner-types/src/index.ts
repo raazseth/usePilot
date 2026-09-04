@@ -1,7 +1,4 @@
-// ─────────────────────────────────────────────────────────────────────────────
 // @usepilot/planner-types — Public API
-// Zero runtime dependencies — pure TypeScript types.
-// ─────────────────────────────────────────────────────────────────────────────
 
 // Request routing
 export type { RequestType, ClassificationResult } from './classifier'

@@ -1,7 +1,4 @@
-// ─────────────────────────────────────────────────────────────────────────────
 // Result<T, E> — explicit error handling without exceptions
-// Forces callers to handle both success and failure paths.
-// ─────────────────────────────────────────────────────────────────────────────
 
 export interface Ok<T> {
   readonly ok: true

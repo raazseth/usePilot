@@ -1,13 +1,8 @@
-// ─────────────────────────────────────────────────────────────────────────────
 // Normalizer
-// Processes raw user text before any LLM call.
-// Pure function — no AI, no external calls.
-// Normalizes whitespace, detects language, tags entities (dates, URLs, etc.)
-// ─────────────────────────────────────────────────────────────────────────────
 
 import type { NormalizedInput, NormalizedEntity } from '@usepilot/planner-types'
 
-// ── Entity detection patterns ────────────────────────────────────────────────
+// Entity detection patterns
 
 const URL_PATTERN = /https?:\/\/[^\s]+/g
 const EMAIL_PATTERN = /[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/g
@@ -58,7 +53,7 @@ function detectLanguage(text: string): string {
   return 'en'
 }
 
-// ── Normalizer ───────────────────────────────────────────────────────────────
+// Normalizer
 
 export class Normalizer {
   normalize(rawText: string): NormalizedInput {

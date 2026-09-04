@@ -1,10 +1,4 @@
-// ─────────────────────────────────────────────────────────────────────────────
 // Planner HTTP Routes
-// GET /plans              — list recent plans
-// GET /plans/:id          — get plan by ID
-// GET /runs/:id           — get planner run by ID
-// GET /conversations/:id/plans — list plans for a conversation
-// ─────────────────────────────────────────────────────────────────────────────
 
 import type { PlanRepository, PlannerRunRepository } from '@usepilot/database'
 

@@ -24,4 +24,3 @@ export type JsonValue =
   | null
   | JsonValue[]
   | { [key: string]: JsonValue }
-

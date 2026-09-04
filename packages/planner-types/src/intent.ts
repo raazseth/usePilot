@@ -1,8 +1,4 @@
-// ─────────────────────────────────────────────────────────────────────────────
 // Intent Types
-// Intent represents what category of action the goal requires, the risk
-// profile, and what is missing before planning can proceed.
-// ─────────────────────────────────────────────────────────────────────────────
 
 /**
  * The broad category of actions required to accomplish the goal.

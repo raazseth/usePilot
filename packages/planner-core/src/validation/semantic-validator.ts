@@ -1,10 +1,4 @@
-// ─────────────────────────────────────────────────────────────────────────────
 // SemanticValidator — Layer 2
-// Checks logical coherence of the plan. Only runs if SchemaValidator passes.
-// - Goal coverage: do tasks collectively achieve the objective?
-// - Duplicate task ID detection
-// - Orphan task detection (tasks referenced in edges but not in task list)
-// ─────────────────────────────────────────────────────────────────────────────
 
 import type { ExecutionBlueprint, LayerValidationResult, ValidationIssue } from '@usepilot/planner-types'
 

@@ -1,8 +1,4 @@
-// ─────────────────────────────────────────────────────────────────────────────
 // Goal Types
-// A Goal represents the structured, validated form of the user's stated
-// objective — after normalization and LLM extraction.
-// ─────────────────────────────────────────────────────────────────────────────
 
 /** Status lifecycle of a goal */
 export type GoalStatus = 'pending' | 'extracting' | 'validated' | 'failed'

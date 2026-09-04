@@ -1,8 +1,4 @@
-// ─────────────────────────────────────────────────────────────────────────────
 // PlanSerializer
-// Converts an ExecutionBlueprint to/from JSON.
-// Computes a stable SHA-256 content hash for deduplication and versioning.
-// ─────────────────────────────────────────────────────────────────────────────
 
 import type { ExecutionBlueprint } from '@usepilot/planner-types'
 import { generateId } from '@usepilot/utils'

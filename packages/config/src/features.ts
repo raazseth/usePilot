@@ -1,10 +1,6 @@
 import { z } from 'zod'
 
-// ─────────────────────────────────────────────────────────────────────────────
 // Feature Flags
-// Structured into categories. Add new flags here before implementation.
-// The UI reads these to decide what to render.
-// ─────────────────────────────────────────────────────────────────────────────
 
 export const FeatureFlagsSchema = z.object({
   /** Experimental features — enabled in dev, disabled in prod by default */

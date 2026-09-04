@@ -1,8 +1,4 @@
-// ─────────────────────────────────────────────────────────────────────────────
 // PlannerError
-// Typed errors for every stage of the planning pipeline.
-// Never throws generic Error — always carries a code and stage.
-// ─────────────────────────────────────────────────────────────────────────────
 
 import type { PlanningStage } from '@usepilot/planner-types'
 

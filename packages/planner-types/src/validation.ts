@@ -1,10 +1,4 @@
-// ─────────────────────────────────────────────────────────────────────────────
 // Validation Types
-// Three distinct validation layers — each with a different responsibility.
-// Schema: structural correctness
-// Semantic: logical coherence
-// Execution: feasibility for the execution engine
-// ─────────────────────────────────────────────────────────────────────────────
 
 /**
  * Which validation layer produced an issue.

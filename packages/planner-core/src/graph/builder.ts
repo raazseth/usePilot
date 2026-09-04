@@ -1,9 +1,4 @@
-// ─────────────────────────────────────────────────────────────────────────────
 // GraphBuilder
-// Pure algorithm — no LLM. Converts a Task[] into an explicit DAG.
-// Detects topological order, computes parallel groups, critical path.
-// Throws if the graph contains cycles.
-// ─────────────────────────────────────────────────────────────────────────────
 
 import type { Task, TaskGraph, DAGNode, DAGEdge } from '@usepilot/planner-types'
 import { PlannerError, PlannerErrorCode } from '../errors'

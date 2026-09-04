@@ -1,9 +1,4 @@
-// ─────────────────────────────────────────────────────────────────────────────
 // ApprovalEngine
-// Scans the task list and assigns ApprovalPolicy based on operation category
-// and content signals. Runs after TaskGenerator, before GraphBuilder.
-// The planner decides policies — Phase 3 reads them, never infers them.
-// ─────────────────────────────────────────────────────────────────────────────
 
 import type { Task, ApprovalPolicy } from '@usepilot/planner-types'
 

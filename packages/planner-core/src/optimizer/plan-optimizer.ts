@@ -1,8 +1,4 @@
-// ─────────────────────────────────────────────────────────────────────────────
 // PlanOptimizer
-// Runs after three-layer validation. Pure algorithm — no LLM.
-// Merges, deduplicates, parallelizes, and simplifies the task graph.
-// ─────────────────────────────────────────────────────────────────────────────
 
 import type { Task, TaskGraph, OptimizationResult } from '@usepilot/planner-types'
 import { GraphBuilder } from '../graph/builder'

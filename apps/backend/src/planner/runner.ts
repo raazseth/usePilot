@@ -1,7 +1,4 @@
-// ─────────────────────────────────────────────────────────────────────────────
 // PlannerRunner
-// Coordinates invocation of the pure core planner with provider & context.
-// ─────────────────────────────────────────────────────────────────────────────
 
 import { Planner } from '@usepilot/planner-core'
 import type {

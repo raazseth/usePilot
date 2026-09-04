@@ -1,14 +1,4 @@
-// ─────────────────────────────────────────────────────────────────────────────
 // Planner — Main Orchestrator
-// Coordinates the full Phase 2 planning pipeline:
-//   Normalizer → GoalExtractor → GoalValidator → IntentAnalyzer
-//   → TaskGenerator → ApprovalEngine → GraphBuilder
-//   → SchemaValidator → SemanticValidator → ExecutionValidator
-//   → PlanOptimizer → PlanSerializer
-//
-// All AI calls are confined to: GoalExtractor, IntentAnalyzer, TaskGenerator.
-// Everything else is deterministic.
-// ─────────────────────────────────────────────────────────────────────────────
 
 import type {
   ExecutionBlueprint,
@@ -96,42 +86,42 @@ export class Planner {
       if (onProgress) await onProgress(stage, pct, msg)
     }
 
-    // ── Stage 1: Normalize ────────────────────────────────────────────────────
+    // Stage 1: Normalize
     await progress('normalizing', 5, 'Normalizing input...')
     const normalizedInput = this.normalizer.normalize(rawText)
 
-    // ── Stage 2: Extract Goal ─────────────────────────────────────────────────
+    // Stage 2: Extract Goal
     await progress('extracting', 15, 'Extracting goal from input...')
     const goal = await this.goalExtractor.extract(normalizedInput, model)
 
-    // ── Stage 3: Validate Goal ────────────────────────────────────────────────
+    // Stage 3: Validate Goal
     await progress('validating_goal', 22, 'Validating goal completeness...')
     this.goalValidator.validateOrThrow(goal)
 
-    // ── Stage 3.5: Detect Missing Information ─────────────────────────────────
+    // Stage 3.5: Detect Missing Information
     await progress('detecting_missing_info', 27, 'Detecting missing information...')
     const missingInfoResult = this.missingInfoDetector.detect(goal)
     if (missingInfoResult.items.length > 0) {
       goal.missingInformation = missingInfoResult.items
     }
 
-    // ── Stage 4: Analyze Intent ───────────────────────────────────────────────
+    // Stage 4: Analyze Intent
     await progress('analyzing', 35, 'Analyzing intent and risk...')
     const intent = await this.intentAnalyzer.analyze(goal, context, model)
 
-    // ── Stage 5: Generate Tasks ───────────────────────────────────────────────
+    // Stage 5: Generate Tasks
     await progress('generating', 48, 'Generating atomic task list...')
     let tasks = await this.taskGenerator.generate(goal, intent, context, model)
 
-    // ── Stage 6: Assign Approval Policies ────────────────────────────────────
+    // Stage 6: Assign Approval Policies
     await progress('generating', 58, 'Assigning approval policies...')
     tasks = this.approvalEngine.assignPolicies(tasks)
 
-    // ── Stage 7: Build Graph ──────────────────────────────────────────────────
+    // Stage 7: Build Graph
     await progress('building', 65, 'Building execution graph...')
     const graph = this.graphBuilder.build(tasks)
 
-    // ── Stage 8: Build partial blueprint for validation ───────────────────────
+    // Stage 8: Build partial blueprint for validation
     const partialBlueprint: Omit<ExecutionBlueprint, 'hash' | 'version'> = {
       id: generateId(),
       status: missingInfoResult.hasCriticalMissingInfo ? 'needs_info' : 'ready',
@@ -147,7 +137,7 @@ export class Planner {
       createdAt: Date.now(),
     }
 
-    // ── Stage 9: Three-layer validation ──────────────────────────────────────
+    // Stage 9: Three-layer validation
     await progress('validating', 72, 'Running schema validation...')
     const schemaResult = this.schemaValidator.validate(partialBlueprint as ExecutionBlueprint)
 
@@ -187,11 +177,11 @@ export class Planner {
       )
     }
 
-    // ── Stage 10: Optimize ────────────────────────────────────────────────────
+    // Stage 10: Optimize
     await progress('optimizing', 88, 'Optimizing task graph...')
     const optimized = this.optimizer.optimize(tasks, graph)
 
-    // ── Stage 10.5: Explain Plan ──────────────────────────────────────────────
+    // Stage 10.5: Explain Plan
     await progress('explaining', 93, 'Synthesizing plan explanation...')
     const explanation = this.planExplainer.explain(
       goal,
@@ -214,7 +204,7 @@ export class Planner {
       validation.warnings.length
     )
 
-    // ── Stage 11: Serialize ───────────────────────────────────────────────────
+    // Stage 11: Serialize
     await progress('serializing', 96, 'Finalizing blueprint...')
     const finalBlueprint: ExecutionBlueprint = {
       ...partialBlueprint,

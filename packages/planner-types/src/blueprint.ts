@@ -1,9 +1,4 @@
-// ─────────────────────────────────────────────────────────────────────────────
 // ExecutionBlueprint Types
-// The final output of the Phase 2 planning pipeline.
-// Called "Blueprint" — not "Plan" — because execution doesn't exist yet.
-// Phase 3 will consume this object directly.
-// ─────────────────────────────────────────────────────────────────────────────
 
 import type { Goal } from './goal'
 import type { Intent, Complexity } from './intent'

@@ -1,9 +1,4 @@
-// ─────────────────────────────────────────────────────────────────────────────
 // Task Types
-// A Task is a single, atomic, executable unit of work within a plan.
-// Atomicity rule: one task = one operation = one tool.
-// Phase 3 must be able to execute a task without any further LLM reasoning.
-// ─────────────────────────────────────────────────────────────────────────────
 
 import type { Complexity } from './intent'
 

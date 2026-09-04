@@ -1,9 +1,4 @@
-// ─────────────────────────────────────────────────────────────────────────────
 // GoalExtractor
-// Sends normalized text to the LLM with a structured JSON prompt.
-// Validates the response with Zod. Retries up to MAX_RETRIES times,
-// injecting validation errors into the re-prompt.
-// ─────────────────────────────────────────────────────────────────────────────
 
 import { z } from 'zod'
 import type { Goal, NormalizedInput, GoalConstraint } from '@usepilot/planner-types'
@@ -13,7 +8,7 @@ import { PlannerError, PlannerErrorCode } from '../errors'
 
 const MAX_RETRIES = 3
 
-// ── Zod schema for the LLM response ─────────────────────────────────────────
+// Zod schema for the LLM response
 
 const GoalConstraintSchema = z.object({
   type: z.enum(['budget', 'temporal', 'location', 'format', 'security', 'preference', 'custom']).default('custom'),
@@ -34,7 +29,7 @@ const GoalResponseSchema = z.object({
 
 type GoalResponse = z.infer<typeof GoalResponseSchema>
 
-// ── Prompt templates ─────────────────────────────────────────────────────────
+// Prompt templates
 
 const SYSTEM_PROMPT = `You are a goal extraction system for an AI task automation assistant.
 Your job is to extract the user's objective as structured JSON.
@@ -57,7 +52,7 @@ function buildUserPrompt(normalizedText: string, previousErrors: string[]): stri
   return prompt
 }
 
-// ── GoalExtractor class ───────────────────────────────────────────────────────
+// GoalExtractor class
 
 export class GoalExtractor {
   constructor(private readonly provider: AIProvider) {}

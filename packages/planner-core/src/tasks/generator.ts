@@ -1,10 +1,4 @@
-// ─────────────────────────────────────────────────────────────────────────────
 // TaskGenerator
-// Converts a Goal + Intent into an ordered list of atomic Tasks.
-// Each task is one operation, one tool.
-// Assigns: requiredTool, preconditions, postconditions, approvalPolicy,
-//          complexity, successConditions, failureConditions, retryPolicy.
-// ─────────────────────────────────────────────────────────────────────────────
 
 import { z } from 'zod'
 import type { Goal, Intent, Task, TaskCapability, TaskTool, TaskCategory, PlannerContext } from '@usepilot/planner-types'
@@ -14,7 +8,7 @@ import { PlannerError } from '../errors'
 
 const MAX_RETRIES = 3
 
-// ── Zod schema for a single task in the LLM response ──────────────────────────
+// Zod schema for a single task in the LLM response
 
 const TaskCapabilityEnum = z.enum([
   'navigate_website',
@@ -64,7 +58,7 @@ const TaskListResponseSchema = z.object({
 
 type TaskListResponse = z.infer<typeof TaskListResponseSchema>
 
-// ── Prompt ────────────────────────────────────────────────────────────────────
+// Prompt
 
 const SYSTEM_PROMPT = `You are a task generation system for an AI automation assistant.
 Break down a user's goal into a list of atomic tasks.
@@ -207,7 +201,7 @@ function capabilityToTool(cap: TaskCapability): TaskTool {
   }
 }
 
-// ── TaskGenerator class ───────────────────────────────────────────────────────
+// TaskGenerator class
 
 export class TaskGenerator {
   constructor(private readonly provider: AIProvider) {}

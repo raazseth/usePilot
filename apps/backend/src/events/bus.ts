@@ -1,11 +1,4 @@
-// ─────────────────────────────────────────────────────────────────────────────
 // Internal Event Bus
-// Typed publish/subscribe — enables decoupled communication between
-// Domain, Application, and Infrastructure layers.
-//
-// Future phases (planner, execution engine) subscribe here without modifying
-// existing code — open/closed principle.
-// ─────────────────────────────────────────────────────────────────────────────
 
 export type DomainEventMap = {
   // Conversation events
@@ -34,7 +27,7 @@ export type DomainEventMap = {
   // Settings events
   'settings.updated': { key: string; value: unknown }
 
-  // ── Phase 2: Planner events ───────────────────────────────────────────────
+  // Phase 2: Planner events
   // Four events only — stage is in the payload, not in the event type name.
   'planner.started':   { runId: string; goalId: string; conversationId: string }
   'planner.progress':  { runId: string; stage: string; progressPct: number; message: string }

@@ -1,10 +1,4 @@
-// ─────────────────────────────────────────────────────────────────────────────
 // PlanExplainer
-// Synthesizes transparent, human-readable explanations of why the planner
-// chose this specific strategy, what assumptions were made, tradeoffs considered,
-// and safety/approval governance applied.
-// No chain-of-thought — just structured rationale.
-// ─────────────────────────────────────────────────────────────────────────────
 
 import type {
   Goal,

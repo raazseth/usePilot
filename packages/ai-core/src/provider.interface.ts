@@ -1,10 +1,6 @@
 import type { AIModel, HealthCheckResult, ProviderType } from '@usepilot/types'
 
-// ─────────────────────────────────────────────────────────────────────────────
 // AI Provider Interface
-// Every provider implementation must satisfy this contract exactly.
-// Switching providers = changing configuration, never changing business logic.
-// ─────────────────────────────────────────────────────────────────────────────
 
 /** A single message in a chat conversation */
 export interface ChatMessage {

@@ -1,7 +1,4 @@
-// ─────────────────────────────────────────────────────────────────────────────
 // PlannerPersistence
-// Handles all database queries, run tracking, and blueprint persistence.
-// ─────────────────────────────────────────────────────────────────────────────
 
 import {
   GoalRepository,

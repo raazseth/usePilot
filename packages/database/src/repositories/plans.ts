@@ -1,6 +1,4 @@
-// ─────────────────────────────────────────────────────────────────────────────
 // PlanRepository
-// ─────────────────────────────────────────────────────────────────────────────
 
 import { eq, desc } from 'drizzle-orm'
 import type { BunSQLiteDatabase } from 'drizzle-orm/bun-sqlite'

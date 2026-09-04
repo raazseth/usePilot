@@ -1,8 +1,4 @@
-// ─────────────────────────────────────────────────────────────────────────────
 // SchemaValidator — Layer 1
-// Checks structural correctness using Zod.
-// If this fails, SemanticValidator never runs.
-// ─────────────────────────────────────────────────────────────────────────────
 
 import { z } from 'zod'
 import type { ExecutionBlueprint, LayerValidationResult, ValidationIssue } from '@usepilot/planner-types'

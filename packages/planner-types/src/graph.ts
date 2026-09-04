@@ -1,8 +1,4 @@
-// ─────────────────────────────────────────────────────────────────────────────
 // Task Graph Types
-// The graph is represented explicitly as nodes + edges, not hidden inside
-// task dependency arrays. Future visualization requires zero model changes.
-// ─────────────────────────────────────────────────────────────────────────────
 
 import type { Complexity } from './intent'
 

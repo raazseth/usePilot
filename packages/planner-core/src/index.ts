@@ -1,6 +1,4 @@
-// ─────────────────────────────────────────────────────────────────────────────
 // @usepilot/planner-core — Public API
-// ─────────────────────────────────────────────────────────────────────────────
 
 export { Planner, PlannerError } from './planner'
 export type { ProgressCallback, PlannerOptions, PlanResult } from './planner'
