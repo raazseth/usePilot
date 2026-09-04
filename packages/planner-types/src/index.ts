@@ -7,7 +7,7 @@
 export type { RequestType, ClassificationResult } from './classifier'
 
 // Goal extraction
-export type { GoalStatus, NormalizedInput, NormalizedEntity, Goal } from './goal'
+export type { GoalStatus, NormalizedInput, NormalizedEntity, GoalConstraint, MissingInformationItem, Goal } from './goal'
 
 // Intent analysis
 export type { IntentType, Complexity, RiskLevel, Intent } from './intent'
@@ -15,6 +15,7 @@ export type { IntentType, Complexity, RiskLevel, Intent } from './intent'
 // Task model
 export type {
   TaskTool,
+  TaskCapability,
   TaskCategory,
   ApprovalPolicy,
   RetryPolicy,
@@ -31,6 +32,7 @@ export type {
   SuccessCriteria,
   PlannerContextSnapshot,
   OptimizationResult,
+  PlanExplanation,
   ExecutionBlueprint,
   BlueprintSummary,
   PlanStatus,

@@ -6,7 +6,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { z } from 'zod'
-import type { Goal, NormalizedInput } from '@usepilot/planner-types'
+import type { Goal, NormalizedInput, GoalConstraint } from '@usepilot/planner-types'
 import { generateId } from '@usepilot/utils'
 import type { AIProvider, ChatRequest } from '@usepilot/ai-core'
 import { PlannerError, PlannerErrorCode } from '../errors'
@@ -15,9 +15,17 @@ const MAX_RETRIES = 3
 
 // ── Zod schema for the LLM response ─────────────────────────────────────────
 
+const GoalConstraintSchema = z.object({
+  type: z.enum(['budget', 'temporal', 'location', 'format', 'security', 'preference', 'custom']).default('custom'),
+  key: z.string(),
+  value: z.union([z.string(), z.number()]),
+  unit: z.string().optional(),
+  isHardConstraint: z.boolean().default(true),
+})
+
 const GoalResponseSchema = z.object({
   primaryObjective: z.string().min(10, 'Primary objective must be at least 10 characters'),
-  constraints: z.array(z.string()).default([]),
+  constraints: z.array(z.union([z.string(), GoalConstraintSchema])).default([]),
   requiredResources: z.array(z.string()).default([]),
   expectedOutcome: z.string().min(5, 'Expected outcome must be at least 5 characters'),
   context: z.string().optional(),
@@ -122,10 +130,31 @@ export class GoalExtractor {
     normalizedInput: NormalizedInput,
     _durationMs: number
   ): Goal {
+    const constraints: GoalConstraint[] = data.constraints.map((c) => {
+      if (typeof c === 'object' && c !== null) {
+        return {
+          id: generateId(),
+          type: c.type ?? 'custom',
+          key: c.key || 'constraint',
+          value: c.value,
+          unit: c.unit,
+          isHardConstraint: c.isHardConstraint ?? true,
+        }
+      }
+      return {
+        id: generateId(),
+        type: 'custom',
+        key: 'constraint',
+        value: String(c),
+        isHardConstraint: true,
+      }
+    })
+
     return {
       id: generateId(),
       primaryObjective: data.primaryObjective,
-      constraints: data.constraints,
+      constraints,
+      rawConstraints: data.constraints.map((c) => (typeof c === 'string' ? c : `${c.key}: ${c.value}`)),
       requiredResources: data.requiredResources,
       expectedOutcome: data.expectedOutcome,
       context: data.context,

@@ -7,14 +7,19 @@ describe('GoalValidator', () => {
 
   const validGoal: Goal = {
     id: 'goal-1',
-    conversationId: 'conv-1',
-    rawText: 'Download all invoices from Amazon',
-    normalizedText: 'Download all invoices from Amazon',
     primaryObjective: 'Download all 2024 invoices from Amazon account',
-    constraints: ['Filter by year 2024'],
+    constraints: [{ id: 'c-1', key: 'temporal', value: 'Filter by year 2024', type: 'temporal', isHardConstraint: true }],
+    rawConstraints: ['Filter by year 2024'],
     requiredResources: ['Amazon login credentials'],
     expectedOutcome: 'PDF invoices saved in Downloads directory',
     confidence: 0.95,
+    normalizedInput: {
+      text: 'Download all invoices from Amazon',
+      originalText: 'Download all invoices from Amazon',
+      detectedLanguage: 'en',
+      entities: [],
+      durationMs: 1,
+    },
     status: 'validated',
     createdAt: Date.now(),
   }

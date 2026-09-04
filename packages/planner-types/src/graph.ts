@@ -4,6 +4,8 @@
 // task dependency arrays. Future visualization requires zero model changes.
 // ─────────────────────────────────────────────────────────────────────────────
 
+import type { Complexity } from './intent'
+
 /**
  * A node in the execution DAG, enriched with graph-level metadata.
  */
@@ -20,6 +22,14 @@ export interface DAGNode {
   inDegree: number
   /** Number of direct successors */
   outDegree: number
+  /** Whether this task is optional for goal success */
+  isOptional?: boolean | undefined
+  /** Estimated subjective complexity of this task node */
+  estimatedComplexity?: Complexity | undefined
+  /** Expected output artifact or state */
+  expectedOutput?: string | undefined
+  /** Identifier of the parallel group this node belongs to, if any */
+  parallelGroupId?: string | undefined
 }
 
 /**

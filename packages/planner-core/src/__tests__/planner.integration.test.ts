@@ -16,6 +16,10 @@ class MockAIProvider implements AIProvider {
     return true
   }
 
+  async healthCheck() {
+    return { status: 'online' as const, latencyMs: 0 }
+  }
+
   async *streamChat(): AsyncGenerator<StreamChunk> {
     yield { token: '', done: true }
   }

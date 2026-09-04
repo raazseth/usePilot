@@ -8,6 +8,7 @@ function makeTask(id: string, dependsOn: string[] = []): Task {
     title: `Task ${id}`,
     description: `Task description for ${id}`,
     category: 'computation',
+    requiredCapability: 'none',
     requiredTool: 'none',
     preconditions: [],
     postconditions: [],

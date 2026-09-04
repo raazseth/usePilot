@@ -34,6 +34,31 @@ export interface NormalizedEntity {
 }
 
 /**
+ * Structured constraint on goal execution.
+ * Elevates constraints from plain strings to first-class parameters.
+ */
+export interface GoalConstraint {
+  id: string
+  type: 'budget' | 'temporal' | 'location' | 'format' | 'security' | 'preference' | 'custom'
+  key: string
+  value: string | number
+  unit?: string | undefined
+  isHardConstraint: boolean // true = non-negotiable; false = soft preference
+}
+
+/**
+ * An item of missing information identified by the MissingInformationDetector.
+ */
+export interface MissingInformationItem {
+  id: string
+  field: string
+  question: string
+  reason: string
+  importance: 'critical' | 'helpful' | 'optional'
+  suggestedValues?: string[] | undefined
+}
+
+/**
  * The primary domain object produced after goal extraction and validation.
  * This is the contract between the GoalExtractor/GoalValidator and the rest
  * of the planning pipeline.
@@ -43,14 +68,18 @@ export interface Goal {
   id: string
   /** Plain-English statement of what needs to be accomplished */
   primaryObjective: string
-  /** Constraints the planner must respect (e.g. "only free tools") */
-  constraints: string[]
+  /** Structured constraints the planner must respect */
+  constraints: GoalConstraint[]
+  /** Optional string representation of constraints for backwards compatibility */
+  rawConstraints?: string[] | undefined
   /** Resources the user mentioned or that the objective implies */
   requiredResources: string[]
   /** What a successful outcome looks like */
   expectedOutcome: string
   /** Background context (e.g. "this is for a client's quarterly report") */
   context?: string | undefined
+  /** Missing information items detected before planning */
+  missingInformation?: MissingInformationItem[] | undefined
   /** 0–1 confidence that the objective was correctly extracted */
   confidence: number
   /** Source the normalized text came from */

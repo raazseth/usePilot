@@ -40,8 +40,8 @@ export type ProgressCallback = (stage: PlanningStage, progressPct: number, messa
 
 export interface PlannerOptions {
   model: string
-  version?: number
-  onProgress?: ProgressCallback
+  version?: number | undefined
+  onProgress?: ProgressCallback | undefined
 }
 
 export interface PlanResult {
@@ -51,10 +51,26 @@ export interface PlanResult {
   tokenCount: number
 }
 
+import { MissingInformationDetector } from './goal/missing-info-detector'
+import { PlanExplainer } from './explainer/plan-explainer'
+
+function computePlannerConfidence(
+  goalConfidence: number,
+  intentConfidence: number,
+  missingInfoPenalty: number,
+  warningCount: number
+): number {
+  const base = goalConfidence * 0.5 + intentConfidence * 0.5
+  const validationPenalty = Math.min(warningCount * 0.05, 0.15)
+  const score = base - missingInfoPenalty - validationPenalty
+  return Math.max(0.1, Math.min(1.0, Math.round(score * 100) / 100))
+}
+
 export class Planner {
   private readonly normalizer = new Normalizer()
   private readonly goalExtractor: GoalExtractor
   private readonly goalValidator = new GoalValidator()
+  private readonly missingInfoDetector = new MissingInformationDetector()
   private readonly intentAnalyzer: IntentAnalyzer
   private readonly taskGenerator: TaskGenerator
   private readonly approvalEngine = new ApprovalEngine()
@@ -63,6 +79,7 @@ export class Planner {
   private readonly semanticValidator = new SemanticValidator()
   private readonly executionValidator: ExecutionValidator
   private readonly optimizer = new PlanOptimizer()
+  private readonly planExplainer = new PlanExplainer()
   private readonly serializer = new PlanSerializer()
 
   constructor(private readonly provider: AIProvider) {
@@ -91,8 +108,15 @@ export class Planner {
     await progress('validating_goal', 22, 'Validating goal completeness...')
     this.goalValidator.validateOrThrow(goal)
 
+    // ── Stage 3.5: Detect Missing Information ─────────────────────────────────
+    await progress('detecting_missing_info', 27, 'Detecting missing information...')
+    const missingInfoResult = this.missingInfoDetector.detect(goal)
+    if (missingInfoResult.items.length > 0) {
+      goal.missingInformation = missingInfoResult.items
+    }
+
     // ── Stage 4: Analyze Intent ───────────────────────────────────────────────
-    await progress('analyzing', 32, 'Analyzing intent and risk...')
+    await progress('analyzing', 35, 'Analyzing intent and risk...')
     const intent = await this.intentAnalyzer.analyze(goal, context, model)
 
     // ── Stage 5: Generate Tasks ───────────────────────────────────────────────
@@ -110,6 +134,7 @@ export class Planner {
     // ── Stage 8: Build partial blueprint for validation ───────────────────────
     const partialBlueprint: Omit<ExecutionBlueprint, 'hash' | 'version'> = {
       id: generateId(),
+      status: missingInfoResult.hasCriticalMissingInfo ? 'needs_info' : 'ready',
       goal,
       intent,
       tasks,
@@ -163,18 +188,44 @@ export class Planner {
     }
 
     // ── Stage 10: Optimize ────────────────────────────────────────────────────
-    await progress('optimizing', 90, 'Optimizing task graph...')
+    await progress('optimizing', 88, 'Optimizing task graph...')
     const optimized = this.optimizer.optimize(tasks, graph)
+
+    // ── Stage 10.5: Explain Plan ──────────────────────────────────────────────
+    await progress('explaining', 93, 'Synthesizing plan explanation...')
+    const explanation = this.planExplainer.explain(
+      goal,
+      intent,
+      optimized.tasks,
+      optimized.graph,
+      this.buildApprovalSummary(optimized.tasks),
+      context
+    )
+
+    const missingPenalty = missingInfoResult.hasCriticalMissingInfo
+      ? 0.35
+      : missingInfoResult.items.length > 0
+        ? 0.1
+        : 0
+    const plannerConfidence = computePlannerConfidence(
+      goal.confidence ?? 0.85,
+      intent.confidence ?? 0.85,
+      missingPenalty,
+      validation.warnings.length
+    )
 
     // ── Stage 11: Serialize ───────────────────────────────────────────────────
     await progress('serializing', 96, 'Finalizing blueprint...')
     const finalBlueprint: ExecutionBlueprint = {
       ...partialBlueprint,
+      status: missingInfoResult.hasCriticalMissingInfo ? 'needs_info' : 'ready',
       tasks: optimized.tasks,
       graph: optimized.graph,
       approvals: this.buildApprovalSummary(optimized.tasks),
       successCriteria: this.buildSuccessCriteria(optimized.tasks),
       optimization: optimized.optimization,
+      explanation,
+      plannerConfidence,
       hash: '',
       version,
     }

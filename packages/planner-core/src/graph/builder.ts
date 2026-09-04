@@ -73,13 +73,20 @@ export class GraphBuilder {
     const nodes: DAGNode[] = order.map((taskId) => {
       const layer = taskToLayer.get(taskId) ?? 0
       const layerTasks = layers[layer] ?? []
+      const task = taskMap.get(taskId)
+      const canParallelize = layerTasks.length > 1
+
       return {
         taskId,
         layer,
         isCritical: criticalSet.has(taskId),
-        canParallelize: layerTasks.length > 1,
+        canParallelize,
         inDegree: inDegree.get(taskId) ?? 0,
         outDegree: outDegree.get(taskId) ?? 0,
+        isOptional: task?.isOptional ?? false,
+        estimatedComplexity: task?.complexity,
+        expectedOutput: task?.expectedOutput,
+        parallelGroupId: canParallelize ? `layer_${layer}` : undefined,
       }
     })
 

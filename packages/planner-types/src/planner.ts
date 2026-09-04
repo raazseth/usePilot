@@ -4,7 +4,7 @@
 // LLM-powered stage of the pipeline.
 // ─────────────────────────────────────────────────────────────────────────────
 
-import type { TaskTool } from './task'
+import type { TaskTool, TaskCapability } from './task'
 import type { BlueprintSummary } from './blueprint'
 
 /**
@@ -12,18 +12,20 @@ import type { BlueprintSummary } from './blueprint'
  * Used in progress events streamed to the frontend.
  */
 export type PlanningStage =
-  | 'classifying'   // RequestClassifier
-  | 'normalizing'   // Normalizer
-  | 'extracting'    // GoalExtractor
-  | 'validating_goal' // GoalValidator
-  | 'analyzing'     // IntentAnalyzer
-  | 'generating'    // TaskGenerator
-  | 'building'      // GraphBuilder
-  | 'validating'    // Three-layer validation
-  | 'optimizing'    // PlanOptimizer
-  | 'serializing'   // PlanSerializer
-  | 'persisting'    // Database write
-  | 'ready'         // Complete
+  | 'classifying'            // RequestClassifier
+  | 'normalizing'            // Normalizer
+  | 'extracting'             // GoalExtractor
+  | 'validating_goal'        // GoalValidator
+  | 'detecting_missing_info' // MissingInformationDetector
+  | 'analyzing'              // IntentAnalyzer
+  | 'generating'             // TaskGenerator
+  | 'building'               // GraphBuilder
+  | 'validating'             // Three-layer validation
+  | 'optimizing'             // PlanOptimizer
+  | 'explaining'             // PlanExplainer
+  | 'serializing'            // PlanSerializer
+  | 'persisting'             // Database write
+  | 'ready'                  // Complete
 
 /**
  * Context passed into every LLM-powered stage of the planning pipeline.
@@ -36,8 +38,18 @@ export interface PlannerContext {
   conversationHistory: ConversationHistoryEntry[]
   /** Active user settings snapshot */
   settings: PlannerSettingsContext
-  /** Tools registered and available on this machine */
+  /** Tools registered and available on this machine (legacy/adapter hint) */
   availableTools: TaskTool[]
+  /** Abstract capabilities available on this system */
+  availableCapabilities?: TaskCapability[] | undefined
+  /** Discovered installed applications on this host */
+  installedApplications?: string[] | undefined
+  /** Discovered installed web browsers (e.g. ['chrome', 'edge', 'firefox']) */
+  availableBrowsers?: string[] | undefined
+  /** Filesystem permissions granted (e.g. ['read_downloads', 'write_documents']) */
+  filesystemPermissions?: string[] | undefined
+  /** AI provider capabilities (e.g. ['json_mode', 'tools', 'vision']) */
+  providerCapabilities?: string[] | undefined
   /** OS platform — affects tool selection and path formats */
   platform: 'windows' | 'macos' | 'linux'
   /**

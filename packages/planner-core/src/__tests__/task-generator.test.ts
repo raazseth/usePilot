@@ -9,6 +9,7 @@ class MockTaskProvider implements AIProvider {
   type = 'ollama' as const
   async listModels() { return [] }
   async testConnection() { return true }
+  async healthCheck() { return { status: 'online' as const, latencyMs: 0 } }
   async *streamChat(): AsyncGenerator<StreamChunk> { yield { token: '', done: true } }
 
   async chat(request: ChatRequest): Promise<ChatResponse> {
@@ -54,26 +55,31 @@ describe('TaskGenerator', () => {
 
   const goal: Goal = {
     id: 'g-1',
-    conversationId: 'c-1',
-    rawText: 'Download records',
-    normalizedText: 'Download records',
     primaryObjective: 'Download all invoice records to CSV',
     constraints: [],
+    rawConstraints: [],
     requiredResources: [],
     expectedOutcome: 'CSV generated',
     confidence: 0.9,
+    normalizedInput: {
+      text: 'Download records',
+      originalText: 'Download records',
+      detectedLanguage: 'en',
+      entities: [],
+      durationMs: 1,
+    },
     status: 'validated',
     createdAt: Date.now(),
   }
 
   const intent: Intent = {
-    type: 'Browser',
+    type: 'browser',
     riskLevel: 'low',
     complexity: 'medium',
-    reasoning: 'Browser + file',
-    suggestedTools: ['browser', 'filesystem'],
-    externalServices: [],
+    requiresHumanApproval: false,
+    missingInformation: [],
     confidence: 0.9,
+    durationMs: 10,
   }
 
   const context: PlannerContext = {

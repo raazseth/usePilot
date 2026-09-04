@@ -96,6 +96,23 @@ export class ApprovalEngine {
       }
     }
 
+    // Capability-based policy rules
+    if (task.requiredCapability === 'execute_command') {
+      return { policy: 'mandatory', reason: 'Command execution requires explicit human approval' }
+    }
+    if (task.requiredCapability === 'delete_file') {
+      return { policy: 'mandatory', reason: 'File deletion requires explicit human approval' }
+    }
+    if (task.requiredCapability === 'authenticate_user') {
+      return { policy: 'mandatory', reason: 'Authentication action requires explicit user approval for security' }
+    }
+    if (task.requiredCapability === 'send_communication') {
+      return { policy: 'mandatory', reason: 'Sending external communication requires human review before dispatch' }
+    }
+    if (task.requiredCapability === 'move_file' || task.requiredCapability === 'write_file') {
+      return { policy: 'optional', reason: 'File modification/movement — review recommended before execution' }
+    }
+
     // Tool-based fallback rules
     if (task.requiredTool === 'terminal') {
       return { policy: 'mandatory', reason: 'Terminal tool usage always requires approval' }

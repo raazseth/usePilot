@@ -185,7 +185,7 @@ export const plans = sqliteTable('plans', {
   version: integer('version', { mode: 'number' }).notNull().default(1),
   hash: text('hash').notNull(),
   status: text('status', {
-    enum: ['pending', 'generating', 'validating', 'optimizing', 'ready', 'invalid', 'executing', 'completed', 'failed'],
+    enum: ['pending', 'generating', 'validating', 'optimizing', 'needs_info', 'ready', 'invalid', 'executing', 'completed', 'failed'],
   })
     .notNull()
     .default('ready'),

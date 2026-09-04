@@ -69,6 +69,23 @@ export interface OptimizationResult {
 }
 
 /**
+ * Explains why the planner formulated this blueprint.
+ * Provides transparent reasoning, assumptions, and tradeoffs to the user.
+ */
+export interface PlanExplanation {
+  /** Concise summary of the chosen plan strategy */
+  summary: string
+  /** Key decisions and reasons why this strategy was chosen */
+  reasoning: string[]
+  /** Assumptions made about the environment, inputs, or user intent */
+  assumptions: string[]
+  /** Tradeoffs evaluated (e.g. speed vs safety, serial vs concurrent) */
+  tradeoffs: string[]
+  /** Safety and governance assessment */
+  riskAssessment: string
+}
+
+/**
  * The fully-resolved, validated, and optimized execution blueprint.
  * This is what the Phase 2 planner produces.
  *
@@ -80,11 +97,10 @@ export interface ExecutionBlueprint {
   id: string
   /** Monotonically increasing version for this goal's plans */
   version: number
-  /**
-   * SHA-256 content hash of the canonical JSON representation.
-   * Used for deduplication and change detection.
-   */
+  /** SHA-256 content hash of the canonical JSON representation */
   hash: string
+  /** Lifecycle status of the plan */
+  status?: PlanStatus | undefined
   /** The extracted, validated goal */
   goal: Goal
   /** The analyzed intent */
@@ -101,6 +117,10 @@ export interface ExecutionBlueprint {
   estimatedComplexity: Complexity
   /** Optimizations applied */
   optimization: OptimizationResult
+  /** Calibrated overall planner confidence (0.0 to 1.0) */
+  plannerConfidence?: number | undefined
+  /** Transparent reasoning and tradeoffs explaining why this plan was chosen */
+  explanation?: PlanExplanation | undefined
   /** Snapshot of context used during planning (for reproducibility) */
   plannerContext: PlannerContextSnapshot
   /** Unix timestamp (ms) of blueprint creation */
@@ -130,6 +150,7 @@ export type PlanStatus =
   | 'generating'
   | 'validating'
   | 'optimizing'
+  | 'needs_info'
   | 'ready'
   | 'invalid'
   | 'executing'    // Phase 3

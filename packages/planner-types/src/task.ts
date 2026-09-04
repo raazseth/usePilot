@@ -8,8 +8,32 @@
 import type { Complexity } from './intent'
 
 /**
- * The tool the execution engine must use to run this task.
- * Phase 3 never infers tools — the planner decides.
+ * Abstract capability required to execute this task.
+ * The planner produces capabilities; Phase 3 maps capabilities to concrete tools/adapters.
+ */
+export type TaskCapability =
+  | 'navigate_website'      // Browser navigation / page opening
+  | 'download_file'         // File download from web / remote
+  | 'read_file'             // File system read / inspect
+  | 'write_file'            // File system create / write
+  | 'move_file'             // File system move / rename / organize
+  | 'delete_file'           // File system deletion
+  | 'search_web'            // Web search engine query
+  | 'extract_web_data'      // Web scraping / form / DOM extraction
+  | 'authenticate_user'     // User login / credentials entry
+  | 'send_communication'    // Email / messaging send
+  | 'read_communication'    // Email / messaging retrieve
+  | 'execute_command'       // Shell / command line execution
+  | 'read_clipboard'        // Read system clipboard
+  | 'write_clipboard'       // Write to system clipboard
+  | 'call_api'              // HTTP REST / RPC request
+  | 'transform_data'        // Pure computation / parsing / formatting
+  | 'verify_state'          // Verification / assertion check
+  | 'none'                  // No external capability needed
+
+/**
+ * Legacy concrete tool category.
+ * In Phase 2, tasks declare abstract TaskCapability. Phase 3 maps capabilities to tools.
  */
 export type TaskTool =
   | 'browser'      // Playwright / web automation
@@ -83,10 +107,21 @@ export interface Task {
   description: string
   /** Semantic category */
   category: TaskCategory
-  /** The tool required to execute this task — chosen by the planner, never inferred by Phase 3 */
-  requiredTool: TaskTool
+  /**
+   * Abstract capability required to execute this task.
+   * Phase 3 execution engine maps capabilities to concrete tools/adapters.
+   */
+  requiredCapability: TaskCapability
+  /** Suggested/inferred tool for UI display and Phase 3 hints */
+  requiredTool?: TaskTool | undefined
+  /** Suggested concrete runner/adapter (e.g. 'playwright', 'chrome-extension') */
+  suggestedTool?: string | undefined
   /** Optional tool-specific configuration (e.g. { url, selector } for browser tasks) */
   toolConfig?: Record<string, unknown> | undefined
+  /** Expected concrete output or artifact from this task (e.g. 'filepath: ~/Downloads/invoice.pdf') */
+  expectedOutput?: string | undefined
+  /** Whether this task is optional for overall goal success */
+  isOptional?: boolean | undefined
   /**
    * Conditions that must be true BEFORE this task can execute.
    * E.g. ["User is logged into Amazon", "Invoice filter is set to 2024"]

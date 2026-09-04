@@ -8,6 +8,7 @@ function makeTask(title: string, description: string = ''): Task {
     title,
     description: description || title,
     category: 'other',
+    requiredCapability: 'none',
     requiredTool: 'browser',
     preconditions: [],
     postconditions: [],

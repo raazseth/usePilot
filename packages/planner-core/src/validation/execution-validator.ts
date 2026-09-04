@@ -43,10 +43,29 @@ export class ExecutionValidator {
       })
     }
 
-    // 3. Tool availability check
+    // 3. Capability / Tool availability check
     const availableToolsSet = new Set(context.availableTools)
+    const availableCapabilitiesSet = context.availableCapabilities?.length
+      ? new Set(context.availableCapabilities)
+      : undefined
+
     for (const task of blueprint.tasks) {
-      if (task.requiredTool !== 'none' && !availableToolsSet.has(task.requiredTool)) {
+      if (
+        availableCapabilitiesSet &&
+        task.requiredCapability &&
+        task.requiredCapability !== 'none' &&
+        !availableCapabilitiesSet.has(task.requiredCapability)
+      ) {
+        issues.push({
+          layer: 'execution',
+          severity: 'warning',
+          code: 'CAPABILITY_UNAVAILABLE',
+          message: `Task "${task.title}" requires capability "${task.requiredCapability}" which is not registered as available in the current context`,
+          target: task.id,
+        })
+      }
+
+      if (task.requiredTool && task.requiredTool !== 'none' && !availableToolsSet.has(task.requiredTool)) {
         issues.push({
           layer: 'execution',
           severity: 'warning',

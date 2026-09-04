@@ -9,6 +9,7 @@ class MockExtractionProvider implements AIProvider {
   type = 'ollama' as const
   async listModels() { return [] }
   async testConnection() { return true }
+  async healthCheck() { return { status: 'online' as const, latencyMs: 0 } }
   async *streamChat(): AsyncGenerator<StreamChunk> { yield { token: '', done: true } }
 
   async chat(request: ChatRequest): Promise<ChatResponse> {
@@ -43,7 +44,8 @@ describe('GoalExtractor', () => {
     const goal = await extractor.extract(normalized, 'test-model')
     expect(goal).toBeDefined()
     expect(goal.primaryObjective).toBe('Download all invoice statements from portal')
-    expect(goal.constraints).toContain('Only PDF format')
+    expect(goal.rawConstraints).toContain('Only PDF format')
+    expect(goal.constraints[0]?.value).toBe('Only PDF format')
     expect(goal.confidence).toBe(0.95)
   })
 })

@@ -22,11 +22,11 @@ export class PlanOptimizer {
     const removedDuplicates: string[] = []
     const simplifications: string[] = []
 
-    // 1. Remove exact duplicates (same title + same tool)
+    // 1. Remove exact duplicates (same title + same capability/tool)
     const seen = new Map<string, string>() // key → first task ID
     const deduped: Task[] = []
     for (const task of working) {
-      const key = `${task.title.toLowerCase()}|${task.requiredTool}`
+      const key = `${task.title.toLowerCase()}|${task.requiredCapability || task.requiredTool}`
       const existing = seen.get(key)
       if (existing) {
         removedDuplicates.push(task.id)
@@ -42,17 +42,23 @@ export class PlanOptimizer {
     }
     working = deduped
 
-    // 2. Merge consecutive tasks with the same tool and no shared successors
+    // 2. Merge consecutive tasks with the same capability/tool and no shared successors
     const merged: Task[] = []
     let i = 0
     while (i < working.length) {
       const curr = working[i]
       const next = working[i + 1]
+      const sameCapability =
+        curr?.requiredCapability &&
+        next?.requiredCapability &&
+        curr.requiredCapability === next.requiredCapability &&
+        curr.requiredCapability !== 'none'
+      const sameTool = curr?.requiredTool === next?.requiredTool && curr?.requiredTool !== 'none'
+
       if (
         curr &&
         next &&
-        curr.requiredTool === next.requiredTool &&
-        curr.requiredTool !== 'none' &&
+        (sameCapability || sameTool) &&
         next.dependsOn.length === 1 &&
         next.dependsOn[0] === curr.id &&
         curr.approvalPolicy === 'automatic' &&
@@ -65,6 +71,7 @@ export class PlanOptimizer {
           description: `${curr.description}\nThen: ${next.description}`,
           successConditions: [...curr.successConditions, ...next.successConditions],
           postconditions: next.postconditions,
+          requiredCapability: curr.requiredCapability,
         }
         mergedTasks.push({ from: [curr.id, next.id], into: mergedTask.id })
         simplifications.push(`Merged tasks: "${curr.title}" + "${next.title}"`)
