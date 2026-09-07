@@ -17,8 +17,8 @@ export default [
       },
     },
     plugins: {
-      '@typescript-eslint': tseslint,
-      import: importPlugin,
+      '@typescript-eslint': /** @type {any} */ (tseslint),
+      import: /** @type {any} */ (importPlugin),
     },
     rules: {
       // TypeScript
