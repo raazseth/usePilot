@@ -20,6 +20,7 @@ interface StreamingMessage {
 }
 
 interface LoadedPlan {
+  planId: string
   blueprint: ExecutionBlueprint
   validation?: ValidationResult | undefined
 }
@@ -72,7 +73,8 @@ export function ChatRoute() {
             )
           )
           setBlueprints(
-            loaded.map((item) => ({
+            loaded.map((item, idx) => ({
+              planId: planSummaries[idx]?.id ?? item.executionBlueprint.id,
               blueprint: item.executionBlueprint,
               validation: item.validationResult,
             }))
@@ -163,6 +165,7 @@ export function ChatRoute() {
         setBlueprints((prev) => [
           ...prev,
           {
+            planId: event.payload.planId,
             blueprint: event.payload.blueprint as ExecutionBlueprint,
             validation: event.payload.validation as ValidationResult | undefined,
           },
@@ -259,6 +262,7 @@ export function ChatRoute() {
             {blueprints.map((item, idx) => (
               <PlanCard
                 key={item.blueprint.id || idx}
+                planId={item.planId}
                 blueprint={item.blueprint}
                 validation={item.validation}
               />

@@ -5,6 +5,7 @@ import { createRouter } from './infrastructure/http/router'
 import { WebSocketHandler } from './infrastructure/websocket/handler'
 import { ProviderManager } from './infrastructure/ai/provider-manager'
 import { PlannerService } from './planner/service'
+import { ExecutionService } from './execution/service'
 import { EventBus } from './events/bus'
 import { migrate } from '@usepilot/database'
 import { seed } from '@usepilot/database'
@@ -44,8 +45,11 @@ async function bootstrap() {
   const plannerService = new PlannerService(db, providerManager, eventBus, logger)
   logger.info('PlannerService initialized')
 
+  const executionService = new ExecutionService(db, eventBus, logger)
+  logger.info('ExecutionService initialized')
+
   // Create WebSocket handler
-  const wsHandler = new WebSocketHandler(db, providerManager, eventBus, logger, plannerService)
+  const wsHandler = new WebSocketHandler(db, providerManager, eventBus, logger, plannerService, executionService)
 
   // Create HTTP router
   const router = createRouter(db, providerManager, eventBus, logger)

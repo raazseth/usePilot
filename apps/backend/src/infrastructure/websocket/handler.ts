@@ -7,6 +7,7 @@ import type { ProviderManager } from '../ai/provider-manager'
 import type { EventBus } from '../../events/bus'
 import type { Logger } from '../../logger'
 import type { PlannerService } from '../../planner/service'
+import type { ExecutionService } from '../../execution/service'
 import { RequestClassifier } from '@usepilot/planner-core'
 
 type DB = ReturnType<typeof import('@usepilot/database').createDatabase>
@@ -35,7 +36,8 @@ export class WebSocketHandler {
     private readonly providerManager: ProviderManager,
     private readonly eventBus: EventBus,
     private readonly logger: Logger,
-    private readonly plannerService?: PlannerService
+    private readonly plannerService?: PlannerService,
+    private readonly executionService?: ExecutionService
   ) {
     this.convRepo = new ConversationRepository(this.db)
     this.msgRepo = new MessageRepository(this.db)
@@ -98,6 +100,53 @@ export class WebSocketHandler {
               break
             }
             await this.plannerService.getPlan(ws, payload.planId)
+            break
+          }
+
+          case 'execution.start': {
+            const payload = event.payload as { planId: string }
+            if (!this.executionService) {
+              this.sendError(ws, { code: 'EXECUTION_UNAVAILABLE', message: 'Execution service is not initialized' })
+              break
+            }
+            void this.executionService.startExecution(ws, payload.planId)
+              .catch((err: unknown) => childLogger.error({ err }, 'ExecutionService.startExecution threw'))
+            break
+          }
+
+          case 'execution.approve': {
+            const payload = event.payload as { runId: string; taskId: string; comment?: string }
+            this.executionService?.approveTask(ws, payload.runId, payload.taskId, true, payload.comment)
+            break
+          }
+
+          case 'execution.reject': {
+            const payload = event.payload as { runId: string; taskId: string; comment?: string }
+            this.executionService?.approveTask(ws, payload.runId, payload.taskId, false, payload.comment)
+            break
+          }
+
+          case 'execution.cancel': {
+            const payload = event.payload as { runId: string }
+            this.executionService?.cancelExecution(ws, payload.runId)
+            break
+          }
+
+          case 'execution.pause': {
+            const payload = event.payload as { runId: string }
+            this.executionService?.pauseExecution(ws, payload.runId)
+            break
+          }
+
+          case 'execution.resume': {
+            const payload = event.payload as { runId: string }
+            this.executionService?.resumeExecution(ws, payload.runId)
+            break
+          }
+
+          case 'execution.status': {
+            const payload = event.payload as { runId: string }
+            await this.executionService?.getExecutionStatus(ws, payload.runId)
             break
           }
 

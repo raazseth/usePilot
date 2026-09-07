@@ -4,15 +4,27 @@ import type { ExecutionBlueprint, ValidationResult } from '@usepilot/planner-typ
 import { TaskCard } from './TaskCard'
 import { ValidationReport } from './ValidationReport'
 import { OptimizerSummary } from './OptimizerSummary'
+import { useAppStore } from '../../shared/store/appStore'
+import { wsManager } from '../../shared/api/websocket'
 
 interface PlanCardProps {
   blueprint: ExecutionBlueprint
   validation?: ValidationResult
+  planId: string
 }
 
-export function PlanCard({ blueprint, validation }: PlanCardProps) {
+export function PlanCard({ blueprint, validation, planId }: PlanCardProps) {
   const [expanded, setExpanded] = useState(true)
   const [showExplanation, setShowExplanation] = useState(false)
+  const executionRunId = useAppStore((s) => s.executionRunId)
+  const executionStatus = useAppStore((s) => s.executionStatus)
+
+  const isThisRunActive = executionRunId !== null
+  const isExecuting = isThisRunActive && (executionStatus === 'running' || executionStatus === 'waiting_approval' || executionStatus === 'paused')
+
+  const handleExecute = () => {
+    wsManager.send({ type: 'execution.start', payload: { planId } } as Parameters<typeof wsManager.send>[0])
+  }
 
   const {
     goal,
@@ -237,19 +249,23 @@ export function PlanCard({ blueprint, validation }: PlanCardProps) {
             </div>
           )}
 
-          {/* Action button */}
+          {/* Execute Blueprint button */}
           <div>
             <button
+              id="execute-blueprint-btn"
               className="plan-execute-btn"
-              disabled
-              title="Execution Engine will be enabled in Phase 3"
+              onClick={handleExecute}
+              disabled={isExecuting || blueprint.approvals.hasForbiddenTasks || blueprint.status === 'needs_info'}
+              title={isExecuting ? 'Execution in progress' : 'Execute this blueprint'}
             >
-              <span>▶</span>
-              <span>Execute Blueprint</span>
+              <span>{isExecuting ? '⏳' : '▶'}</span>
+              <span>{isExecuting ? 'Executing…' : 'Execute Blueprint'}</span>
             </button>
-            <div className="plan-execute-hint" style={{ marginTop: '6px' }}>
-              Phase 2 deterministic intelligence layer — execution engine unlocks in Phase 3
-            </div>
+            {!isExecuting && (
+              <div className="plan-execute-hint" style={{ marginTop: '6px' }}>
+                Phase 3 execution engine — deterministic, observable, verifiable
+              </div>
+            )}
           </div>
         </div>
       )}

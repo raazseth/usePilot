@@ -33,6 +33,22 @@ export type DomainEventMap = {
   'planner.progress':  { runId: string; stage: string; progressPct: number; message: string }
   'planner.completed': { runId: string; blueprintId: string; taskCount: number; estimatedComplexity: string }
   'planner.failed':    { runId: string; errorCode: string; stage: string; retries: number; message: string }
+
+  // Phase 3: Execution events
+  'execution.started':           { runId: string; planId: string; traceId: string; taskCount: number }
+  'execution.progress':          { runId: string; traceId: string; completedCount: number; totalCount: number; currentTaskTitle: string }
+  'execution.task.started':      { runId: string; traceId: string; taskId: string; taskTitle: string; capability: string; attempt: number }
+  'execution.task.completed':    { runId: string; traceId: string; taskId: string; durationMs: number; verificationPassed: boolean }
+  'execution.task.failed':       { runId: string; traceId: string; taskId: string; failureCategory: string; error: string; attempt: number }
+  'execution.task.retrying':     { runId: string; traceId: string; taskId: string; attempt: number; backoffMs: number }
+  'execution.task.skipped':      { runId: string; traceId: string; taskId: string; reason: string }
+  'execution.approval.required': { runId: string; traceId: string; taskId: string; taskTitle: string; capability: string; reason: string; requestId: string }
+  'execution.approval.received': { runId: string; traceId: string; taskId: string; approved: boolean }
+  'execution.paused':            { runId: string; traceId: string }
+  'execution.resumed':           { runId: string; traceId: string }
+  'execution.completed':         { runId: string; traceId: string; tasksCompleted: number; tasksFailed: number; tasksSkipped: number; durationMs: number }
+  'execution.failed':            { runId: string; traceId: string; errorCode: string; failedTaskId?: string | undefined; failureCategory?: string | undefined }
+  'execution.cancelled':         { runId: string; traceId: string }
 }
 
 export type DomainEventType = keyof DomainEventMap

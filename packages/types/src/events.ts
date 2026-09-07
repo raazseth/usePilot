@@ -26,6 +26,14 @@ export type ClientEventType =
   // Phase 2: Planner
   | 'plan.create'
   | 'plan.get'
+  // Phase 3: Execution
+  | 'execution.start'
+  | 'execution.pause'
+  | 'execution.resume'
+  | 'execution.cancel'
+  | 'execution.approve'
+  | 'execution.reject'
+  | 'execution.status'
 
 export interface ConversationCreatePayload {
   title?: string
@@ -66,6 +74,14 @@ export type ClientEvent =
   // Phase 2: Planner
   | AppEvent<{ conversationId: ID; text: string }> & { type: 'plan.create' }
   | AppEvent<{ planId: ID }> & { type: 'plan.get' }
+  // Phase 3: Execution
+  | AppEvent<{ planId: ID }> & { type: 'execution.start' }
+  | AppEvent<{ runId: ID }> & { type: 'execution.pause' }
+  | AppEvent<{ runId: ID }> & { type: 'execution.resume' }
+  | AppEvent<{ runId: ID }> & { type: 'execution.cancel' }
+  | AppEvent<{ runId: ID; taskId: ID; comment?: string }> & { type: 'execution.approve' }
+  | AppEvent<{ runId: ID; taskId: ID; comment?: string }> & { type: 'execution.reject' }
+  | AppEvent<{ runId: ID }> & { type: 'execution.status' }
 
 // Server → Client Events
 
@@ -85,6 +101,21 @@ export type ServerEventType =
   | 'plan.progress'
   | 'plan.ready'
   | 'plan.error'
+  // Phase 3: Execution
+  | 'execution.started'
+  | 'execution.progress'
+  | 'execution.task.started'
+  | 'execution.task.completed'
+  | 'execution.task.failed'
+  | 'execution.task.retrying'
+  | 'execution.task.skipped'
+  | 'execution.approval.required'
+  | 'execution.approval.received'
+  | 'execution.paused'
+  | 'execution.resumed'
+  | 'execution.completed'
+  | 'execution.failed'
+  | 'execution.cancelled'
 
 export interface ConversationCreatedPayload {
   conversationId: ID
@@ -152,6 +183,21 @@ export type ServerEvent =
   | AppEvent<{ runId: string; stage: string; progressPct: number; message: string }> & { type: 'plan.progress' }
   | AppEvent<{ runId: string; blueprint: unknown; planId: string; validation?: unknown }> & { type: 'plan.ready' }
   | AppEvent<{ runId: string; code: string; message: string; retries: number }> & { type: 'plan.error' }
+  // Phase 3: Execution
+  | AppEvent<{ runId: string; planId: string; traceId: string; taskCount: number }> & { type: 'execution.started' }
+  | AppEvent<{ runId: string; traceId: string; completedCount: number; totalCount: number; currentTaskTitle: string }> & { type: 'execution.progress' }
+  | AppEvent<{ runId: string; traceId: string; taskId: string; taskTitle: string; capability: string; attempt: number }> & { type: 'execution.task.started' }
+  | AppEvent<{ runId: string; traceId: string; taskId: string; durationMs: number; verificationPassed: boolean }> & { type: 'execution.task.completed' }
+  | AppEvent<{ runId: string; traceId: string; taskId: string; failureCategory: string; error: string; attempt: number }> & { type: 'execution.task.failed' }
+  | AppEvent<{ runId: string; traceId: string; taskId: string; attempt: number; backoffMs: number }> & { type: 'execution.task.retrying' }
+  | AppEvent<{ runId: string; traceId: string; taskId: string; reason: string }> & { type: 'execution.task.skipped' }
+  | AppEvent<{ requestId: string; runId: string; taskId: string; taskTitle: string; capability: string; reason?: string }> & { type: 'execution.approval.required' }
+  | AppEvent<{ runId: string; traceId: string; taskId: string; approved: boolean }> & { type: 'execution.approval.received' }
+  | AppEvent<{ runId: string; traceId: string }> & { type: 'execution.paused' }
+  | AppEvent<{ runId: string; traceId: string }> & { type: 'execution.resumed' }
+  | AppEvent<{ result: unknown }> & { type: 'execution.completed' }
+  | AppEvent<{ runId: string; error: string; failedTaskId?: string }> & { type: 'execution.failed' }
+  | AppEvent<{ runId: string; traceId: string }> & { type: 'execution.cancelled' }
 
 /** Union of all event types */
 export type EventType = ClientEventType | ServerEventType

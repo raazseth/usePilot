@@ -254,3 +254,158 @@ export type PlanRow = typeof plans.$inferSelect
 export type NewPlanRow = typeof plans.$inferInsert
 export type PlanTaskRow = typeof planTasks.$inferSelect
 export type PlanValidationRow = typeof planValidations.$inferSelect
+
+// Phase 3: Execution Tables
+
+export const executionRuns = sqliteTable('execution_runs', {
+  id: text('id').primaryKey(),
+  planId: text('plan_id').notNull().references(() => plans.id, { onDelete: 'cascade' }),
+  blueprintHash: text('blueprint_hash').notNull(),
+  traceId: text('trace_id').notNull(),
+  status: text('status', {
+    enum: ['created', 'running', 'paused', 'waiting_approval', 'recovering', 'completed', 'failed', 'cancelled'],
+  }).notNull().default('created'),
+  startedAt: integer('started_at', { mode: 'number' }).notNull(),
+  completedAt: integer('completed_at', { mode: 'number' }),
+  errorCode: text('error_code'),
+  tasksTotal: integer('tasks_total', { mode: 'number' }).notNull().default(0),
+  tasksCompleted: integer('tasks_completed', { mode: 'number' }).notNull().default(0),
+  tasksFailed: integer('tasks_failed', { mode: 'number' }).notNull().default(0),
+  tasksSkipped: integer('tasks_skipped', { mode: 'number' }).notNull().default(0),
+  /** JSON: ExecutionContextSnapshot */
+  contextSnapshot: text('context_snapshot'),
+  /** JSON: Record<string, unknown> */
+  metadata: text('metadata'),
+})
+
+export const executionTaskRecords = sqliteTable('execution_task_records', {
+  id: text('id').primaryKey(),
+  runId: text('run_id').notNull().references(() => executionRuns.id, { onDelete: 'cascade' }),
+  taskId: text('task_id').notNull(),
+  taskTitle: text('task_title').notNull(),
+  capability: text('capability').notNull(),
+  status: text('status').notNull().default('pending'),
+  attemptCount: integer('attempt_count', { mode: 'number' }).notNull().default(0),
+  adapterName: text('adapter_name'),
+  /** JSON: AdapterResult */
+  adapterResult: text('adapter_result'),
+  /** JSON: VerificationResult */
+  verificationResult: text('verification_result'),
+  failureCategory: text('failure_category'),
+  startedAt: integer('started_at', { mode: 'number' }),
+  completedAt: integer('completed_at', { mode: 'number' }),
+  errorMessage: text('error_message'),
+})
+
+export const executionJournal = sqliteTable('execution_journal', {
+  id: text('id').primaryKey(),
+  runId: text('run_id').notNull().references(() => executionRuns.id, { onDelete: 'cascade' }),
+  traceId: text('trace_id').notNull(),
+  taskId: text('task_id'),
+  eventType: text('event_type').notNull(),
+  adapterName: text('adapter_name'),
+  stateFrom: text('state_from'),
+  stateTo: text('state_to'),
+  attemptNumber: integer('attempt_number', { mode: 'number' }),
+  /** JSON: Record<string, unknown> */
+  payload: text('payload').notNull().default('{}'),
+  timestamp: integer('timestamp', { mode: 'number' }).notNull(),
+})
+
+export const executionCheckpoints = sqliteTable('execution_checkpoints', {
+  id: text('id').primaryKey(),
+  runId: text('run_id').notNull().references(() => executionRuns.id, { onDelete: 'cascade' }),
+  createdAt: integer('created_at', { mode: 'number' }).notNull(),
+  executionStatus: text('execution_status').notNull(),
+  /** JSON: string[] */
+  completedTaskIds: text('completed_task_ids').notNull().default('[]'),
+  /** JSON: string[] */
+  pendingTaskIds: text('pending_task_ids').notNull().default('[]'),
+  /** JSON: string[] */
+  failedTaskIds: text('failed_task_ids').notNull().default('[]'),
+  /** JSON: string[] */
+  skippedTaskIds: text('skipped_task_ids').notNull().default('[]'),
+  /** JSON: Record<string, number> */
+  retryCounters: text('retry_counters').notNull().default('{}'),
+  pendingApprovalTaskId: text('pending_approval_task_id'),
+  /** JSON: Record<string, unknown> */
+  metadata: text('metadata').notNull().default('{}'),
+})
+
+export const approvalRequests = sqliteTable('approval_requests', {
+  id: text('id').primaryKey(),
+  runId: text('run_id').notNull().references(() => executionRuns.id, { onDelete: 'cascade' }),
+  taskId: text('task_id').notNull(),
+  taskTitle: text('task_title').notNull(),
+  capability: text('capability').notNull(),
+  approvalReason: text('approval_reason').notNull(),
+  policy: text('policy', { enum: ['automatic', 'optional', 'mandatory', 'forbidden'] }).notNull(),
+  requestedAt: integer('requested_at', { mode: 'number' }).notNull(),
+  expiresAt: integer('expires_at', { mode: 'number' }),
+  respondedAt: integer('responded_at', { mode: 'number' }),
+  approved: integer('approved', { mode: 'boolean' }),
+  comment: text('comment'),
+})
+
+export const verificationResults = sqliteTable('verification_results', {
+  id: text('id').primaryKey(),
+  runId: text('run_id').notNull().references(() => executionRuns.id, { onDelete: 'cascade' }),
+  taskId: text('task_id').notNull(),
+  passed: integer('passed', { mode: 'boolean' }).notNull().default(false),
+  /** JSON: string[] */
+  checkedConditions: text('checked_conditions').notNull().default('[]'),
+  /** JSON: string[] */
+  failedConditions: text('failed_conditions').notNull().default('[]'),
+  strategy: text('strategy').notNull().default('state_check'),
+  notes: text('notes'),
+  durationMs: integer('duration_ms', { mode: 'number' }).notNull().default(0),
+  createdAt: integer('created_at', { mode: 'number' }).notNull(),
+})
+
+export const executionReports = sqliteTable('execution_reports', {
+  id: text('id').primaryKey(),
+  runId: text('run_id').notNull().references(() => executionRuns.id, { onDelete: 'cascade' }),
+  traceId: text('trace_id').notNull(),
+  summary: text('summary').notNull(),
+  /** JSON: TaskSummary[] */
+  taskSummaries: text('task_summaries').notNull().default('[]'),
+  /** JSON: FailureCategory[] */
+  failureCategories: text('failure_categories').notNull().default('[]'),
+  /** JSON: ExecutionMetrics */
+  metrics: text('metrics').notNull().default('{}'),
+  blueprintHash: text('blueprint_hash'),
+  executionHash: text('execution_hash'),
+  plannerVersion: text('planner_version'),
+  executionVersion: text('execution_version'),
+  /** JSON: Record<string, string> */
+  adapterVersions: text('adapter_versions'),
+  /** JSON: ExecutionContextSnapshot */
+  contextSnapshot: text('context_snapshot'),
+  createdAt: integer('created_at', { mode: 'number' }).notNull(),
+})
+
+export const executionManifests = sqliteTable('execution_manifests', {
+  id: text('id').primaryKey(),
+  runId: text('run_id').notNull().references(() => executionRuns.id, { onDelete: 'cascade' }),
+  manifestHash: text('manifest_hash').notNull(),
+  /** JSON: ExecutionManifest */
+  manifest: text('manifest').notNull(),
+  createdAt: integer('created_at', { mode: 'number' }).notNull(),
+})
+
+// Execution Type Exports
+
+export type ExecutionRunRow = typeof executionRuns.$inferSelect
+export type NewExecutionRunRow = typeof executionRuns.$inferInsert
+export type ExecutionTaskRecordRow = typeof executionTaskRecords.$inferSelect
+export type NewExecutionTaskRecordRow = typeof executionTaskRecords.$inferInsert
+export type ExecutionJournalRow = typeof executionJournal.$inferSelect
+export type NewExecutionJournalRow = typeof executionJournal.$inferInsert
+export type ExecutionCheckpointRow = typeof executionCheckpoints.$inferSelect
+export type NewExecutionCheckpointRow = typeof executionCheckpoints.$inferInsert
+export type ApprovalRequestRow = typeof approvalRequests.$inferSelect
+export type NewApprovalRequestRow = typeof approvalRequests.$inferInsert
+export type VerificationResultRow = typeof verificationResults.$inferSelect
+export type ExecutionReportRow = typeof executionReports.$inferSelect
+export type ExecutionManifestRow = typeof executionManifests.$inferSelect
+export type NewExecutionManifestRow = typeof executionManifests.$inferInsert
