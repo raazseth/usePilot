@@ -1,6 +1,7 @@
-import { describe, it, expect } from 'vitest'
-import { ExecutionPolicyEngine, createDefaultExecutionPolicy } from '../policy/engine'
 import type { Task } from '@usepilot/planner-types'
+import { describe, it, expect } from 'vitest'
+
+import { ExecutionPolicyEngine, createDefaultExecutionPolicy } from '../policy/engine'
 
 function makeMockTask(overrides?: Partial<Task>): Task {
   return {

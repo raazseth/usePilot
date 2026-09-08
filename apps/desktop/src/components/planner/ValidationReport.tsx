@@ -1,6 +1,6 @@
 import './planner.css'
-import { useState } from 'react'
 import type { ValidationResult } from '@usepilot/planner-types'
+import { useState } from 'react'
 
 interface ValidationReportProps {
   validation: ValidationResult

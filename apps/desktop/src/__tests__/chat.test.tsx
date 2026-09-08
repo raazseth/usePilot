@@ -1,9 +1,11 @@
-import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
-import { MessageBubble } from '../components/chat/MessageBubble'
+import type { Message } from '@usepilot/types'
+import { describe, it, expect, vi } from 'vitest'
+
 import { ChatInput } from '../components/chat/ChatInput'
 import { EmptyState } from '../components/chat/EmptyState'
-import type { Message } from '@usepilot/types'
+import { MessageBubble } from '../components/chat/MessageBubble'
+
 
 describe('MessageBubble', () => {
   it('renders user message', () => {

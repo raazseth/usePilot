@@ -1,6 +1,7 @@
-import { describe, it, expect } from 'vitest'
-import { AdapterSandbox } from '../sandbox'
 import type { ICapabilityAdapter, AdapterContext } from '@usepilot/execution-types'
+import { describe, it, expect } from 'vitest'
+
+import { AdapterSandbox } from '../sandbox'
 
 function makeMockAdapter(overrides: Partial<ICapabilityAdapter> = {}): ICapabilityAdapter {
   return {

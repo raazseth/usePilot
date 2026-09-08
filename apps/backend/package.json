@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "bun run --watch src/index.ts",
-    "build": "bun build src/index.ts --compile --outfile bun-backend --target bun",
+    "build": "bun build src/index.ts --compile --outfile bun-backend --target bun --external playwright --external tesseract.js",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src --ext .ts",
     "test": "vitest run",

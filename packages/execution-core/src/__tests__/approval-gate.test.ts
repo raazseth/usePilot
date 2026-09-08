@@ -1,6 +1,7 @@
-import { describe, it, expect } from 'vitest'
-import { ApprovalGate } from '../approval-gate'
 import type { Task } from '@usepilot/planner-types'
+import { describe, it, expect } from 'vitest'
+
+import { ApprovalGate } from '../approval-gate'
 
 function makeTask(id: string): Task {
   return {

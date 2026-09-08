@@ -26,16 +26,33 @@ export { SessionManager } from './session/manager'
 export { ExecutionPolicyEngine, createDefaultExecutionPolicy } from './policy/engine'
 export { ManifestGenerator } from './manifest/generator'
 
-import { CapabilityRegistry } from './registry'
+// Phase 4: Production Capability Runtimes
+export { NativeFilesystemAdapter } from './adapters/filesystem/fs-adapter'
+export { NativeDesktopAdapter } from './adapters/desktop/desktop-adapter'
+export { PlaywrightBrowserAdapter } from './adapters/browser/browser-adapter'
+export { PlaywrightBrowserSession } from './adapters/browser/browser-session'
+export { VisionSubsystem } from './vision/vision-subsystem'
+export { SelfHealingPipeline } from './healing/self-healing'
+export { SecretVault } from './security/vault'
+export { PermissionManager } from './security/permissions'
+export { BrowserStateVerifier, FilesystemVerifier, DesktopStateVerifier } from './verification/capability-verifiers'
+
+import type { TaskCapability } from '@usepilot/planner-types'
+
+import { PlaywrightBrowserAdapter } from './adapters/browser/browser-adapter'
+import { NativeDesktopAdapter } from './adapters/desktop/desktop-adapter'
+import { NativeFilesystemAdapter } from './adapters/filesystem/fs-adapter'
 import { ALL_CAPABILITIES, createStubAdapterFactory } from './adapters/stub'
+import { ApprovalGate } from './approval-gate'
+import { CheckpointManager } from './checkpoint'
+import { ExecutionJournal } from './journal'
+import { ExecutionMetricsCollector } from './metrics'
+import { CapabilityRegistry } from './registry'
+import { RetryEngine } from './retry'
+import { ExecutionRunner } from './runner'
 import { TaskScheduler } from './scheduler'
 import { ExecutionStateMachine } from './state-machine'
-import { ApprovalGate } from './approval-gate'
-import { RetryEngine } from './retry'
-import { ExecutionJournal } from './journal'
-import { CheckpointManager } from './checkpoint'
-import { ExecutionMetricsCollector } from './metrics'
-import { ExecutionRunner } from './runner'
+
 
 export function createDefaultRegistry(): CapabilityRegistry {
   const registry = new CapabilityRegistry()
@@ -48,6 +65,54 @@ export function createDefaultRegistry(): CapabilityRegistry {
       name: 'StubAdapter',
     })
   }
+  return registry
+}
+
+export function createProductionRegistry(): CapabilityRegistry {
+  const registry = createDefaultRegistry()
+
+  // Register NativeFilesystemAdapter
+  const fsCaps: TaskCapability[] = ['read_file', 'write_file', 'move_file', 'delete_file']
+  for (const cap of fsCaps) {
+    registry.register({
+      factory: () => new NativeFilesystemAdapter(cap),
+      capability: cap,
+      priority: 100,
+      platformSupport: ['windows', 'macos', 'linux'],
+      name: 'NativeFilesystemAdapter',
+    })
+  }
+
+  // Register NativeDesktopAdapter
+  const desktopCaps: TaskCapability[] = ['read_clipboard', 'write_clipboard', 'execute_command']
+  for (const cap of desktopCaps) {
+    registry.register({
+      factory: () => new NativeDesktopAdapter(cap),
+      capability: cap,
+      priority: 100,
+      platformSupport: ['windows', 'macos', 'linux'],
+      name: 'NativeDesktopAdapter',
+    })
+  }
+
+  // Register PlaywrightBrowserAdapter
+  const browserCaps: TaskCapability[] = [
+    'navigate_website',
+    'search_web',
+    'authenticate_user',
+    'extract_web_data',
+    'download_file',
+  ]
+  for (const cap of browserCaps) {
+    registry.register({
+      factory: () => new PlaywrightBrowserAdapter(cap),
+      capability: cap,
+      priority: 100,
+      platformSupport: ['windows', 'macos', 'linux'],
+      name: 'PlaywrightBrowserAdapter',
+    })
+  }
+
   return registry
 }
 

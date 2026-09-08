@@ -1,10 +1,12 @@
+import type { ConversationSummary } from '@usepilot/types'
+import { formatRelativeTime } from '@usepilot/utils'
 import { useState, useCallback } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { useAppStore } from '../../shared/store/appStore'
+
 import { apiClient } from '../../shared/api/client'
-import { formatRelativeTime } from '@usepilot/utils'
+import { useAppStore } from '../../shared/store/appStore'
 import { ConversationSearch } from '../chat/ConversationSearch'
-import type { ConversationSummary } from '@usepilot/types'
+
 import './Sidebar.css'
 
 export function Sidebar() {

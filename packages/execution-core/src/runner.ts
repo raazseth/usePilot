@@ -1,7 +1,5 @@
 // ExecutionRunner — orchestrates the full execution lifecycle
 
-import { generateId } from '@usepilot/utils'
-import type { ExecutionBlueprint, Task } from '@usepilot/planner-types'
 import type {
   ExecutionResult,
   ExecutionReport,
@@ -17,21 +15,24 @@ import type {
   SelectedAdapterRecord,
   ExecutionManifest,
 } from '@usepilot/execution-types'
-import { CapabilityRegistry } from './registry'
-import { TaskScheduler } from './scheduler'
-import { ExecutionStateMachine } from './state-machine'
-import { ApprovalGate } from './approval-gate'
-import { RetryEngine } from './retry'
-import { ExecutionJournal } from './journal'
-import { CheckpointManager } from './checkpoint'
-import { ExecutionMetricsCollector } from './metrics'
-import { AdapterSandbox } from './sandbox'
-import { PolicyBasedCapabilityNegotiator } from './negotiator'
-import { ExecutionResourceManager } from './resource-manager'
-import { CancellationTokenSource } from './token'
-import { ExecutionPolicyEngine } from './policy/engine'
-import { SessionManager } from './session/manager'
+import type { ExecutionBlueprint, Task } from '@usepilot/planner-types'
+import { generateId } from '@usepilot/utils'
+
+import type { ApprovalGate } from './approval-gate'
+import type { CheckpointManager } from './checkpoint'
+import type { ExecutionJournal } from './journal'
 import { ManifestGenerator } from './manifest/generator'
+import type { ExecutionMetricsCollector } from './metrics'
+import { PolicyBasedCapabilityNegotiator } from './negotiator'
+import { ExecutionPolicyEngine } from './policy/engine'
+import type { CapabilityRegistry } from './registry'
+import { ExecutionResourceManager } from './resource-manager'
+import { RetryEngine } from './retry'
+import { AdapterSandbox } from './sandbox'
+import type { TaskScheduler } from './scheduler'
+import type { ExecutionStateMachine } from './state-machine'
+import { CancellationTokenSource } from './token'
+import { SessionManager } from './session/manager'
 
 export interface ExecutionCallbacks {
   onTaskStarted?: (taskId: string, taskTitle: string, capability: string, attempt: number) => void | Promise<void>

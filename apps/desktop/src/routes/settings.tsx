@@ -1,8 +1,9 @@
-import { useState, useCallback, useEffect } from 'react'
-import { useAppStore } from '../shared/store/appStore'
-import { apiClient } from '../shared/api/client'
-import { useToast } from '../components/ui/Toast'
 import type { Settings, AIModel } from '@usepilot/types'
+import { useState, useCallback, useEffect } from 'react'
+
+import { useToast } from '../components/ui/Toast'
+import { apiClient } from '../shared/api/client'
+import { useAppStore } from '../shared/store/appStore'
 import './settings.css'
 
 export function SettingsRoute() {

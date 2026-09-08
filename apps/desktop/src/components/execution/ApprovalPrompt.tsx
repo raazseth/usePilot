@@ -1,5 +1,6 @@
-import { useState } from 'react'
 import type { ApprovalRequest } from '@usepilot/execution-types'
+import { useState } from 'react'
+
 import { wsManager } from '../../shared/api/websocket'
 
 interface ApprovalPromptProps {

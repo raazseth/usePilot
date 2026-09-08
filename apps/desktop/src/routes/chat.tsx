@@ -1,16 +1,18 @@
+import type { ExecutionBlueprint, ValidationResult, PlanningStage } from '@usepilot/planner-types'
+import type { Message, ConversationSummary } from '@usepilot/types'
+import { generateId } from '@usepilot/utils'
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { useParams } from 'react-router-dom'
-import { wsManager } from '../shared/api/websocket'
-import { apiClient } from '../shared/api/client'
-import { useAppStore } from '../shared/store/appStore'
-import { generateId } from '@usepilot/utils'
-import type { Message } from '@usepilot/types'
-import type { ExecutionBlueprint, ValidationResult } from '@usepilot/planner-types'
-import { MessageBubble } from '../components/chat/MessageBubble'
+
+
 import { ChatInput } from '../components/chat/ChatInput'
 import { EmptyState } from '../components/chat/EmptyState'
-import { Spinner } from '../components/ui/Spinner'
+import { MessageBubble } from '../components/chat/MessageBubble'
 import { PlanCard, PlanningProgress } from '../components/planner'
+import { Spinner } from '../components/ui/Spinner'
+import { apiClient } from '../shared/api/client'
+import { wsManager } from '../shared/api/websocket'
+import { useAppStore } from '../shared/store/appStore'
 import './chat.css'
 
 interface StreamingMessage {
@@ -137,7 +139,7 @@ export function ChatRoute() {
         setTimeout(() => scrollToBottom(), 50)
 
         // Update conversations list
-        const all = await apiClient.get<import('@usepilot/types').ConversationSummary[]>('/conversations')
+        const all = await apiClient.get<ConversationSummary[]>('/conversations')
         useAppStore.getState().setConversations(all)
       }),
 
@@ -153,7 +155,7 @@ export function ChatRoute() {
       // Phase 2: Planner event listeners
       wsManager.on('plan.progress', (event) => {
         setPlanningProgress({
-          stage: event.payload.stage as import('@usepilot/planner-types').PlanningStage,
+          stage: event.payload.stage as PlanningStage,
           message: event.payload.message,
           progressPct: event.payload.progressPct,
         })

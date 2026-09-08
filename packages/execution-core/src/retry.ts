@@ -1,6 +1,5 @@
 // RetryEngine — infrastructure-driven retry, independent of adapters
 
-import type { Task, ExecutionBlueprint } from '@usepilot/planner-types'
 import type {
   ICapabilityAdapter,
   AdapterContext,
@@ -9,8 +8,10 @@ import type {
   IExecutionPolicyEngine,
   IAdapterSession,
 } from '@usepilot/execution-types'
-import { VerificationEngine } from './verification'
+import type { Task, ExecutionBlueprint } from '@usepilot/planner-types'
+
 import { AdapterSandbox } from './sandbox'
+import { VerificationEngine } from './verification'
 
 export interface RetryResult {
   adapterResult: AdapterResult

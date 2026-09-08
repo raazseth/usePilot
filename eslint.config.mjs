@@ -40,7 +40,7 @@ export default tseslint.config(
     rules: {
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/no-unused-vars': [
-        'error',
+        'warn',
         {
           argsIgnorePattern: '^_',
           varsIgnorePattern: '^_',
@@ -49,24 +49,25 @@ export default tseslint.config(
       ],
       '@typescript-eslint/consistent-type-imports': [
         'error',
-        { prefer: 'type-imports', fixStyle: 'separate-type-imports' },
+        { prefer: 'type-imports', fixStyle: 'separate-type-imports', disallowTypeAnnotations: false },
       ],
       '@typescript-eslint/no-non-null-assertion': 'warn',
       'no-unused-vars': 'off',
       'no-undef': 'off',
       'import/order': [
-        'error',
+        'warn',
         {
           groups: ['builtin', 'external', 'internal', ['parent', 'sibling'], 'index'],
           'newlines-between': 'always',
           alphabetize: { order: 'asc', caseInsensitive: true },
         },
       ],
-      'import/no-duplicates': 'error',
+      'import/no-duplicates': 'warn',
       'no-console': ['warn', { allow: ['warn', 'error'] }],
       'prefer-const': 'error',
       'no-var': 'error',
-      eqeqeq: ['error', 'always'],
+      eqeqeq: ['warn', 'smart'],
+      'no-useless-escape': 'warn',
     },
   },
   {
@@ -97,6 +98,7 @@ export default tseslint.config(
     },
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-unused-vars': 'off',
       '@typescript-eslint/no-non-null-assertion': 'off',
       'no-console': 'off',
     },

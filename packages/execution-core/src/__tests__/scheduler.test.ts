@@ -1,6 +1,7 @@
-import { describe, it, expect } from 'vitest'
-import { TaskScheduler } from '../scheduler'
 import type { ExecutionBlueprint, Task, TaskGraph } from '@usepilot/planner-types'
+import { describe, it, expect } from 'vitest'
+
+import { TaskScheduler } from '../scheduler'
 
 function makeBlueprint(tasks: Task[], parallelGroups: string[][]): ExecutionBlueprint {
   const nodes = tasks.map((t, i) => ({

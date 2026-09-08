@@ -1,12 +1,13 @@
 import { useEffect } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import { useAppStore } from './shared/store/appStore'
+
 import { AppShell } from './components/layout/AppShell'
+import { Spinner } from './components/ui/Spinner'
+import { ToastProvider } from './components/ui/Toast'
 import { ChatRoute } from './routes/chat'
 import { SettingsRoute } from './routes/settings'
 import { WelcomeRoute } from './routes/welcome'
-import { ToastProvider } from './components/ui/Toast'
-import { Spinner } from './components/ui/Spinner'
+import { useAppStore } from './shared/store/appStore'
 
 export default function App() {
   const { status, error, initialize } = useAppStore()

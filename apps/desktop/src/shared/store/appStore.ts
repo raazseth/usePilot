@@ -1,11 +1,16 @@
-import { create } from 'zustand'
-import { apiClient } from '../api/client'
-import { wsManager } from '../api/websocket'
-import { IPCQuery } from '@usepilot/types'
-import { invokeQuery } from '../api/tauri'
-import type { Settings, ConversationSummary } from '@usepilot/types'
-import type { PlanningStage, ExecutionBlueprint } from '@usepilot/planner-types'
 import type { ExecutionStatus, TaskExecutionStatus, ApprovalRequest, JournalEntry, ExecutionMetrics, ExecutionReport, ExecutionResult } from '@usepilot/execution-types'
+import type { PlanningStage, ExecutionBlueprint, TaskCapability } from '@usepilot/planner-types'
+import { IPCQuery } from '@usepilot/types'
+import type { Settings, ConversationSummary } from '@usepilot/types'
+import { create } from 'zustand'
+
+import type { PermissionPromptRequest } from '../../components/execution/PermissionPrompt'
+import { apiClient } from '../api/client'
+import { invokeQuery } from '../api/tauri'
+import { wsManager } from '../api/websocket'
+import type { WebSocketStatus } from '../api/websocket'
+
+
 
 export type AppStatus = 'initializing' | 'ready' | 'error'
 
@@ -22,7 +27,7 @@ interface AppState {
   settings: Settings | null
   conversations: ConversationSummary[]
   activeConversationId: string | null
-  wsStatus: import('../api/websocket').WebSocketStatus
+  wsStatus: WebSocketStatus
 
   // Phase 2: Planner state
   planningProgress: PlanningProgressState | null
@@ -41,17 +46,43 @@ interface AppState {
   executionMetrics: Partial<ExecutionMetrics> | null
   lastExecutionReport: ExecutionReport | null
 
+  // Phase 4: Capability Runtime state
+  browserActivity: {
+    url?: string
+    title?: string
+    screenshot?: string
+    activeTab?: number
+    action?: string
+  } | null
+  activeCapability: string | null
+  activeAdapterInfo: string | null
+  verificationStatus: {
+    taskId?: string
+    passed: boolean
+    strategy: string
+    details?: string
+  } | null
+  recoveryAttempts: Array<{
+    timestamp: number
+    taskId: string
+    stage: string
+    message: string
+    succeeded: boolean
+  }>
+  permissionPrompt: PermissionPromptRequest | null
+
   // Actions
   initialize: () => Promise<void>
   setActiveConversation: (id: string | null) => void
   setConversations: (conversations: ConversationSummary[]) => void
   updateSettings: (patch: Partial<Settings>) => void
-  setWsStatus: (status: import('../api/websocket').WebSocketStatus) => void
+  setWsStatus: (status: WebSocketStatus) => void
   setPlanningProgress: (progress: PlanningProgressState | null) => void
   setActiveBlueprint: (blueprint: ExecutionBlueprint | null) => void
   setPlanningError: (error: string | null) => void
   resetPlanning: () => void
   resetExecution: () => void
+  setPermissionPrompt: (prompt: PermissionPromptRequest | null) => void
 }
 
 export const useAppStore = create<AppState>((set, get) => ({
@@ -77,6 +108,14 @@ export const useAppStore = create<AppState>((set, get) => ({
   executionJournal: [],
   executionMetrics: null,
   lastExecutionReport: null,
+
+  // Phase 4 initial state
+  browserActivity: null,
+  activeCapability: null,
+  activeAdapterInfo: null,
+  verificationStatus: null,
+  recoveryAttempts: [],
+  permissionPrompt: null,
 
   initialize: async () => {
     try {
@@ -120,7 +159,35 @@ export const useAppStore = create<AppState>((set, get) => ({
       })
 
       wsManager.on('execution.task.started', (event) => {
-        set((s) => ({ taskStatuses: { ...s.taskStatuses, [event.payload.taskId]: 'running' } }))
+        const payload = event.payload as { taskId: string; capability?: string; adapterInfo?: string }
+        set((s) => ({
+          taskStatuses: { ...s.taskStatuses, [payload.taskId]: 'running' },
+          activeCapability: payload.capability ?? s.activeCapability,
+          activeAdapterInfo: payload.adapterInfo ?? s.activeAdapterInfo,
+        }))
+      })
+
+      const anyWs = wsManager as unknown as { on: (event: string, handler: (e: { payload: unknown }) => void) => void }
+
+      anyWs.on('execution.browser.activity', (event) => {
+        set({ browserActivity: event.payload as AppState['browserActivity'] })
+      })
+
+      anyWs.on('execution.verification', (event) => {
+        set({ verificationStatus: event.payload as AppState['verificationStatus'] })
+      })
+
+      anyWs.on('execution.self_healing', (event) => {
+        const item = event.payload as AppState['recoveryAttempts'][0]
+        set((s) => ({ recoveryAttempts: [...s.recoveryAttempts, item] }))
+      })
+
+      anyWs.on('execution.permission.requested', (event) => {
+        set({ permissionPrompt: event.payload as AppState['permissionPrompt'] })
+      })
+
+      anyWs.on('execution.permission.resolved', () => {
+        set({ permissionPrompt: null })
       })
 
       wsManager.on('execution.task.completed', (event) => {
@@ -146,7 +213,7 @@ export const useAppStore = create<AppState>((set, get) => ({
           runId: p.runId,
           taskId: p.taskId,
           taskTitle: p.taskTitle,
-          capability: p.capability as import('@usepilot/planner-types').TaskCapability,
+          capability: p.capability as TaskCapability,
           approvalReason: p.reason ?? '',
           policy: 'mandatory',
           requestedAt: Date.now(),
@@ -244,5 +311,13 @@ export const useAppStore = create<AppState>((set, get) => ({
       executionJournal: [],
       executionMetrics: null,
       lastExecutionReport: null,
+      browserActivity: null,
+      activeCapability: null,
+      activeAdapterInfo: null,
+      verificationStatus: null,
+      recoveryAttempts: [],
+      permissionPrompt: null,
     }),
+
+  setPermissionPrompt: (permissionPrompt) => set({ permissionPrompt }),
 }))

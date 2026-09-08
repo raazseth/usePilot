@@ -4,6 +4,7 @@ import type { ServerWebSocket } from 'bun'
 import { generateId } from '@usepilot/utils'
 import {
   createDefaultRegistry,
+  createProductionRegistry,
   createExecutionRunner,
   ExecutionJournal,
   CheckpointManager,
@@ -65,7 +66,7 @@ export class ExecutionService {
 
     const blueprint = this.planRepo.parseBlueprint(planRow)
     const traceId = generateId()
-    const registry = createDefaultRegistry()
+    const registry = createProductionRegistry()
     const approvalGate = new ApprovalGate({ timeoutMs: 5 * 60 * 1000 })
     const runId = generateId()
 

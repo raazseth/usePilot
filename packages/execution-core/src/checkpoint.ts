@@ -1,7 +1,7 @@
 // CheckpointManager — snapshots execution state for restart resilience
 
-import { generateId } from '@usepilot/utils'
 import type { ExecutionCheckpoint, ExecutionStatus } from '@usepilot/execution-types'
+import { generateId } from '@usepilot/utils'
 
 export interface ICheckpointBackend {
   save(checkpoint: ExecutionCheckpoint): Promise<void>

@@ -1,7 +1,7 @@
 // VerificationEngine — checks postconditions / successCriteria before marking task complete
 
-import type { Task, ExecutionBlueprint } from '@usepilot/planner-types'
 import type { AdapterResult, VerificationResult, VerificationLevel } from '@usepilot/execution-types'
+import type { Task, ExecutionBlueprint } from '@usepilot/planner-types'
 
 export class VerificationEngine {
   async verify(

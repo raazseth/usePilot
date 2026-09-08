@@ -1,7 +1,5 @@
 // AdapterSession — encapsulates adapter lifecycle and state across multiple tasks
 
-import { generateId } from '@usepilot/utils'
-import type { TaskCapability } from '@usepilot/planner-types'
 import type {
   IAdapterSession,
   ICapabilityAdapter,
@@ -11,6 +9,9 @@ import type {
   SessionLifecycle,
   SessionStatus,
 } from '@usepilot/execution-types'
+import type { TaskCapability } from '@usepilot/planner-types'
+import { generateId } from '@usepilot/utils'
+
 import { AdapterSandbox } from '../sandbox'
 
 export class AdapterSession implements IAdapterSession {

@@ -1,8 +1,8 @@
 // ApprovalGate — suspends execution on mandatory tasks, survives restart
 
-import { generateId } from '@usepilot/utils'
-import type { Task } from '@usepilot/planner-types'
 import type { ApprovalRequest, ApprovalResponse } from '@usepilot/execution-types'
+import type { Task } from '@usepilot/planner-types'
+import { generateId } from '@usepilot/utils'
 
 interface PendingApproval {
   request: ApprovalRequest

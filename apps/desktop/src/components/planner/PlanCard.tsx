@@ -1,11 +1,12 @@
 import './planner.css'
-import { useState } from 'react'
 import type { ExecutionBlueprint, ValidationResult } from '@usepilot/planner-types'
+import { useState } from 'react'
+
+import { OptimizerSummary } from './OptimizerSummary'
 import { TaskCard } from './TaskCard'
 import { ValidationReport } from './ValidationReport'
-import { OptimizerSummary } from './OptimizerSummary'
-import { useAppStore } from '../../shared/store/appStore'
 import { wsManager } from '../../shared/api/websocket'
+import { useAppStore } from '../../shared/store/appStore'
 
 interface PlanCardProps {
   blueprint: ExecutionBlueprint

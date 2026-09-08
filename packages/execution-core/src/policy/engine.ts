@@ -1,6 +1,5 @@
 // ExecutionPolicyEngine — centralized execution policy decisions
 
-import type { Task, TaskCapability } from '@usepilot/planner-types'
 import type {
   ExecutionPolicy,
   IExecutionPolicyEngine,
@@ -8,6 +7,7 @@ import type {
   VerificationLevel,
   SessionScope,
 } from '@usepilot/execution-types'
+import type { Task, TaskCapability } from '@usepilot/planner-types'
 
 export function createDefaultExecutionPolicy(overrides?: Partial<ExecutionPolicy>): ExecutionPolicy {
   return {

@@ -1,8 +1,9 @@
+import type { ExecutionBlueprint, Task } from '@usepilot/planner-types'
 import { describe, it, expect } from 'vitest'
+
+import { createExecutionRunner, createDefaultRegistry } from '../index'
 import { ManifestGenerator } from '../manifest/generator'
 import { createDefaultExecutionPolicy } from '../policy/engine'
-import { createExecutionRunner, createDefaultRegistry } from '../index'
-import type { ExecutionBlueprint, Task } from '@usepilot/planner-types'
 
 function makeMockBlueprint(): ExecutionBlueprint {
   const task: Task = {

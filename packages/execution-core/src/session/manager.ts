@@ -1,6 +1,5 @@
 // SessionManager — manages adapter sessions across execution runs
 
-import type { TaskCapability } from '@usepilot/planner-types'
 import type {
   ISessionManager,
   IAdapterSession,
@@ -8,9 +7,11 @@ import type {
   SessionScope,
   SessionManagerOptions,
 } from '@usepilot/execution-types'
+import type { TaskCapability } from '@usepilot/planner-types'
+
 import { AdapterSession } from './session'
-import { AdapterSandbox } from '../sandbox'
 import type { ExecutionResourceManager } from '../resource-manager'
+import { AdapterSandbox } from '../sandbox'
 
 export class SessionManager implements ISessionManager {
   private readonly sessions = new Map<string, AdapterSession>()

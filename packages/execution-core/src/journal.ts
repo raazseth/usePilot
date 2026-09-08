@@ -1,7 +1,7 @@
 // ExecutionJournal — append-only audit trail
 
-import { generateId } from '@usepilot/utils'
 import type { JournalEntry, JournalEventType } from '@usepilot/execution-types'
+import { generateId } from '@usepilot/utils'
 
 type JournalEntryInput = Omit<JournalEntry, 'id' | 'timestamp'>
 

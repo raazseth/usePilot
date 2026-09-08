@@ -1,4 +1,6 @@
+import type { ExecutionBlueprint, Task, TaskGraph, Goal, Intent } from '@usepilot/planner-types'
 import { describe, it, expect, vi } from 'vitest'
+
 import {
   createExecutionRunner,
   createDefaultRegistry,
@@ -11,7 +13,6 @@ import {
   ExecutionMetricsCollector,
   ExecutionRunner,
 } from '../index'
-import type { ExecutionBlueprint, Task, TaskGraph, Goal, Intent } from '@usepilot/planner-types'
 
 function makeTask(overrides: Partial<Task> = {}): Task {
   return {

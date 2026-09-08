@@ -1,5 +1,5 @@
-import { createContext, useContext, useState, useCallback, type ReactNode } from 'react'
 import { generateId } from '@usepilot/utils'
+import { createContext, useContext, useState, useCallback, type ReactNode } from 'react'
 import './Toast.css'
 
 interface Toast {

@@ -1,8 +1,6 @@
 // Adapter Types
 
-import type { Task } from '@usepilot/planner-types'
-import type { ExecutionBlueprint } from '@usepilot/planner-types'
-import type { TaskCapability } from '@usepilot/planner-types'
+import type { Task, ExecutionBlueprint, TaskCapability } from '@usepilot/planner-types'
 import type { FailureCategory } from './execution'
 import type { VerificationResult } from './verification'
 

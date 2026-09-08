@@ -1,5 +1,5 @@
-import { useState, useRef } from 'react'
 import type { ConversationSummary } from '@usepilot/types'
+import { useState, useRef } from 'react'
 import './ConversationSearch.css'
 
 interface ConversationSearchProps {

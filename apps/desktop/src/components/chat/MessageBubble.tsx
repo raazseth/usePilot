@@ -1,7 +1,8 @@
+import type { Message } from '@usepilot/types'
 import { useState, useCallback } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import type { Message } from '@usepilot/types'
+
 import { CodeBlock } from '../ui/CodeBlock'
 import './MessageBubble.css'
 
@@ -52,7 +53,7 @@ export function MessageBubble({ message, isStreaming }: MessageBubbleProps) {
               <ReactMarkdown
                 remarkPlugins={[remarkGfm]}
                 components={{
-                  code({ node, className, children, ...props }) {
+                  code({ node: _node, className, children, ...props }) {
                     const match = /language-(\w+)/.exec(className ?? '')
                     const isBlock = !!match
                     if (isBlock) {

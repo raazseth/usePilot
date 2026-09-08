@@ -1,6 +1,6 @@
 import './planner.css'
-import { useState } from 'react'
 import type { Task } from '@usepilot/planner-types'
+import { useState } from 'react'
 
 interface TaskCardProps {
   task: Task

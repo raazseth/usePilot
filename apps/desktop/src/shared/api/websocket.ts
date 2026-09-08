@@ -1,6 +1,6 @@
-import { generateId } from '@usepilot/utils'
 import { appConfig } from '@usepilot/config'
 import type { ClientEvent, ServerEvent, ServerEventType } from '@usepilot/types'
+import { generateId } from '@usepilot/utils'
 
 type Handler<T extends ServerEventType> = (
   event: Extract<ServerEvent, { type: T }>

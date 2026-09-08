@@ -1,7 +1,7 @@
 // CapabilityRegistry — dynamic adapter registry, no hardcoded mappings
 
-import type { TaskCapability } from '@usepilot/planner-types'
 import type { ICapabilityAdapter, AdapterFactory, AdapterRegistration } from '@usepilot/execution-types'
+import type { TaskCapability } from '@usepilot/planner-types'
 
 export class CapabilityRegistry {
   private readonly registrations = new Map<TaskCapability, AdapterRegistration[]>()

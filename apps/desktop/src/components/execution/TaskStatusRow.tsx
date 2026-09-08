@@ -1,6 +1,6 @@
 import './execution.css'
-import { useState } from 'react'
 import type { TaskExecutionStatus, FailureCategory } from '@usepilot/execution-types'
+import { useState } from 'react'
 
 interface TaskStatusRowProps {
   taskId: string

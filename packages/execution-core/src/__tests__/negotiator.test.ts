@@ -1,6 +1,7 @@
-import { describe, it, expect } from 'vitest'
-import { PolicyBasedCapabilityNegotiator } from '../negotiator'
 import type { AdapterRegistration, ICapabilityAdapter } from '@usepilot/execution-types'
+import { describe, it, expect } from 'vitest'
+
+import { PolicyBasedCapabilityNegotiator } from '../negotiator'
 
 function makeMockRegistration(
   name: string,

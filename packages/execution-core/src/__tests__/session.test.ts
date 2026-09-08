@@ -1,10 +1,11 @@
-import { describe, it, expect, beforeEach } from 'vitest'
-import { StubAdapter } from '../adapters/stub'
-import { AdapterSession } from '../session/session'
-import { SessionManager } from '../session/manager'
-import { ExecutionResourceManager } from '../resource-manager'
 import type { AdapterContext } from '@usepilot/execution-types'
 import type { Task, ExecutionBlueprint } from '@usepilot/planner-types'
+import { describe, it, expect, beforeEach } from 'vitest'
+
+import { StubAdapter } from '../adapters/stub'
+import { ExecutionResourceManager } from '../resource-manager'
+import { SessionManager } from '../session/manager'
+import { AdapterSession } from '../session/session'
 
 function makeMockBlueprint(): ExecutionBlueprint {
   return {

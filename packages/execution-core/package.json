@@ -23,13 +23,15 @@
   "dependencies": {
     "@usepilot/execution-types": "workspace:*",
     "@usepilot/planner-types": "workspace:*",
-    "@usepilot/utils": "workspace:*"
+    "@usepilot/utils": "workspace:*",
+    "playwright": "^1.63.0",
+    "tesseract.js": "^7.0.0"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
     "@usepilot/typescript-config": "workspace:*",
+    "rimraf": "^6.0.1",
     "typescript": "^5.7.3",
-    "vitest": "^2.1.8",
-    "rimraf": "^6.0.1"
+    "vitest": "^2.1.8"
   }
 }

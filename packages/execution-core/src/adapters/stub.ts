@@ -1,13 +1,12 @@
 // StubAdapter — simulates all capabilities, exercises the full runtime path
 
-import type { TaskCapability } from '@usepilot/planner-types'
 import type {
   ICapabilityAdapter,
   AdapterContext,
   AdapterResult,
   AdapterFactory,
-} from '@usepilot/execution-types'
-import type { VerificationResult } from '@usepilot/execution-types'
+ VerificationResult } from '@usepilot/execution-types'
+import type { TaskCapability } from '@usepilot/planner-types'
 
 export class StubAdapter implements ICapabilityAdapter {
   readonly capability: TaskCapability
