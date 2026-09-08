@@ -143,6 +143,17 @@ export function Sidebar() {
       {/* Footer */}
       <div className="sidebar__footer">
         <button
+          id="diagnostics-btn"
+          className="sidebar__settings-btn"
+          onClick={() => navigate('/diagnostics')}
+          title="Diagnostics"
+        >
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
+            <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+          </svg>
+          Diagnostics
+        </button>
+        <button
           id="settings-btn"
           className="sidebar__settings-btn"
           onClick={() => navigate('/settings')}
