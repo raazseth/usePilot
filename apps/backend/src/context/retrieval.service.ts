@@ -1,34 +1,15 @@
 import {
-  RuntimeQueryEngine,
-  MemoryContextStore,
-  ObservationEngine,
-  KnowledgeStore,
-  RuntimeIndexEngine,
-  ExecutionMemoryStore,
-  RuntimeEntityGraph,
+  createRuntimeContextFacade,
+  type RuntimeContextFacade,
 } from '@usepilot/runtime-context'
 import type { MultiDomainQuery, RuntimeContextBundle, SearchQuery, SearchResult } from '@usepilot/runtime-context'
 
 export class RetrievalService {
   private static instance: RetrievalService | null = null
-  private queryEngine: RuntimeQueryEngine
+  private facade: RuntimeContextFacade
 
-  constructor(
-    contextStore = MemoryContextStore.getInstance(),
-    observationEngine = ObservationEngine.getInstance(),
-    knowledgeStore = KnowledgeStore.getInstance(),
-    indexEngine = RuntimeIndexEngine.getInstance(),
-    executionMemory = ExecutionMemoryStore.getInstance(),
-    entityGraph = RuntimeEntityGraph.getInstance()
-  ) {
-    this.queryEngine = new RuntimeQueryEngine({
-      contextStore,
-      observationEngine,
-      knowledgeStore,
-      indexEngine,
-      executionMemory,
-      entityGraph,
-    })
+  constructor(facade = createRuntimeContextFacade()) {
+    this.facade = facade
   }
 
   static getInstance(): RetrievalService {
@@ -38,15 +19,16 @@ export class RetrievalService {
     return RetrievalService.instance
   }
 
-  getQueryEngine(): RuntimeQueryEngine {
-    return this.queryEngine
+  getFacade(): RuntimeContextFacade {
+    return this.facade
   }
 
-  async query(options: MultiDomainQuery): Promise<RuntimeContextBundle> {
-    return this.queryEngine.query(options)
+  async query(options: MultiDomainQuery): Promise<Readonly<RuntimeContextBundle>> {
+    return this.facade.query.compile(options)
   }
 
   search(query: SearchQuery): SearchResult[] {
-    return this.queryEngine.search(query)
+    return this.facade.query.search(query)
   }
 }
+

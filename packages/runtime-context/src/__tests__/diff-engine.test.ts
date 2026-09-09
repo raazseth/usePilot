@@ -7,11 +7,13 @@ describe('ContextDiffEngine', () => {
     snapshotId: 'snap-1',
     sessionId: 'sess-test',
     version: 1,
+    contextSchemaVersion: 1,
     timestamp: 1000,
     checksum: 'sha-base',
     state: {
       sessionId: 'sess-test',
       version: 1,
+      contextSchemaVersion: 1,
       createdAt: 1000,
       updatedAt: 1000,
       browser: {
@@ -52,10 +54,12 @@ describe('ContextDiffEngine', () => {
       ...baseSnapshot,
       snapshotId: 'snap-2',
       version: 2,
+      contextSchemaVersion: 1,
       timestamp: 2000,
       state: {
         ...baseSnapshot.state,
         version: 2,
+        contextSchemaVersion: 1,
         updatedAt: 2000,
         browser: {
           ...baseSnapshot.state.browser,

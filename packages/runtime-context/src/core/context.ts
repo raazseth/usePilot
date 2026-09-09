@@ -2,10 +2,11 @@ import { createHash } from 'node:crypto'
 
 import { createProvenance } from './provenance'
 import type { ContextProvenance } from './provenance'
-import type {
-  RuntimeContextState,
-  ContextSnapshot,
-  StateMutationFn,
+import {
+  CURRENT_CONTEXT_SCHEMA_VERSION,
+  type RuntimeContextState,
+  type ContextSnapshot,
+  type StateMutationFn,
 } from './types'
 
 export class RuntimeContext {
@@ -17,6 +18,7 @@ export class RuntimeContext {
     this.state = {
       sessionId,
       version: 1,
+      contextSchemaVersion: CURRENT_CONTEXT_SCHEMA_VERSION,
       browser: {
         authenticatedDomains: [],
         tabCount: 0,
@@ -134,6 +136,7 @@ export class RuntimeContext {
       snapshotId: `snap-${this.state.sessionId}-v${this.state.version}-${now}`,
       sessionId: this.state.sessionId,
       version: this.state.version,
+      contextSchemaVersion: this.state.contextSchemaVersion ?? CURRENT_CONTEXT_SCHEMA_VERSION,
       state: JSON.parse(serialized) as RuntimeContextState,
       timestamp: now,
       checksum,

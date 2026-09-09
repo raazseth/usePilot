@@ -9,14 +9,15 @@ export {
 
 export { RuntimeContext } from './core/context'
 export { MemoryContextStore, type IContextStore } from './core/store'
-export type {
-  RuntimeContextState,
-  BrowserRuntimeState,
-  DesktopRuntimeState,
-  FilesystemRuntimeState,
-  ContextSnapshot,
-  ContextTransactionOptions,
-  StateMutationFn,
+export {
+  CURRENT_CONTEXT_SCHEMA_VERSION,
+  type RuntimeContextState,
+  type BrowserRuntimeState,
+  type DesktopRuntimeState,
+  type FilesystemRuntimeState,
+  type ContextSnapshot,
+  type ContextTransactionOptions,
+  type StateMutationFn,
 } from './core/types'
 
 // 2. Observations
@@ -131,4 +132,33 @@ export type {
   SliceDiff,
   ContextDiff,
 } from './diff/types'
+
+// 13. Hot / Warm / Cold Storage Tiering
+export { RuntimeStorageTierManager, type StorageTierDependencies } from './tiering/storage-manager'
+export type {
+  StorageTier,
+  TieredStorageMetrics,
+  TierPruneOptions,
+  TierPruneResult,
+} from './tiering/types'
+
+// 14. Primary Facade & Factory (Recommended External Entry Point)
+export { RuntimeContextFacade, type RuntimeContextFacadeDependencies } from './facade/facade'
+export {
+  createRuntimeContextFacade,
+  type RuntimeContextConfig,
+  type RuntimeContextDependencies,
+} from './facade/factory'
+export {
+  ContextTransactionRunner,
+  type ContextTransactionScope,
+} from './facade/transaction'
+export { QueryDomain } from './facade/domains/query.domain'
+export { ObservationsDomain } from './facade/domains/observations.domain'
+export { KnowledgeDomain } from './facade/domains/knowledge.domain'
+export { EntitiesDomain } from './facade/domains/entities.domain'
+export { StorageDomain } from './facade/domains/storage.domain'
+export { ReplayDomain } from './facade/domains/replay.domain'
+export { StateDomain } from './facade/domains/state.domain'
+
 

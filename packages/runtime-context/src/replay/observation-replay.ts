@@ -32,9 +32,14 @@ export class ObservationReplayEngine {
   private observations: Observation[]
   private currentStep = 0
 
-  constructor(observations: Observation[]) {
+  constructor(observations: Observation[] = []) {
     // Sort strictly chronological
+    this.observations = [...(observations ?? [])].sort((a, b) => a.timestamp - b.timestamp)
+  }
+
+  loadObservations(observations: Observation[]): void {
     this.observations = [...observations].sort((a, b) => a.timestamp - b.timestamp)
+    this.currentStep = 0
   }
 
   getTotalSteps(): number {

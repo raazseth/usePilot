@@ -23,9 +23,12 @@ export interface FilesystemRuntimeState {
   lastUpdated: number
 }
 
+export const CURRENT_CONTEXT_SCHEMA_VERSION = 1
+
 export interface RuntimeContextState {
   sessionId: string
   version: number
+  contextSchemaVersion: number
   browser: BrowserRuntimeState
   desktop: DesktopRuntimeState
   filesystem: FilesystemRuntimeState
@@ -38,6 +41,7 @@ export interface ContextSnapshot {
   snapshotId: string
   sessionId: string
   version: number
+  contextSchemaVersion: number
   state: RuntimeContextState
   timestamp: number
   checksum: string
