@@ -137,6 +137,12 @@ export class ObservationEngine {
     }
   }
 
+  purge(predicate: (obs: Observation) => boolean): number {
+    const before = this.observations.length
+    this.observations = this.observations.filter((obs) => !predicate(obs))
+    return before - this.observations.length
+  }
+
   clear(): void {
     this.observations = []
   }

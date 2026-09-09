@@ -23,13 +23,30 @@ export interface QueryEngineDependencies {
   entityGraph: RuntimeEntityGraph
 }
 
+/**
+ * RuntimeQueryEngine — STRICT READ-ONLY CONTRACT
+ *
+ * Architectural Topology:
+ *   Planner / UI / External Consumers
+ *            ↓ (READ ONLY)
+ *   RuntimeQueryEngine
+ *            ↓ (READS)
+ *     RuntimeContext
+ *            ↑ (WRITES ONLY)
+ *   ObservationEngine / Capability Runtime / Execution
+ *
+ * INVARIANTS:
+ * 1. RuntimeQueryEngine is strictly READ-ONLY. It exposes zero mutation or deletion methods.
+ * 2. All mutations originate exclusively from ObservationEngine, Capability Runtime, or ExecutionRunner.
+ * 3. All returned collections represent immutable or defensive copies of internal state.
+ */
 export class RuntimeQueryEngine {
   private static instance: RuntimeQueryEngine | null = null
-  private deps: QueryEngineDependencies
-  private healthMonitor: RuntimeContextHealthMonitor
+  private readonly deps: Readonly<QueryEngineDependencies>
+  private readonly healthMonitor: RuntimeContextHealthMonitor
 
   constructor(deps: QueryEngineDependencies) {
-    this.deps = deps
+    this.deps = Object.freeze({ ...deps })
     this.healthMonitor = new RuntimeContextHealthMonitor({
       knowledgeStore: deps.knowledgeStore,
       runtimeIndex: deps.indexEngine,
@@ -51,10 +68,11 @@ export class RuntimeQueryEngine {
 
   /**
    * Primary context compilation method consumed by Planner, Agents, and Services.
+   * Strictly read-only; returns an immutable context bundle.
    */
-  async query(options: MultiDomainQuery): Promise<RuntimeContextBundle> {
+  async query(options: MultiDomainQuery): Promise<Readonly<RuntimeContextBundle>> {
     const recentObservations: Observation[] = options.includeObservations !== false
-      ? this.observe({ limit: 20 })
+      ? [...this.observe({ limit: 20 })]
       : []
 
     const domainGraph = options.domain

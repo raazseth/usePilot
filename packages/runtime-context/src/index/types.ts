@@ -16,6 +16,7 @@ export interface IndexDocument {
   entityType: IndexedEntityType
   title: string
   content: string
+  uri?: string | undefined
   tags: string[]
   metadata?: Record<string, unknown> | undefined
   provenance: ContextProvenance

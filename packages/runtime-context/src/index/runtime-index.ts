@@ -147,6 +147,28 @@ export class RuntimeIndexEngine {
     return count
   }
 
+  removeByUri(uri: string): number {
+    let removed = 0
+    for (const [id, doc] of this.documents.entries()) {
+      if (doc.uri === uri || doc.uri?.startsWith(uri)) {
+        this.documents.delete(id)
+        removed++
+      }
+    }
+    return removed
+  }
+
+  purge(predicate: (doc: IndexDocument) => boolean): number {
+    let removed = 0
+    for (const [id, doc] of this.documents.entries()) {
+      if (predicate(doc)) {
+        this.documents.delete(id)
+        removed++
+      }
+    }
+    return removed
+  }
+
   clear(): void {
     this.documents.clear()
   }

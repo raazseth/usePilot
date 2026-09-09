@@ -132,6 +132,20 @@ export class BrowserKnowledgeGraph {
     return Array.from(this.domains.keys())
   }
 
+  invalidateDomain(domain: string): boolean {
+    return this.domains.delete(domain)
+  }
+
+  invalidatePage(domain: string, path: string): boolean {
+    const graph = this.domains.get(domain)
+    if (!graph || !graph.nodes[path]) return false
+    delete graph.nodes[path]
+    graph.graphVersion += 1
+    graph.updatedAt = Date.now()
+    graph.fingerprint = this.computeFingerprint(graph)
+    return true
+  }
+
   exportAll(): Record<string, DomainKnowledgeGraph> {
     const result: Record<string, DomainKnowledgeGraph> = {}
     for (const [d, g] of this.domains.entries()) {

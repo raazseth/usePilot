@@ -111,3 +111,24 @@ export type {
   SubsystemHealthStatus,
 } from './health/types'
 
+// 11. Context Invalidation
+export {
+  ContextInvalidationEngine,
+  type InvalidationEngineDependencies,
+} from './invalidation/invalidation-engine'
+export type {
+  InvalidationReason,
+  InvalidationScope,
+  InvalidationEvent,
+  InvalidationSubscriber,
+  InvalidationOptions,
+} from './invalidation/types'
+
+// 12. Context Diff
+export { ContextDiffEngine } from './diff/diff-engine'
+export type {
+  ValueDiff,
+  SliceDiff,
+  ContextDiff,
+} from './diff/types'
+
