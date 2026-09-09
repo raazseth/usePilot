@@ -1,0 +1,34 @@
+{
+  "name": "@usepilot/runtime-context",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Intelligence & Runtime Context Layer for usePilot — Single source of truth between Planner and Execution",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src --ext .ts",
+    "test": "vitest run",
+    "clean": "rimraf dist"
+  },
+  "dependencies": {
+    "@usepilot/planner-types": "workspace:*",
+    "@usepilot/execution-types": "workspace:*",
+    "@usepilot/utils": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@usepilot/typescript-config": "workspace:*",
+    "typescript": "^5.7.3",
+    "vitest": "^2.1.9",
+    "rimraf": "^6.0.1"
+  }
+}

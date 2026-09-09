@@ -5,6 +5,7 @@ import { AppShell } from './components/layout/AppShell'
 import { Spinner } from './components/ui/Spinner'
 import { ToastProvider } from './components/ui/Toast'
 import { ChatRoute } from './routes/chat'
+import { ContextRoute } from './routes/context'
 import { DiagnosticsRoute } from './routes/diagnostics'
 import { SettingsRoute } from './routes/settings'
 import { WelcomeRoute } from './routes/welcome'
@@ -81,6 +82,7 @@ export default function App() {
           <Routes>
             <Route path="/" element={<WelcomeRoute />} />
             <Route path="/chat/:conversationId" element={<ChatRoute />} />
+            <Route path="/context" element={<ContextRoute />} />
             <Route path="/diagnostics" element={<DiagnosticsRoute />} />
             <Route path="/settings" element={<SettingsRoute />} />
             <Route path="*" element={<Navigate to="/" replace />} />

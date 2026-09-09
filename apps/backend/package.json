@@ -23,7 +23,8 @@
     "@usepilot/planner-core": "workspace:*",
     "@usepilot/planner-types": "workspace:*",
     "@usepilot/execution-core": "workspace:*",
-    "@usepilot/execution-types": "workspace:*"
+    "@usepilot/execution-types": "workspace:*",
+    "@usepilot/runtime-context": "workspace:*"
   },
   "devDependencies": {
     "@usepilot/typescript-config": "workspace:*",

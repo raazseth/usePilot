@@ -1,13 +1,9 @@
-# Execution Replay Engine
+# Observation Replay Subsystem
 
-The Execution Replay Engine visualizes past workflow executions without executing any side-effects.
+The **Observation Replay Subsystem** deterministically reproduces the perceived state of past executions.
 
-## How Replay Works
-
-1. **Idempotent Inspection**: Replay reads strictly from the `ExecutionJournal` and the `ArtifactStore`. It never issues network requests, launches processes, or touches live systems.
-2. **Timeline Frame Stepper**: Converts chronological journal actions into interactive `ReplayFrame`s showing:
-   - Current task description and capability
-   - Live screenshot at that exact moment (if captured)
-   - Associated DOM snapshot or downloaded artifact
-   - Self-healing interventions and verification results
-3. **Auditing & Forensic Debugging**: Allows operators to review exactly what the AI agent did and verify compliance before running similar workflows in the future.
+## Features
+- **Stepped Playback**: `stepForward()`, `stepBackward()`, and `seekTo()`.
+- **State Projection**: Carries forward latest known URLs, DOM fingerprints, filesystem changes, vision bounding boxes, and verification assertions at each step.
+- **Read-Only**: Zero destructive live tool executions during replay.
+- **UI Integration**: Powers the History tab in `/context`.

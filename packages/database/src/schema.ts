@@ -409,3 +409,132 @@ export type VerificationResultRow = typeof verificationResults.$inferSelect
 export type ExecutionReportRow = typeof executionReports.$inferSelect
 export type ExecutionManifestRow = typeof executionManifests.$inferSelect
 export type NewExecutionManifestRow = typeof executionManifests.$inferInsert
+
+// ---------------------------------------------------------------------------
+// Phase 5 — Intelligence & Runtime Context Layer Tables
+// ---------------------------------------------------------------------------
+
+export const runtimeContext = sqliteTable('runtime_context', {
+  id: text('id').primaryKey(),
+  sessionId: text('session_id').notNull(),
+  version: integer('version').notNull(),
+  /** JSON: RuntimeContextState */
+  statePayload: text('state_payload').notNull(),
+  createdAt: integer('created_at', { mode: 'number' }).notNull(),
+  updatedAt: integer('updated_at', { mode: 'number' }).notNull(),
+})
+
+export const observations = sqliteTable('observations', {
+  id: text('id').primaryKey(),
+  correlationId: text('correlation_id'),
+  type: text('type').notNull(),
+  source: text('source').notNull(),
+  confidence: integer('confidence', { mode: 'number' }).notNull(), // Scaled integer (e.g. 0-100 or float)
+  /** JSON: Observation Payload */
+  payload: text('payload').notNull(),
+  /** JSON: ContextProvenance */
+  provenance: text('provenance').notNull(),
+  /** JSON: Record<string, unknown> */
+  metadata: text('metadata'),
+  timestamp: integer('timestamp', { mode: 'number' }).notNull(),
+})
+
+export const knowledgeStore = sqliteTable('knowledge_store', {
+  id: text('id').primaryKey(),
+  compoundKey: text('compound_key').notNull().unique(),
+  key: text('key').notNull(),
+  category: text('category').notNull(),
+  policy: text('policy').notNull(),
+  /** JSON: Data payload */
+  data: text('data').notNull(),
+  /** JSON: ContextProvenance */
+  provenance: text('provenance').notNull(),
+  version: integer('version').notNull(),
+  expiresAt: integer('expires_at', { mode: 'number' }),
+  createdAt: integer('created_at', { mode: 'number' }).notNull(),
+  updatedAt: integer('updated_at', { mode: 'number' }).notNull(),
+})
+
+export const browserGraph = sqliteTable('browser_graph', {
+  domain: text('domain').primaryKey(),
+  rootUrl: text('root_url').notNull(),
+  /** JSON: Record<string, BrowserPageNode> */
+  nodesJson: text('nodes_json').notNull(),
+  authenticated: integer('authenticated', { mode: 'boolean' }).notNull().default(false),
+  discoveredAt: integer('discovered_at', { mode: 'number' }).notNull(),
+  updatedAt: integer('updated_at', { mode: 'number' }).notNull(),
+})
+
+export const runtimeIndex = sqliteTable('runtime_index', {
+  id: text('id').primaryKey(),
+  entityType: text('entity_type').notNull(),
+  title: text('title').notNull(),
+  content: text('content').notNull(),
+  /** JSON: string[] */
+  tags: text('tags').notNull(),
+  /** JSON: ContextProvenance */
+  provenance: text('provenance').notNull(),
+  /** JSON: number[] optional embedding vector */
+  vectorJson: text('vector_json'),
+  indexedAt: integer('indexed_at', { mode: 'number' }).notNull(),
+})
+
+export const executionMemory = sqliteTable('execution_memory', {
+  id: text('id').primaryKey(),
+  executionId: text('execution_id').notNull(),
+  blueprintId: text('blueprint_id').notNull(),
+  intent: text('intent').notNull(),
+  /** JSON: string[] */
+  capabilitySequence: text('capability_sequence').notNull(),
+  /** JSON: string[] */
+  domainTargets: text('domain_targets').notNull(),
+  success: integer('success', { mode: 'boolean' }).notNull(),
+  failureReason: text('failure_reason'),
+  durationMs: integer('duration_ms', { mode: 'number' }).notNull(),
+  approvalCount: integer('approval_count', { mode: 'number' }).notNull(),
+  verificationPassed: integer('verification_passed', { mode: 'boolean' }).notNull(),
+  healingEventCount: integer('healing_event_count', { mode: 'number' }).notNull(),
+  artifactsProducedCount: integer('artifacts_produced_count', { mode: 'number' }).notNull(),
+  /** JSON: ContextProvenance */
+  provenance: text('provenance').notNull(),
+  timestamp: integer('timestamp', { mode: 'number' }).notNull(),
+  /** JSON: string[] */
+  tags: text('tags').notNull(),
+})
+
+export const contextSnapshots = sqliteTable('context_snapshots', {
+  id: text('id').primaryKey(),
+  sessionId: text('session_id').notNull(),
+  version: integer('version').notNull(),
+  checksum: text('checksum').notNull(),
+  /** JSON: RuntimeContextState */
+  statePayload: text('state_payload').notNull(),
+  timestamp: integer('timestamp', { mode: 'number' }).notNull(),
+})
+
+export const replaySessions = sqliteTable('replay_sessions', {
+  id: text('id').primaryKey(),
+  runId: text('run_id').notNull(),
+  totalSteps: integer('total_steps', { mode: 'number' }).notNull(),
+  currentStep: integer('current_step', { mode: 'number' }).notNull(),
+  status: text('status').notNull(), // 'active' | 'completed'
+  createdAt: integer('created_at', { mode: 'number' }).notNull(),
+})
+
+export type RuntimeContextRow = typeof runtimeContext.$inferSelect
+export type NewRuntimeContextRow = typeof runtimeContext.$inferInsert
+export type ObservationRow = typeof observations.$inferSelect
+export type NewObservationRow = typeof observations.$inferInsert
+export type KnowledgeStoreRow = typeof knowledgeStore.$inferSelect
+export type NewKnowledgeStoreRow = typeof knowledgeStore.$inferInsert
+export type BrowserGraphRow = typeof browserGraph.$inferSelect
+export type NewBrowserGraphRow = typeof browserGraph.$inferInsert
+export type RuntimeIndexRow = typeof runtimeIndex.$inferSelect
+export type NewRuntimeIndexRow = typeof runtimeIndex.$inferInsert
+export type ExecutionMemoryRow = typeof executionMemory.$inferSelect
+export type NewExecutionMemoryRow = typeof executionMemory.$inferInsert
+export type ContextSnapshotRow = typeof contextSnapshots.$inferSelect
+export type NewContextSnapshotRow = typeof contextSnapshots.$inferInsert
+export type ReplaySessionRow = typeof replaySessions.$inferSelect
+export type NewReplaySessionRow = typeof replaySessions.$inferInsert
+
