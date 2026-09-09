@@ -5,6 +5,7 @@ import {
   KnowledgeStore,
   RuntimeIndexEngine,
   ExecutionMemoryStore,
+  RuntimeEntityGraph,
 } from '@usepilot/runtime-context'
 import type { MultiDomainQuery, RuntimeContextBundle, SearchQuery, SearchResult } from '@usepilot/runtime-context'
 
@@ -17,7 +18,8 @@ export class RetrievalService {
     observationEngine = ObservationEngine.getInstance(),
     knowledgeStore = KnowledgeStore.getInstance(),
     indexEngine = RuntimeIndexEngine.getInstance(),
-    executionMemory = ExecutionMemoryStore.getInstance()
+    executionMemory = ExecutionMemoryStore.getInstance(),
+    entityGraph = RuntimeEntityGraph.getInstance()
   ) {
     this.queryEngine = new RuntimeQueryEngine({
       contextStore,
@@ -25,6 +27,7 @@ export class RetrievalService {
       knowledgeStore,
       indexEngine,
       executionMemory,
+      entityGraph,
     })
   }
 

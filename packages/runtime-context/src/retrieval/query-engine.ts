@@ -1,5 +1,9 @@
 import type { MemoryContextStore } from '../core/store'
 import type { ContextSnapshot } from '../core/types'
+import type { RuntimeEntityGraph } from '../graph/entity-graph'
+import type { EntityGraphQuery, GraphEntity, GraphRelationship } from '../graph/types'
+import { RuntimeContextHealthMonitor } from '../health/health-monitor'
+import type { RuntimeContextHealthReport } from '../health/types'
 import type { RuntimeIndexEngine } from '../index/runtime-index'
 import type { SearchQuery, SearchResult } from '../index/types'
 import type { KnowledgeStore } from '../knowledge/knowledge-store'
@@ -16,14 +20,23 @@ export interface QueryEngineDependencies {
   knowledgeStore: KnowledgeStore
   indexEngine: RuntimeIndexEngine
   executionMemory: ExecutionMemoryStore
+  entityGraph: RuntimeEntityGraph
 }
 
 export class RuntimeQueryEngine {
   private static instance: RuntimeQueryEngine | null = null
   private deps: QueryEngineDependencies
+  private healthMonitor: RuntimeContextHealthMonitor
 
   constructor(deps: QueryEngineDependencies) {
     this.deps = deps
+    this.healthMonitor = new RuntimeContextHealthMonitor({
+      knowledgeStore: deps.knowledgeStore,
+      runtimeIndex: deps.indexEngine,
+      observationEngine: deps.observationEngine,
+      executionMemory: deps.executionMemory,
+      entityGraph: deps.entityGraph,
+    })
   }
 
   static getInstance(deps?: QueryEngineDependencies): RuntimeQueryEngine {
@@ -92,15 +105,12 @@ export class RuntimeQueryEngine {
    * Direct key lookup across persistent knowledge, documents, and cached data.
    */
   lookup<T = unknown>(key: string): T | undefined {
-    // Check persistent knowledge
     const persistent = this.deps.knowledgeStore.getPersistent<T>(key)
     if (persistent !== undefined) return persistent
 
-    // Check cache
     const cached = this.deps.knowledgeStore.getCache<T>(key)
     if (cached !== undefined) return cached
 
-    // Check documents
     const doc = this.deps.knowledgeStore.getDocument<T>(key)
     if (doc !== undefined) return doc
 
@@ -143,5 +153,26 @@ export class RuntimeQueryEngine {
    */
   executions(query?: ExecutionMemoryQuery): ExecutionMemoryRecord[] {
     return this.deps.executionMemory.query(query)
+  }
+
+  /**
+   * Query RuntimeEntityGraph entities and relationships.
+   */
+  entities(query: EntityGraphQuery = {}): { entities: GraphEntity[]; relationships: GraphRelationship[] } {
+    return this.deps.entityGraph.query(query)
+  }
+
+  /**
+   * Traverse neighbors of an entity in the graph.
+   */
+  entityNeighbors(entityId: string): { entity: GraphEntity; relationship: GraphRelationship }[] {
+    return this.deps.entityGraph.getNeighbors(entityId)
+  }
+
+  /**
+   * Retrieve real-time health telemetry across all Runtime Context subsystems.
+   */
+  health(): RuntimeContextHealthReport {
+    return this.healthMonitor.getHealthReport()
   }
 }

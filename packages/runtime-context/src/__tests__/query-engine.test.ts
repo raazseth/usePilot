@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest'
 
 import { createProvenance } from '../core/provenance'
 import { MemoryContextStore } from '../core/store'
+import { RuntimeEntityGraph } from '../graph/entity-graph'
 import { RuntimeIndexEngine } from '../index/runtime-index'
 import { KnowledgeStore } from '../knowledge/knowledge-store'
 import { ExecutionMemoryStore } from '../memory/execution-memory'
@@ -17,6 +18,7 @@ describe('Unified RuntimeQueryEngine & Execution Memory (Deliverables 6, 7 & Req
     const knowledgeStore = new KnowledgeStore()
     const indexEngine = new RuntimeIndexEngine()
     const executionMemory = new ExecutionMemoryStore()
+    const entityGraph = new RuntimeEntityGraph()
 
     const queryEngine = new RuntimeQueryEngine({
       contextStore,
@@ -24,6 +26,7 @@ describe('Unified RuntimeQueryEngine & Execution Memory (Deliverables 6, 7 & Req
       knowledgeStore,
       indexEngine,
       executionMemory,
+      entityGraph,
     })
 
     const prov = createProvenance('browser')
@@ -92,6 +95,11 @@ describe('Unified RuntimeQueryEngine & Execution Memory (Deliverables 6, 7 & Req
     }
     executionMemory.recordExecution(execRecord)
 
+    // 5. Seed entity graph
+    entityGraph.addEntity({ id: 'ent-web-1', type: 'website', label: 'github.com', properties: {} })
+    entityGraph.addEntity({ id: 'ent-doc-1', type: 'document', label: 'PR-Guide.pdf', properties: {} })
+    entityGraph.addRelationship('ent-web-1', 'ent-doc-1', 'downloaded')
+
     // Query via unified query()
     const bundle = await queryEngine.query({
       intent: 'review all open pull requests',
@@ -120,5 +128,21 @@ describe('Unified RuntimeQueryEngine & Execution Memory (Deliverables 6, 7 & Req
     const execs = queryEngine.executions({ domain: 'github.com' })
     expect(execs.length).toBe(1)
     expect(execs[0]?.executionId).toBe('run-999')
+
+    // e. entities() and entityNeighbors()
+    const entitiesResult = queryEngine.entities({ entityType: 'website' })
+    expect(entitiesResult.entities.length).toBe(1)
+    expect(entitiesResult.entities[0]?.id).toBe('ent-web-1')
+
+    const neighbors = queryEngine.entityNeighbors('ent-web-1')
+    expect(neighbors.length).toBe(1)
+    expect(neighbors[0]?.entity.id).toBe('ent-doc-1')
+    expect(neighbors[0]?.relationship.type).toBe('downloaded')
+
+    // f. health()
+    const health = queryEngine.health()
+    expect(health.overallStatus).toBe('healthy')
+    expect(health.subsystems.entityGraph.metrics['entitiesCount']).toBe(2)
+    expect(health.subsystems.entityGraph.metrics['relationshipsCount']).toBe(1)
   })
 })

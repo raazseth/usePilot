@@ -92,3 +92,22 @@ export {
   ObservationReplayEngine,
   type ReplayStateSnapshot,
 } from './replay/observation-replay'
+
+// 9. Runtime Entity Graph
+export { RuntimeEntityGraph } from './graph/entity-graph'
+export type {
+  EntityType,
+  RelationshipType,
+  GraphEntity,
+  GraphRelationship,
+  EntityGraphQuery,
+} from './graph/types'
+
+// 10. Runtime Health Telemetry
+export { RuntimeContextHealthMonitor, type HealthMonitorDependencies } from './health/health-monitor'
+export type {
+  RuntimeContextHealthReport,
+  SubsystemHealthReport,
+  SubsystemHealthStatus,
+} from './health/types'
+

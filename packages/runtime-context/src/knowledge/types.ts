@@ -29,9 +29,12 @@ export interface KnowledgeItem<T = unknown> {
 
 export interface FormFieldDescriptor {
   name: string
-  type: string
+  type?: string | undefined
   label?: string | undefined
-  required: boolean
+  required?: boolean | undefined
+  selector?: string | undefined
+  action?: string | undefined
+  inputs?: Array<{ name: string; type?: string; required?: boolean; selector?: string }> | undefined
 }
 
 export interface PageActionDescriptor {
@@ -49,7 +52,7 @@ export interface BrowserPageNode {
   parentPath?: string | undefined
   forms: FormFieldDescriptor[]
   actions: PageActionDescriptor[]
-  requiresAuth: boolean
+  requiresAuth?: boolean | undefined
   lastVisited: number
   visitCount: number
 }
@@ -57,6 +60,10 @@ export interface BrowserPageNode {
 export interface DomainKnowledgeGraph {
   domain: string
   rootUrl: string
+  graphVersion: number
+  confidence: number // 0.0 to 1.0
+  fingerprint: string
+  lastVerified: number
   nodes: Record<string, BrowserPageNode>
   authenticated: boolean
   discoveredAt: number
