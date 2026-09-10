@@ -25,6 +25,7 @@ export { AdapterSession } from './session/session'
 export { SessionManager } from './session/manager'
 export { ExecutionPolicyEngine, createDefaultExecutionPolicy } from './policy/engine'
 export { ManifestGenerator } from './manifest/generator'
+export { ExecutionTimelineBuilder } from './timeline'
 
 // Phase 4: Production Capability Runtimes
 export { NativeFilesystemAdapter } from './adapters/filesystem/fs-adapter'

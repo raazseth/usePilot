@@ -151,3 +151,19 @@ export type PlanStatus =
   | 'executing'    // Phase 3
   | 'completed'    // Phase 3
   | 'failed'       // Phase 3
+
+/**
+ * Planner Quality Metrics — measures planning benchmarks and execution efficacy.
+ */
+export interface PlannerQualityMetrics {
+  planId: string
+  blueprintHash: string
+  planSucceeded: boolean
+  replanCount: number
+  tasksTotal: number
+  tasksExecuted: number
+  tasksSkipped: number
+  unnecessaryTaskCount: number
+  verificationFailures: number
+  executionEfficiencyScore: number
+}

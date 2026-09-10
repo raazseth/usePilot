@@ -31,6 +31,14 @@ export type FailureCategory =
   | 'cancellation'
   | 'configuration'
   | 'unknown'
+  // Granular operational failure taxonomy
+  | 'planner_failure'
+  | 'capability_failure'
+  | 'permission_failure'
+  | 'environment_failure'
+  | 'user_cancellation'
+  | 'policy_failure'
+  | 'resource_failure'
 
 export interface ExecutionRun {
   id: string

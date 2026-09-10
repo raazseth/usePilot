@@ -12,6 +12,10 @@ export interface AppEvent<P = unknown> {
   timestamp: string
   /** Event-specific payload */
   payload: P
+  /** Event protocol envelope version */
+  eventVersion?: string | undefined
+  /** Payload schema version */
+  schemaVersion?: string | undefined
 }
 
 // Client → Server Events

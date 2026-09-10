@@ -76,4 +76,25 @@ export class CapabilityRegistry {
   registeredCapabilities(): TaskCapability[] {
     return Array.from(this.registrations.keys())
   }
+
+  getHealth(platform: 'windows' | 'macos' | 'linux' = 'windows'): {
+    adaptersRegistered: number
+    adaptersAvailable: number
+    adaptersDisabled: number
+    capabilitiesCovered: TaskCapability[]
+    capabilityCoverageRatio: number
+  } {
+    const all = this.listRegistered()
+    const compatible = all.filter(
+      (r) => r.platformSupport.length === 0 || r.platformSupport.includes(platform)
+    )
+    const coveredCaps = this.registeredCapabilities()
+    return {
+      adaptersRegistered: all.length,
+      adaptersAvailable: compatible.length,
+      adaptersDisabled: all.length - compatible.length,
+      capabilitiesCovered: coveredCaps,
+      capabilityCoverageRatio: coveredCaps.length > 0 ? 1 : 0,
+    }
+  }
 }

@@ -13,4 +13,12 @@ export interface ExecutionMetrics {
   journalEntryCount: number
   cancellationCount: number
   recoveryCount: number
+  // Capability cost & resource telemetry
+  cpuTimeMs?: number | undefined
+  memoryDeltaBytes?: number | undefined
+  browserStartupCostMs?: number | undefined
+  ocrDurationMs?: number | undefined
+  screenshotCount?: number | undefined
+  downloadSizeBytes?: number | undefined
+  adapterUtilization?: Record<string, number> | undefined
 }

@@ -51,6 +51,10 @@ export interface RunOptions {
   callbacks?: ExecutionCallbacks
   contextSnapshot?: ExecutionContextSnapshot
   policy?: Partial<ExecutionPolicy>
+  /** Current runtime context hash for pre-execution drift verification */
+  currentContextHash?: string
+  /** Require context hash equivalence before executing (detects drift) */
+  requireContextMatch?: boolean
 }
 
 export interface RunnerDependencies {
@@ -126,6 +130,59 @@ export class ExecutionRunner {
       })),
       permissions: ['filesystem', 'network'],
       createdAt: Date.now(),
+    }
+
+    // Pre-execution drift detection: verify blueprint context hash matches current runtime context
+    if (
+      options.requireContextMatch &&
+      options.currentContextHash &&
+      blueprint.hash !== options.currentContextHash
+    ) {
+      const errorMsg = `Runtime context drift detected: blueprint hash "${blueprint.hash}" differs from current context hash "${options.currentContextHash}". Replanning required.`
+      stateMachine.transitionExecution('failed')
+      await journal.log(runId, traceId, 'execution_failed', {
+        error: errorMsg,
+        failureCategory: 'environment_failure',
+      })
+      await callbacks.onFailed?.(runId, errorMsg)
+      const finalMetrics = metrics.finalize()
+      const report = this.buildReport(runId, traceId, blueprint, [], new Set(), finalMetrics, snapshot)
+      const manifest = await ManifestGenerator.generate({
+        runId,
+        traceId,
+        blueprintHash: blueprint.hash,
+        plannerVersion: '0.2.0',
+        executionVersion: '0.3.0',
+        policy: policyEngine.policy,
+        capabilities: blueprint.tasks.map((t) => t.requiredCapability),
+        selectedAdapters,
+        environment: {
+          os: platform,
+          arch: typeof process !== 'undefined' ? process.arch : 'unknown',
+          runtime: 'Bun' in globalThis ? 'bun' : 'node',
+          nodeVersion: typeof process !== 'undefined' ? process.version : 'unknown',
+        },
+        startedAt: snapshot.createdAt,
+        completedAt: Date.now(),
+        tasksSummary: {
+          total: blueprint.tasks.length,
+          completed: 0,
+          failed: 0,
+          skipped: blueprint.tasks.length,
+        },
+        outcome: 'failed',
+      })
+      return {
+        runId,
+        traceId,
+        status: 'failed',
+        tasksCompleted: 0,
+        tasksFailed: 0,
+        tasksSkipped: blueprint.tasks.length,
+        durationMs: 0,
+        report,
+        manifest,
+      }
     }
 
     const completedTaskIds = new Set<string>()

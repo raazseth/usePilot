@@ -53,3 +53,16 @@ export interface ContextTransactionOptions {
 }
 
 export type StateMutationFn = (draft: RuntimeContextState) => void | Promise<void>
+
+/**
+ * Resource budgets and growth limits for runtime context engines.
+ * Prevents memory growth and query degradation in long-running agent loops.
+ */
+export interface RuntimeContextBudgets {
+  maxObservationsPerSession?: number | undefined
+  maxEntityNodes?: number | undefined
+  maxEntityEdges?: number | undefined
+  maxReplaySteps?: number | undefined
+  maxKnowledgeCacheEntries?: number | undefined
+  maxOcrCacheEntries?: number | undefined
+}

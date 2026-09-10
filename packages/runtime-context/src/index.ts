@@ -18,6 +18,7 @@ export {
   type ContextSnapshot,
   type ContextTransactionOptions,
   type StateMutationFn,
+  type RuntimeContextBudgets,
 } from './core/types'
 
 // 2. Observations

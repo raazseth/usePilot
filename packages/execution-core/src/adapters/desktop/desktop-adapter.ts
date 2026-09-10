@@ -75,7 +75,11 @@ export class NativeDesktopAdapter implements ICapabilityAdapter {
         await new Promise<void>((resolve) => {
           const proc = spawn('clip', { stdio: ['pipe', 'ignore', 'ignore'] })
           const timer = setTimeout(() => {
-            try { proc.kill() } catch {}
+            try {
+              proc.kill()
+            } catch {
+              // Ignore process kill error on cleanup
+            }
             resolve()
           }, 1500)
           proc.on('error', () => { clearTimeout(timer); resolve() })

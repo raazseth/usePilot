@@ -17,7 +17,30 @@ export type {
   ICapabilityAdapter,
   AdapterFactory,
   AdapterRegistration,
+  AdapterManifest,
+  AdapterStartupDiagnostic,
 } from './adapter'
+
+export {
+  type RuntimeFeatureFlags,
+  DEFAULT_RUNTIME_FEATURE_FLAGS,
+} from './flags'
+
+export {
+  type DependencyRelationType,
+  type SubsystemDependency,
+  type PermissionDependency,
+  type CapabilityDependencyRequirement,
+  CAPABILITY_DEPENDENCY_GRAPH,
+} from './dependencies'
+
+export type { RuntimeCorrelationChain } from './correlation'
+
+export type {
+  TimelineEventType,
+  ExecutionTimelineEntry,
+  ExecutionTimeline,
+} from './timeline'
 
 export type { ApprovalRequest, ApprovalResponse } from './approval'
 

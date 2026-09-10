@@ -33,6 +33,7 @@ export type {
   ExecutionBlueprint,
   BlueprintSummary,
   PlanStatus,
+  PlannerQualityMetrics,
 } from './blueprint'
 
 // Validation
