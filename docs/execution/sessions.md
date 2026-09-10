@@ -17,22 +17,30 @@ With sessions, an adapter instance remains active across multiple tasks until th
 Represents a managed, active session wrapping an underlying `ICapabilityAdapter`:
 
 ```typescript
+export type SessionStatus = 'active' | 'idle' | 'closed' | 'panicked'
+export type SessionScope = 'run' | 'task' | 'capability'
+
+export interface SessionLifecycle {
+  sessionId: string
+  runId: string
+  capability: TaskCapability
+  adapterName: string
+  createdAt: number
+  lastActiveAt: number
+  tasksExecuted: number
+  errorCount: number
+  status: SessionStatus
+}
+
 export interface IAdapterSession {
   readonly id: string
   readonly runId: string
   readonly capability: TaskCapability
   readonly adapter: ICapabilityAdapter
-  readonly status: SessionStatus // 'idle' | 'active' | 'recovering' | 'closed' | 'error'
-  readonly scope: SessionScope   // 'run' | 'capability' | 'task'
-  readonly tasksExecuted: number
-  readonly errorCount: number
-  readonly recoveryCount: number
-  readonly createdAt: number
-  readonly lastActiveAt: number
+  readonly status: SessionStatus
+  readonly lifecycle: SessionLifecycle
 
-  acquire(): void
-  release(): void
-  recordError(): void
+  execute(ctx: AdapterContext, options?: SandboxOptions): Promise<SandboxExecutionResult>
   recover(): Promise<boolean>
   close(): Promise<void>
 }
@@ -40,17 +48,20 @@ export interface IAdapterSession {
 
 ### `ISessionManager`
 
-Coordinates session pooling, acquisition, recycling, and shutdown:
+Coordinates session pooling, scoping, and clean shutdown:
 
 ```typescript
 export interface ISessionManager {
-  getOrCreateSession(capability: TaskCapability): Promise<IAdapterSession>
-  releaseSession(session: IAdapterSession): void
-  recoverSession(session: IAdapterSession): Promise<boolean>
+  getOrCreateSession(
+    runId: string,
+    capability: TaskCapability,
+    adapter: ICapabilityAdapter,
+    scope?: SessionScope
+  ): Promise<IAdapterSession>
+  getSession(sessionId: string): IAdapterSession | undefined
+  listActiveSessions(): IAdapterSession[]
   closeSession(sessionId: string): Promise<void>
   closeAll(): Promise<void>
-  getActiveSessions(): ReadonlyArray<IAdapterSession>
-  getSessionStats(): SessionStats
 }
 ```
 
@@ -62,9 +73,9 @@ export interface ISessionManager {
 
 ## Error Recovery Protocol
 
-When a task fails or throws an unhandled error:
-1. `session.recordError()` increments the error counter.
-2. If `errorCount > 0`, `sessionManager.recoverSession(session)` is triggered.
-3. The session enters `'recovering'` status, calls `adapter.cleanup()`, and re-initializes the adapter.
-4. If recovery succeeds, the session returns to `'idle'` and can be reused.
-5. If recovery fails, the session transitions to `'error'` and is closed/removed from the pool, forcing subsequent tasks to acquire a fresh instance.
+When an adapter within a session experiences a failure or panic:
+1. `session.lifecycle.errorCount` is incremented, and status transitions to `'panicked'` if unhandled.
+2. The session executes `session.recover()`, calling `adapter.cleanup()` and re-verifying adapter readiness.
+3. If recovery succeeds, the session returns to `'idle'` status for subsequent task executions.
+4. If recovery fails, the session is closed and removed from the active session pool, forcing subsequent tasks to acquire a fresh instance.
+

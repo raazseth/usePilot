@@ -11,5 +11,6 @@ Introduce the **Diagnostics Dashboard** in the desktop application (`/diagnostic
 4. **Structured Log Viewer**: Displays filterable runtime logs categorized by log level (DEBUG, INFO, WARN, ERROR) and subsystem.
 
 ## Consequences
-- Elevates usePilot into an enterprise-grade, observable execution runtime.
-- Maintains the clean, minimalist dark-mode design system without visual clutter.
+- Elevates usePilot into an observable execution runtime.
+- Maintains a structured diagnostics view within the application shell.
+

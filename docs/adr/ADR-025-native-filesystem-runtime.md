@@ -12,5 +12,6 @@ Implement `NativeFilesystemAdapter` supporting `read_file`, `write_file`, `move_
 5. **Glob & Extension Filters**: `search_files` supports recursive traversal with extension filtering, filename matching, and regex queries.
 
 ## Consequences
-- Guarantees crash-safe, deterministic file operations on Windows and future platforms.
+- Guarantees crash-safe, deterministic file operations across supported platforms.
 - Supports high-throughput workspace organization without file corruption.
+

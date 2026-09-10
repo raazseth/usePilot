@@ -10,3 +10,7 @@ Enforce the `ICapabilityAdapter` contract across all capabilities with discrete 
 - Clean lifecycle guarantees: cleanup and disposal are always invoked in `try...finally` blocks.
 - Unified cooperative cancellation through `AbortSignal`.
 - Testable adapter harnesses with pluggable stubs.
+
+> [!NOTE]
+> Per-task adapter lifecycle was subsequently extended by [ADR-019](ADR-019-adapter-sandbox.md) (isolation and panic safety) and [ADR-021](ADR-021-adapter-sessions.md) (stateful session pooling and scoped reuse).
+

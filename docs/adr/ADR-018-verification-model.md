@@ -9,3 +9,7 @@ Route all adapter results through `VerificationEngine`. It validates stated post
 ## Consequences
 - Prevents false-positive completions and compounding errors downstream.
 - Provides actionable telemetry on whether failures stem from infrastructure, code, or user denial.
+
+> [!NOTE]
+> Verification failures feed directly into the deterministic self-healing pipeline ([ADR-028](ADR-028-deterministic-self-healing.md)) and are archived into diagnostic bundles ([ADR-035](ADR-035-failure-bundle.md)).
+

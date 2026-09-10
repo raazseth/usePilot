@@ -74,7 +74,7 @@ Capabilities can be added without modifying existing execution logic.
 
 # What usePilot Can Do
 
-Current architecture supports:
+Supported capabilities:
 
 - Natural language task planning
 - Multi-step execution
@@ -106,38 +106,38 @@ Current architecture supports:
 
                   ▼
 
-            Planner Engine
+               Planner
 
                   │
 
                   ▼
 
-      Runtime Context Facade
+       RuntimeContextFacade
 
-   ┌────────────────────────────┐
-   │ Query                      │
-   │ Runtime State              │
-   │ Observations               │
-   │ Knowledge                  │
-   │ Entity Graph               │
-   │ Browser Graph              │
-   │ Runtime Search             │
-   │ Replay                     │
-   └────────────────────────────┘
-
-                  │
-
-                  ▼
-
-        Deterministic Execution
+    ┌────────────────────────────┐
+    │ Query                      │
+    │ Runtime State              │
+    │ Observations               │
+    │ Knowledge                  │
+    │ Entity Graph               │
+    │ Browser Graph              │
+    │ Runtime Search             │
+    │ Replay                     │
+    └────────────────────────────┘
 
                   │
 
                   ▼
 
-         Capability Adapters
+           ExecutionRunner
 
-      Browser • Desktop • Files
+                  │
+
+                  ▼
+
+          Capability Adapters
+
+       Browser • Desktop • Files
 ```
 
 Execution never bypasses the runtime.
@@ -154,7 +154,7 @@ The Runtime Context Layer acts as the operating memory of usePilot.
 
 It continuously maintains:
 
-- Current browser state
+- Active browser state
 - Desktop state
 - Filesystem state
 - Runtime observations
@@ -182,7 +182,7 @@ Runtime information is organized into three tiers.
 
 ## Hot
 
-Current execution state.
+Active execution state.
 
 Examples:
 
@@ -309,13 +309,15 @@ usePilot/
 │   ├── planner-core/
 │   ├── planner-types/
 │   ├── runtime-context/
-│   ├── ui/
 │   ├── types/
 │   └── utils/
 │
 ├── docs/
 │   ├── architecture/
-│   └── adr/
+│   ├── adr/
+│   ├── planner/
+│   ├── execution/
+│   └── runtime-context/
 │
 └── turbo.json
 ```
@@ -364,17 +366,17 @@ pnpm build
 
 # Documentation
 
-Documentation is organized into:
+Documentation is organized into dedicated subsystem directories:
 
-- Architecture
-- ADRs
-- Runtime
-- Browser
-- Database
-- Planner
-- Execution
+- [Master Documentation Index](docs/README.md)
+- [Architecture](docs/architecture/README.md)
+- [ADRs (47 Architectural Decision Records)](docs/adr/README.md)
+- [Planner Subsystem](docs/planner/README.md)
+- [Execution Subsystem](docs/execution/README.md)
+- [Runtime Context Subsystem](docs/runtime-context/README.md)
+- [Public API Reference](docs/architecture/public-api-reference.md)
 
-Every architectural decision is documented through ADRs.
+Every architectural decision is documented with trade-offs and consequences in the [ADR Index](docs/adr/README.md).
 
 ---
 

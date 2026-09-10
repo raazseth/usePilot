@@ -11,7 +11,7 @@ We expose a single, cohesive interface: `RuntimeQueryEngine`:
 - `query()`: General multi-domain context query returning a compiled `RuntimeContextBundle`.
 - `search()`: Hybrid search across indexed local assets.
 - `lookup()`: Direct key/URI lookup across persistent knowledge.
-- `observe()`: Latest state observations for a subsystem or target.
+- `observe()`: Most recent state observations for a subsystem or target.
 - `history()`: Historical snapshots and session states.
 - `graph()`: Domain navigation and page hierarchy queries.
 - `documents()`: Parsed document and table lookups.
@@ -21,4 +21,5 @@ All internal consumers (Planner, Desktop UI, Replay, Services) interact exclusiv
 
 ## Consequences
 - Single access point simplifies security audits, query logging, and caching.
-- Seamless future plugin and sidecar extensibility.
+- Plugin and sidecar extensibility.
+

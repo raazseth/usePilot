@@ -10,8 +10,9 @@ Implement `PermissionManager` integrated with `ApprovalGate`:
    - `session`: Valid for all tasks within the active execution run.
    - `always`: Persisted to local disk across application sessions.
 2. **Resource Scoping**: Permissions bind to specific capability/resource pairs (e.g. `filesystem:write` on `C:\Users\Downloads`).
-3. **ApprovalGate Integration**: If a task requires a capability/resource grant that is not currently held, `PermissionManager` delegates to the runtime `ApprovalGate`, pausing execution until the user explicitly approves or denies access.
+3. **ApprovalGate Integration**: If a task requires a capability/resource grant that is not held, `PermissionManager` delegates to the runtime `ApprovalGate`, pausing execution until the user explicitly approves or denies access.
 4. **Zero Cloud Telemetry**: All grants are stored locally in client configuration, maintaining privacy.
+
 
 ## Consequences
 - Protects user data and prevents unauthorized filesystem or network operations.

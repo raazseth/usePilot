@@ -4,10 +4,31 @@
 
 The `ExecutionResourceManager` tracks and disposes transient runtime resources (adapter instances, open file descriptors, child processes, network connections, and temporary directories) allocated during plan execution.
 
-## Key Features
+## Data Structures
+
+```typescript
+export type TrackedResourceType = 'adapter' | 'temp_file' | 'handle' | 'session'
+
+export interface TrackedResource {
+  id: string
+  type: TrackedResourceType
+  description: string
+  dispose: () => Promise<void>
+  registeredAt: number
+}
+
+export interface IResourceManager {
+  register(resource: TrackedResource): void
+  unregister(id: string): void
+  cleanupAll(): Promise<void>
+  listActive(): TrackedResource[]
+}
+```
+
+## Key Responsibilities
 
 1. **Centralized Registration**:
-   Any component initializing an external resource registers it with the resource manager:
+   Components initializing external or stateful resources register them with the resource manager:
    ```typescript
    resourceManager.register({
      id: `adapter-${task.id}`,
@@ -19,10 +40,11 @@ The `ExecutionResourceManager` tracks and disposes transient runtime resources (
    ```
 
 2. **Timeout-Safe Teardown (`cleanupAll`)**:
-   - Iterates through all active resources in parallel.
+   - Disposes all registered resources concurrently.
    - Enforces an individual timeout per resource disposal (default: 5,000ms).
-   - Recovers from individual disposal errors, ensuring one faulty disposal does not prevent other resources from being cleaned up.
-   - Clears the registry upon completion.
+   - Recovers from individual disposal errors, ensuring one faulty cleanup does not abort the remaining disposals.
+   - Clears active tracked resources upon completion.
 
 3. **Lifecycle Integration**:
-   - In `ExecutionRunner`, `cleanupAll()` is guaranteed to run at the conclusion of every execution (whether `completed`, `failed`, or `cancelled`).
+   - In `ExecutionRunner`, `cleanupAll()` is guaranteed to execute in a `finally` block at the conclusion of every execution run, whether `completed`, `failed`, or `cancelled`.
+

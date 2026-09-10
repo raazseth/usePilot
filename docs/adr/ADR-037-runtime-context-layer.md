@@ -20,3 +20,7 @@ User → Planner → Runtime Query Engine (Runtime Context) → Execution → Ca
 - Strict decoupling: Planner operates on state perceptions and knowledge assets without live tool side effects.
 - Clean auditability: Every state change generates an immutable, content-addressed snapshot.
 - Zero regressions: Core planner, execution substrate, and adapters remain cleanly isolated.
+
+> [!NOTE]
+> Direct caller interaction with individual internal sub-engines was subsequently superseded by the unified `RuntimeContextFacade` in [ADR-045](ADR-045-runtime-context-facade-and-tiered-storage.md) and atomic transactional execution in [ADR-046](ADR-046-context-transactions-and-schema-versioning.md).
+

@@ -42,3 +42,5 @@ packages/types
 2. Packages NEVER import upwards from `apps/*`.
 3. Circular dependencies between packages are forbidden and checked via linting/typechecking.
 4. Database queries and models are strictly encapsulated within `@usepilot/database` repositories.
+5. All additional packages (`@usepilot/planner-types`, `@usepilot/planner-core`, `@usepilot/execution-types`, `@usepilot/execution-core`, `@usepilot/runtime-context`) adhere strictly to this unidirectional layering. See [overview.md](../architecture/overview.md) for the complete monorepo dependency hierarchy.
+

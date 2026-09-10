@@ -6,7 +6,7 @@ Accepted
 ## Context
 1. **Multi-Subsystem Atomicity**: As operations mutate state, add entity nodes, record browser pages, and emit perceptions, a failure mid-flow can leave disparate stores in an inconsistent state.
 2. **Facade Dependency Injection**: The Facade required decoupling from hardcoded component instantiations to allow testing with custom mocks, enterprise plugins, and alternative storage backends.
-3. **Future-Proof Snapshot Evolution**: Without an explicit `contextSchemaVersion` on snapshots and state models, historical replay and long-term persistence would struggle to migrate old snapshots into future state representations.
+3. **Deterministic Snapshot Evolution**: Without an explicit `contextSchemaVersion` on snapshots and state models, historical replay and long-term persistence would struggle to migrate recorded snapshots across state schema migrations.
 
 ## Decision
 
@@ -54,4 +54,5 @@ export const CURRENT_CONTEXT_SCHEMA_VERSION = 1
 ## Consequences
 - Guaranteed atomicity across multi-domain operations.
 - 100% dependency-injected orchestration with zero hidden global singletons.
-- Future-proof snapshot schemas for seamless execution replay across versions.
+- Versioned snapshot schemas for deterministic execution replay across schema changes.
+

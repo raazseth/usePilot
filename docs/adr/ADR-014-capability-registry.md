@@ -9,3 +9,7 @@ Introduce `CapabilityRegistry` to resolve tasks by abstract `TaskCapability` rat
 ## Consequences
 - Plans remain portable across operating systems and execution engines.
 - The runtime can operate with baseline stub adapters or register specialized automation adapters without modifying the planner or runner.
+
+> [!NOTE]
+> Static priority matching was subsequently enhanced in [ADR-020](ADR-020-capability-negotiation.md) to incorporate runtime probes, policy preferences, and the static `CAPABILITY_DEPENDENCY_GRAPH`.
+

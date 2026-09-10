@@ -32,5 +32,6 @@ We implement:
 
 ## Consequences
 - Planners and agents can query multi-hop operational provenance without touching raw capability adapters or database tables.
-- Subsystem health is continuously observable for debugging, diagnostics, and future autonomous recovery.
+- Subsystem health is continuously observable for debugging, diagnostics, and automated recovery.
 - Architecture remains local-first, memory-safe, and zero-cloud.
+

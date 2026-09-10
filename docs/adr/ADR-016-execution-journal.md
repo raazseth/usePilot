@@ -10,3 +10,7 @@ Record every state transition, adapter invocation, retry, verification result, a
 - Full post-mortem observability for every execution run.
 - Immutable timeline that survives application crashes or restarts.
 - Zero in-place row mutations on journal records.
+
+> [!NOTE]
+> Large binary payloads (screenshots, DOM snapshots) are offloaded to disk via [ADR-031](ADR-031-runtime-artifact-store.md), while journals serve as the foundation for deterministic execution replay ([ADR-034](ADR-034-execution-replay.md)) and failure bundles ([ADR-035](ADR-035-failure-bundle.md)).
+
