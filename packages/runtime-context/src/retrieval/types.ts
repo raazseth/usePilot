@@ -1,8 +1,7 @@
-import type { ContextSnapshot } from '../core/types'
+import type { SearchResult } from '../index/types'
 import type { DomainKnowledgeGraph, KnowledgeItem } from '../knowledge/types'
 import type { ExecutionMemoryRecord } from '../memory/types'
 import type { Observation } from '../observations/types'
-import type { SearchResult } from '../index/types'
 
 export interface MultiDomainQuery {
   intent?: string | undefined

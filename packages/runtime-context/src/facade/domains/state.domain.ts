@@ -2,8 +2,6 @@ import type { RuntimeContext } from '../../core/context'
 import type { MemoryContextStore } from '../../core/store'
 import type {
   ContextSnapshot,
-  ContextTransactionOptions,
-  RuntimeContextState,
   StateMutationFn,
 } from '../../core/types'
 import { ContextDiffEngine } from '../../diff/diff-engine'

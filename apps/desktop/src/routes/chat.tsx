@@ -7,6 +7,7 @@ import { useParams } from 'react-router-dom'
 
 import { ChatInput } from '../components/chat/ChatInput'
 import { EmptyState } from '../components/chat/EmptyState'
+import { ExecutionPanel } from '../components/execution/ExecutionPanel'
 import { MessageBubble } from '../components/chat/MessageBubble'
 import { PlanCard, PlanningProgress } from '../components/planner'
 import { Spinner } from '../components/ui/Spinner'
@@ -29,7 +30,7 @@ interface LoadedPlan {
 
 export function ChatRoute() {
   const { conversationId } = useParams<{ conversationId: string }>()
-  const { settings, planningProgress, setPlanningProgress, setPlanningError } = useAppStore()
+  const { settings, planningProgress, setPlanningProgress, setPlanningError, executionRunId } = useAppStore()
   const [messages, setMessages] = useState<Message[]>([])
   const [blueprints, setBlueprints] = useState<LoadedPlan[]>([])
   const [streaming, setStreaming] = useState<StreamingMessage | null>(null)
@@ -40,6 +41,13 @@ export function ChatRoute() {
   const userScrolledRef = useRef(false)
   const scrollAreaRef = useRef<HTMLDivElement>(null)
   const [showScrollBtn, setShowScrollBtn] = useState(false)
+
+  // Auto-scroll
+  const scrollToBottom = useCallback((behavior: ScrollBehavior = 'smooth') => {
+    bottomRef.current?.scrollIntoView({ behavior })
+    setShowScrollBtn(false)
+    userScrolledRef.current = false
+  }, [])
 
   // Load messages when conversation changes
   useEffect(() => {
@@ -86,14 +94,7 @@ export function ChatRoute() {
         }
       })
       .catch(() => setBlueprints([]))
-  }, [conversationId])
-
-  // Auto-scroll
-  const scrollToBottom = useCallback((behavior: ScrollBehavior = 'smooth') => {
-    bottomRef.current?.scrollIntoView({ behavior })
-    setShowScrollBtn(false)
-    userScrolledRef.current = false
-  }, [])
+  }, [conversationId, scrollToBottom])
 
   const handleScroll = useCallback(() => {
     const el = scrollAreaRef.current
@@ -104,12 +105,12 @@ export function ChatRoute() {
     setShowScrollBtn(!isNearBottom && (messages.length > 0 || blueprints.length > 0))
   }, [messages.length, blueprints.length])
 
-  // Auto-scroll during streaming or planning
+  // Auto-scroll during streaming, planning, or execution
   useEffect(() => {
-    if ((streaming || planningProgress) && !userScrolledRef.current) {
+    if ((streaming || planningProgress || executionRunId) && !userScrolledRef.current) {
       scrollToBottom('instant')
     }
-  }, [streaming?.content, planningProgress?.progressPct, scrollToBottom])
+  }, [streaming, planningProgress, executionRunId, scrollToBottom])
 
   // Subscribe to WebSocket events
   useEffect(() => {
@@ -270,12 +271,15 @@ export function ChatRoute() {
               />
             ))}
 
+            {/* Production Execution Panel */}
+            {executionRunId && <ExecutionPanel />}
+
             {/* Streaming assistant message */}
             {streaming && (
               <MessageBubble
                 message={{
                   id: streaming.id,
-                  conversationId: conversationId!,
+                  conversationId: conversationId ?? '',
                   role: 'assistant',
                   content: streaming.content,
                   metadata: null,

@@ -1,11 +1,40 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
+import { apiClient } from '../shared/api/client'
 import './context.css'
 
 export function ContextRoute() {
   const [activeTab, setActiveTab] = useState<'runtime' | 'knowledge' | 'observations' | 'history' | 'indexes'>('runtime')
   const [searchQuery, setSearchQuery] = useState('')
   const [replayStep, setReplayStep] = useState(0)
+  const [liveObservations, setLiveObservations] = useState<Array<{
+    id: string
+    type: string
+    source: string
+    confidence: number
+    timestamp: number
+    summary: string
+    payload: Record<string, unknown>
+  }> | null>(null)
+
+  useEffect(() => {
+    apiClient
+      .get<Array<{
+        id: string
+        type: string
+        source: string
+        confidence: number
+        timestamp: number
+        summary: string
+        payload: Record<string, unknown>
+      }>>('/context/observations')
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) {
+          setLiveObservations(data)
+        }
+      })
+      .catch(() => {})
+  }, [])
 
   // Example live state cards
   const mockBrowserState = {
@@ -230,7 +259,7 @@ export function ContextRoute() {
         {/* Tab 3: Typed Observations Stream */}
         {activeTab === 'observations' && (
           <div className="obs-stream">
-            {mockObservations.map((obs) => (
+            {(liveObservations && liveObservations.length > 0 ? liveObservations : mockObservations).map((obs) => (
               <div key={obs.id} className="obs-item">
                 <div className="obs-item-meta">
                   <span className="badge-source">{obs.source}</span>
@@ -247,29 +276,37 @@ export function ContextRoute() {
         {/* Tab 4: Replay & History */}
         {activeTab === 'history' && (
           <div className="context-card">
-            <div className="context-card-header">
-              <span>Observation Replay Viewer</span>
-              <span>Step {replayStep + 1} of 3</span>
-            </div>
-            <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
-              <button
-                className="context-tab-btn active"
-                onClick={() => setReplayStep(Math.max(0, replayStep - 1))}
-                disabled={replayStep === 0}
-              >
-                ◀ Step Back
-              </button>
-              <button
-                className="context-tab-btn active"
-                onClick={() => setReplayStep(Math.min(2, replayStep + 1))}
-                disabled={replayStep === 2}
-              >
-                Step Forward ▶
-              </button>
-            </div>
-            <div className="obs-item-json" style={{ marginTop: '14px' }}>
-              {JSON.stringify(mockObservations[replayStep], null, 2)}
-            </div>
+            {(() => {
+              const displayObs = liveObservations && liveObservations.length > 0 ? liveObservations : mockObservations
+              const currentStep = Math.min(replayStep, displayObs.length - 1)
+              return (
+                <>
+                  <div className="context-card-header">
+                    <span>Observation Replay Viewer</span>
+                    <span>Step {currentStep + 1} of {displayObs.length}</span>
+                  </div>
+                  <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
+                    <button
+                      className="context-tab-btn active"
+                      onClick={() => setReplayStep(Math.max(0, currentStep - 1))}
+                      disabled={currentStep === 0}
+                    >
+                      ◀ Step Back
+                    </button>
+                    <button
+                      className="context-tab-btn active"
+                      onClick={() => setReplayStep(Math.min(displayObs.length - 1, currentStep + 1))}
+                      disabled={currentStep >= displayObs.length - 1}
+                    >
+                      Step Forward ▶
+                    </button>
+                  </div>
+                  <div className="obs-item-json" style={{ marginTop: '14px' }}>
+                    {JSON.stringify(displayObs[currentStep], null, 2)}
+                  </div>
+                </>
+              )
+            })()}
           </div>
         )}
 

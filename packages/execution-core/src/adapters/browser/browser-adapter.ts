@@ -1,3 +1,5 @@
+import { join, basename } from 'node:path'
+
 import type {
   ICapabilityAdapter,
   AdapterContext,
@@ -152,7 +154,7 @@ export class PlaywrightBrowserAdapter implements ICapabilityAdapter {
           const download = await downloadPromise
           let downloadPath: string | null = null
           if (download) {
-            downloadPath = `${this.session.downloadsPath}/${download.suggestedFilename()}`
+            downloadPath = join(this.session.downloadsPath, basename(download.suggestedFilename()))
             await download.saveAs(downloadPath)
           }
 

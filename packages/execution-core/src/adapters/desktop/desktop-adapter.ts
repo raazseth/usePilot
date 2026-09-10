@@ -45,23 +45,20 @@ export class NativeDesktopAdapter implements ICapabilityAdapter {
   }
 
   private async readSystemClipboard(): Promise<string> {
+    if (NativeDesktopAdapter.memoryClipboard && Date.now() - NativeDesktopAdapter.lastWrittenTimestamp < 10000) {
+      return NativeDesktopAdapter.memoryClipboard
+    }
     const platform = process.platform
     try {
       if (platform === 'win32') {
-        const { stdout } = await execAsync('powershell -NoProfile -Command "Get-Clipboard"')
+        const { stdout } = await execAsync('powershell -NoProfile -Command "Get-Clipboard"', { timeout: 3000 })
         const trimmed = stdout.trimEnd()
-        if (NativeDesktopAdapter.memoryClipboard && trimmed === NativeDesktopAdapter.memoryClipboard) {
-          return trimmed
-        }
-        if (NativeDesktopAdapter.memoryClipboard && Date.now() - NativeDesktopAdapter.lastWrittenTimestamp < 10000) {
-          return NativeDesktopAdapter.memoryClipboard
-        }
         return trimmed || NativeDesktopAdapter.memoryClipboard
       } else if (platform === 'darwin') {
-        const { stdout } = await execAsync('pbpaste')
+        const { stdout } = await execAsync('pbpaste', { timeout: 3000 })
         return stdout || NativeDesktopAdapter.memoryClipboard
       } else {
-        const { stdout } = await execAsync('xclip -selection clipboard -o')
+        const { stdout } = await execAsync('xclip -selection clipboard -o', { timeout: 3000 })
         return stdout || NativeDesktopAdapter.memoryClipboard
       }
     } catch {
@@ -75,8 +72,22 @@ export class NativeDesktopAdapter implements ICapabilityAdapter {
     const platform = process.platform
     try {
       if (platform === 'win32') {
-        const escaped = text.replace(/'/g, "''")
-        await execAsync(`powershell -NoProfile -Command "Set-Clipboard -Value '${escaped}'"`)
+        await new Promise<void>((resolve) => {
+          const proc = spawn('clip', { stdio: ['pipe', 'ignore', 'ignore'] })
+          const timer = setTimeout(() => {
+            try { proc.kill() } catch {}
+            resolve()
+          }, 1500)
+          proc.on('error', () => { clearTimeout(timer); resolve() })
+          proc.on('close', () => { clearTimeout(timer); resolve() })
+          try {
+            proc.stdin.write(text)
+            proc.stdin.end()
+          } catch {
+            clearTimeout(timer)
+            resolve()
+          }
+        })
       } else if (platform === 'darwin') {
         const proc = spawn('pbcopy')
         proc.stdin.write(text)

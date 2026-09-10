@@ -88,8 +88,13 @@ export class NativeFilesystemAdapter implements ICapabilityAdapter {
 
           // Atomic write via temp file
           const tempPath = `${target}.tmp.${randomBytes(6).toString('hex')}`
-          await fs.writeFile(tempPath, content, 'utf8')
-          await fs.rename(tempPath, target)
+          try {
+            await fs.writeFile(tempPath, content, 'utf8')
+            await fs.rename(tempPath, target)
+          } catch (writeErr) {
+            await fs.unlink(tempPath).catch(() => {})
+            throw writeErr
+          }
 
           const stats = await fs.stat(target)
           const hash = await this.computeHash(target)

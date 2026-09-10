@@ -27,11 +27,14 @@ export function ExecutionPanel({ report }: ExecutionPanelProps) {
   const activeAdapterInfo = useAppStore((s) => s.activeAdapterInfo)
   const verificationStatus = useAppStore((s) => s.verificationStatus)
   const recoveryAttempts = useAppStore((s) => s.recoveryAttempts)
+  const lastExecutionReport = useAppStore((s) => s.lastExecutionReport)
 
   const [isScreenshotExpanded, setIsScreenshotExpanded] = useState(false)
   const [isRecoveryExpanded, setIsRecoveryExpanded] = useState(false)
 
   if (!executionStatus || !executionRunId) return null
+
+  const displayReport = report ?? lastExecutionReport
 
   const progressPct =
     taskProgress.total > 0
@@ -264,7 +267,7 @@ export function ExecutionPanel({ report }: ExecutionPanelProps) {
       )}
 
       {/* Final report */}
-      {isDone && report && <ExecutionReport report={report} />}
+      {isDone && displayReport && <ExecutionReport report={displayReport} />}
     </div>
   )
 }

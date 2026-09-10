@@ -1,5 +1,4 @@
 import type {
-  EntityType,
   RelationshipType,
   GraphEntity,
   GraphRelationship,

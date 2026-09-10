@@ -40,7 +40,8 @@ export class ExecutionMemoryStore {
       result = result.filter((r) => r.domainTargets.some((dt) => dt.toLowerCase().includes(d)))
     }
     if (query.capability) {
-      result = result.filter((r) => r.capabilitySequence.includes(query.capability!))
+      const cap = query.capability
+      result = result.filter((r) => r.capabilitySequence.includes(cap))
     }
     if (query.intent) {
       const intentLower = query.intent.toLowerCase()

@@ -1,7 +1,7 @@
 import type { ServerWebSocket } from 'bun'
 import { generateId, toTimestamp } from '@usepilot/utils'
 import { AIProviderError } from '@usepilot/ai-core'
-import { ConversationRepository, MessageRepository } from '@usepilot/database'
+import { ConversationRepository, MessageRepository, PlanRepository } from '@usepilot/database'
 import type { ClientEvent, MessageSendPayload, MessageStopPayload } from '@usepilot/types'
 import type { ProviderManager } from '../ai/provider-manager'
 import type { EventBus } from '../../events/bus'
@@ -239,10 +239,37 @@ export class WebSocketHandler {
       }
 
       if (classification.type === 'execution') {
+        const planRepo = new PlanRepository(this.db)
+        const conversationPlans = await planRepo.listByConversation(conversationId)
+        const latestPlan = conversationPlans[0]
+
+        if (latestPlan && this.executionService) {
+          const assistantMsg = await this.msgRepo.create({
+            conversationId,
+            role: 'assistant',
+            content: `Initiating execution for plan "${latestPlan.id}". Tracking progress live below...`,
+            status: 'complete',
+          })
+          this.send(ws, {
+            type: 'message.started',
+            payload: { messageId: assistantMsg.id, conversationId, model: targetModel },
+          })
+          this.send(ws, {
+            type: 'message.chunk',
+            payload: { messageId: assistantMsg.id, conversationId, token: assistantMsg.content, index: 0 },
+          })
+          this.send(ws, {
+            type: 'message.finished',
+            payload: { messageId: assistantMsg.id, conversationId, tokens: 16, durationMs: 10 },
+          })
+          void this.executionService.startExecution(ws, latestPlan.id)
+          return
+        }
+
         const assistantMsg = await this.msgRepo.create({
           conversationId,
           role: 'assistant',
-          content: 'Execution Engine will be activated in Phase 3. Your blueprint is ready and validated for execution.',
+          content: 'No blueprint found to execute yet. Ask usePilot to plan your task first, then click "Execute Blueprint" on the plan card.',
           status: 'complete',
         })
         this.send(ws, {
@@ -255,7 +282,7 @@ export class WebSocketHandler {
         })
         this.send(ws, {
           type: 'message.finished',
-          payload: { messageId: assistantMsg.id, conversationId, tokens: 18, durationMs: 10 },
+          payload: { messageId: assistantMsg.id, conversationId, tokens: 24, durationMs: 10 },
         })
         return
       }

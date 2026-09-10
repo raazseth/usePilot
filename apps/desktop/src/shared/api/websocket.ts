@@ -58,18 +58,22 @@ export class WebSocketManager {
   }
 
   on<T extends ServerEventType>(type: T, handler: Handler<T>): Unsubscribe {
-    if (!this.handlers.has(type)) {
-      this.handlers.set(type, new Set())
+    let set = this.handlers.get(type)
+    if (!set) {
+      set = new Set()
+      this.handlers.set(type, set)
     }
-    this.handlers.get(type)!.add(handler as AnyHandler)
+    set.add(handler as AnyHandler)
     return () => this.handlers.get(type)?.delete(handler as AnyHandler)
   }
 
   onAny(handler: AnyHandler): Unsubscribe {
-    if (!this.handlers.has('*')) {
-      this.handlers.set('*', new Set())
+    let set = this.handlers.get('*')
+    if (!set) {
+      set = new Set()
+      this.handlers.set('*', set)
     }
-    this.handlers.get('*')!.add(handler)
+    set.add(handler)
     return () => this.handlers.get('*')?.delete(handler)
   }
 

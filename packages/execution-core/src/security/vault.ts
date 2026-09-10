@@ -71,7 +71,7 @@ export class SecretVault {
       iv: iv.toString('hex'),
       tag: tag.toString('hex'),
       ciphertext: encrypted.toString('hex'),
-      salt: this.getSaltPath(),
+      salt: 'vault.salt',
     }
   }
 

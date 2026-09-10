@@ -72,14 +72,17 @@ async function bootstrap() {
   process.stdout.write(`BACKEND_PORT=${actualPort}\n`)
 
   // Handle graceful shutdown
-  const shutdown = () => {
+  const shutdown = async () => {
     logger.info('Shutting down...')
+    await executionService.shutdown().catch((err) => {
+      logger.error({ err }, 'Error during execution service shutdown')
+    })
     server.stop()
     process.exit(0)
   }
 
-  process.on('SIGINT', shutdown)
-  process.on('SIGTERM', shutdown)
+  process.on('SIGINT', () => { void shutdown() })
+  process.on('SIGTERM', () => { void shutdown() })
 }
 
 bootstrap().catch((error) => {

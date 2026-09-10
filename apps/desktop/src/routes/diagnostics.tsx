@@ -73,7 +73,7 @@ export function DiagnosticsRoute() {
       description: 'AES-256-GCM authenticated local encryption',
       metrics: {
         'Cipher': 'AES-256-GCM',
-        'Key Derivation': 'PBKDF2-SHA256 (100k rounds)',
+        'Key Derivation': 'scrypt (RFC 7914)',
         'Plaintext Persistence': '0 (Strictly Barred)',
       },
     },

@@ -234,12 +234,14 @@ export const useAppStore = create<AppState>((set, get) => ({
       })
 
       wsManager.on('execution.completed', (event) => {
-        const res = event.payload.result as ExecutionResult | undefined
-        set({ executionStatus: 'completed', lastExecutionReport: res?.report ?? null })
+        const payload = event.payload as { report?: ExecutionReport; result?: ExecutionResult }
+        const report = payload.report ?? payload.result?.report ?? null
+        set({ executionStatus: 'completed', lastExecutionReport: report })
       })
 
       wsManager.on('execution.failed', (event) => {
-        set({ executionStatus: 'failed', executionError: event.payload.error })
+        const payload = event.payload as { errorCode?: string; error?: string }
+        set({ executionStatus: 'failed', executionError: payload.errorCode ?? payload.error ?? 'Execution failed' })
       })
 
       wsManager.on('execution.cancelled', () => {

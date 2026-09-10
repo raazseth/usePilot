@@ -16,6 +16,7 @@ import { providersRouter } from './routes/providers'
 import { settingsRouter } from './routes/settings'
 import { healthRouter } from './routes/health'
 import { plannerRouter } from './routes/planner'
+import { contextRouter } from './routes/context'
 
 type DB = ReturnType<typeof import('@usepilot/database').createDatabase>
 
@@ -56,6 +57,7 @@ export function createRouter(
     messagesRouter(repos, providerManager, eventBus, logger),
     providersRouter(repos, providerManager, eventBus, logger),
     settingsRouter(repos, eventBus, logger),
+    contextRouter(),
     // Planner routes adapter
     async (req: Request, url: URL) => plannerRoutes.handle(req, url.pathname),
   ]

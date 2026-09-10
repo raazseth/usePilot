@@ -215,6 +215,11 @@ export class ExecutionService {
         await this.events.emitFailed(ws, runId, traceId, 'EXECUTION_FAILED', failedTaskId)
         this.activeExecutions.delete(runId)
       },
+      onCancelled: async (cancelledRunId) => {
+        await this.persistence.markRunCancelled(cancelledRunId)
+        await this.events.emitCancelled(ws, cancelledRunId, traceId)
+        this.activeExecutions.delete(cancelledRunId)
+      },
     }
 
     void runner
@@ -252,7 +257,19 @@ export class ExecutionService {
     const active = this.activeExecutions.get(runId)
     if (!active) return
     active.runner.cancel()
-    this.activeExecutions.delete(runId)
+  }
+
+  async shutdown(): Promise<void> {
+    this.logger.info({ activeCount: this.activeExecutions.size }, 'Shutting down ExecutionService...')
+    for (const [runId, active] of this.activeExecutions.entries()) {
+      try {
+        active.runner.cancel()
+        await this.persistence.markRunCancelled(runId)
+      } catch (err) {
+        this.logger.error({ err, runId }, 'Error cancelling active execution during shutdown')
+      }
+    }
+    this.activeExecutions.clear()
   }
 
   pauseExecution(ws: WS, runId: string): void {

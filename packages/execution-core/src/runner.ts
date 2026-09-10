@@ -5,18 +5,14 @@ import type {
   ExecutionReport,
   TaskSummary,
   FailureCategory,
-  TaskExecutionStatus,
   ExecutionContextSnapshot,
   ICapabilityNegotiator,
   ICapabilityAdapter,
   ExecutionPolicy,
-  IExecutionPolicyEngine,
   ISessionManager,
   SelectedAdapterRecord,
-  ExecutionManifest,
 } from '@usepilot/execution-types'
 import type { ExecutionBlueprint, Task } from '@usepilot/planner-types'
-import { generateId } from '@usepilot/utils'
 
 import type { ApprovalGate } from './approval-gate'
 import type { CheckpointManager } from './checkpoint'
@@ -30,9 +26,9 @@ import { ExecutionResourceManager } from './resource-manager'
 import { RetryEngine } from './retry'
 import { AdapterSandbox } from './sandbox'
 import type { TaskScheduler } from './scheduler'
+import { SessionManager } from './session/manager'
 import type { ExecutionStateMachine } from './state-machine'
 import { CancellationTokenSource } from './token'
-import { SessionManager } from './session/manager'
 
 export interface ExecutionCallbacks {
   onTaskStarted?: (taskId: string, taskTitle: string, capability: string, attempt: number) => void | Promise<void>
@@ -47,6 +43,7 @@ export interface ExecutionCallbacks {
   onResumed?: (runId: string) => void | Promise<void>
   onCompleted?: (result: ExecutionResult) => void | Promise<void>
   onFailed?: (runId: string, error: string, failedTaskId?: string) => void | Promise<void>
+  onCancelled?: (runId: string) => void | Promise<void>
 }
 
 export interface RunOptions {
@@ -131,7 +128,6 @@ export class ExecutionRunner {
       createdAt: Date.now(),
     }
 
-    const taskMap = new Map(blueprint.tasks.map((t) => [t.id, t]))
     const completedTaskIds = new Set<string>()
     const failedTaskIds = new Set<string>()
     const skippedTaskIds = new Set<string>()
@@ -478,6 +474,7 @@ export class ExecutionRunner {
           })
           stateMachine.transitionExecution('cancelled')
           await journal.log(runId, traceId, 'execution_cancelled', {})
+          await callbacks.onCancelled?.(runId)
           return {
             runId,
             traceId,
@@ -587,6 +584,7 @@ export class ExecutionRunner {
       })
       stateMachine.transitionExecution('cancelled')
       await journal.log(runId, traceId, 'execution_cancelled', {})
+      await callbacks.onCancelled?.(runId)
 
       return {
         runId, traceId, status: 'cancelled',
