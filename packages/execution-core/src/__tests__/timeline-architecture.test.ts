@@ -8,7 +8,7 @@ import {
 import { ExecutionTimelineBuilder } from '../timeline'
 import { CapabilityRegistry } from '../registry'
 
-describe('Pre-Phase 6 Architecture Extensions', () => {
+describe('Capability and Timeline Architecture Extensions', () => {
   it('builds an index-based ExecutionTimeline referencing entities without data duplication', () => {
     const mockJournal: JournalEntry[] = [
       {

@@ -92,7 +92,7 @@ function makeTestBlueprint(id: string, tasks: Task[]): ExecutionBlueprint {
   }
 }
 
-describe('End-to-End Capability Workflows (Phase 4)', () => {
+describe('End-to-End Capability Workflows', () => {
   const testDir = join(tmpdir(), `usepilot-e2e-${Date.now()}`)
 
   beforeEach(() => {

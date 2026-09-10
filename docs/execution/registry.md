@@ -21,4 +21,4 @@ registry.register({
 })
 ```
 
-In Phase 3, `createDefaultRegistry()` populates all 17 capabilities with `StubAdapter` (priority 0) to validate runtime plumbing before concrete adapters are introduced in Phase 4.
+By default, `createDefaultRegistry()` registers baseline adapters for all 17 capabilities, allowing concrete implementations to override them based on platform and priority.

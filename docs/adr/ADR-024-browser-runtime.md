@@ -1,7 +1,7 @@
 # ADR-024: Playwright Browser Runtime with Multi-Channel Profile Persistence
 
 ## Context
-Phase 3 relied on in-memory stub adapters to validate the execution substrate. Production web automation requires real browser engines capable of multi-tab navigation, data extraction, cookie persistence, downloads, uploads, file chooser triggers, CDP protocol hooks, and enterprise authentication across Chrome, Microsoft Edge, Brave, and Firefox. Furthermore, requiring users to download hundreds of megabytes of bundled browser binaries violates local-first simplicity.
+Production web automation requires real browser engines capable of multi-tab navigation, data extraction, cookie persistence, downloads, uploads, file chooser triggers, CDP protocol hooks, and authentication across Chrome, Microsoft Edge, Brave, and Firefox, while respecting local-first simplicity without redundant downloads.
 
 ## Decision
 Implement `PlaywrightBrowserAdapter` and `PlaywrightBrowserSession` using Playwright:
@@ -14,4 +14,4 @@ Implement `PlaywrightBrowserAdapter` and `PlaywrightBrowserSession` using Playwr
 ## Consequences
 - Enables high-speed, local browser automation with zero external cloud dependencies.
 - Retains user logins and cookies across workflow runs safely.
-- Adheres strictly to the Adapter Session Model established in Phase 3.
+- Adheres strictly to the standard Adapter Session Model.

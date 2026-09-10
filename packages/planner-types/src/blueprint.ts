@@ -22,14 +22,14 @@ export interface ApprovalSummary {
 }
 
 /**
- * A measurable condition the execution engine can verify (Phase 3).
+ * A measurable condition the execution engine can verify upon completion.
  */
 export interface SuccessCriteria {
   /** Human-readable condition statement */
   condition: string
   /**
    * How the execution engine will verify this condition.
-   * 'screenshot' means visual inspection (Phase 3+ only).
+   * 'screenshot' indicates visual state inspection.
    */
   verificationStrategy: 'state_check' | 'file_exists' | 'api_response' | 'screenshot' | 'manual'
   /** Whether this criterion is required for the plan to be considered complete */
@@ -82,10 +82,6 @@ export interface PlanExplanation {
 
 /**
  * The fully-resolved, validated, and optimized execution blueprint.
- * This is what the Phase 2 planner produces.
- *
- * Phase 3 will add an 'execution' field alongside this.
- * Phase 3 must not require changes to this type to begin execution.
  */
 export interface ExecutionBlueprint {
   /** Database-assigned ID */
@@ -148,12 +144,12 @@ export type PlanStatus =
   | 'needs_info'
   | 'ready'
   | 'invalid'
-  | 'executing'    // Phase 3
-  | 'completed'    // Phase 3
-  | 'failed'       // Phase 3
+  | 'executing'
+  | 'completed'
+  | 'failed'
 
 /**
- * Planner Quality Metrics — measures planning benchmarks and execution efficacy.
+ * Planner Quality Metrics — records planner outcomes and execution efficacy.
  */
 export interface PlannerQualityMetrics {
   planId: string

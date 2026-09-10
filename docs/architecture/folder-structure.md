@@ -35,13 +35,18 @@ usePilot/
 │   ├── ai-providers/          # Ollama, LM Studio, OpenAI-compatible
 │   ├── config/                # Centralized schemas & feature flags
 │   ├── database/              # SQLite schema, Drizzle ORM, repositories
+│   ├── execution-core/        # Deterministic execution engine, adapters, verification
+│   ├── execution-types/       # Execution, adapter, and lifecycle types
+│   ├── planner-core/          # Cognitive planner, graph generator, validator
+│   ├── planner-types/         # Blueprint, task, and intent domain types
+│   ├── runtime-context/       # Dynamic system state, knowledge store, replay journal
 │   ├── types/                 # Shared TypeScript domain types
 │   └── utils/                 # Pure utility functions & Result type
 │
 ├── tooling/
 │   └── typescript-config/     # Base, React, and Node tsconfig presets
 │
-├── docs/                      # Architecture, ADRs, Roadmap
+├── docs/                      # Architecture specifications and ADRs
 ├── turbo.json                 # Turborepo task pipeline
 ├── pnpm-workspace.yaml        # Monorepo workspace configuration
 └── package.json               # Root workspace scripts

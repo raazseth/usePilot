@@ -153,7 +153,7 @@ export function ChatRoute() {
         }
       }),
 
-      // Phase 2: Planner event listeners
+      // Planner event listeners
       wsManager.on('plan.progress', (event) => {
         setPlanningProgress({
           stage: event.payload.stage as PlanningStage,

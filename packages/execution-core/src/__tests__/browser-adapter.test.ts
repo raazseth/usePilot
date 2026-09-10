@@ -57,7 +57,7 @@ describe('PlaywrightBrowserAdapter & BrowserSession', () => {
       description: 'Open data URL',
       category: 'navigation',
       requiredCapability: 'navigate_website',
-      toolConfig: { url: 'data:text/html,<html><head><title>usePilot Test Page</title></head><body><h1>Welcome to usePilot Phase 4</h1><div id="content">GST Invoice Total: INR 25,000</div></body></html>' },
+      toolConfig: { url: 'data:text/html,<html><head><title>usePilot Test Page</title></head><body><h1>Welcome to usePilot</h1><div id="content">GST Invoice Total: INR 25,000</div></body></html>' },
       preconditions: [],
       postconditions: [],
       successConditions: ['Page loaded'],

@@ -264,7 +264,7 @@ export function PlanCard({ blueprint, validation, planId }: PlanCardProps) {
             </button>
             {!isExecuting && (
               <div className="plan-execute-hint" style={{ marginTop: '6px' }}>
-                Phase 3 execution engine — deterministic, observable, verifiable
+                Deterministic, observable, verifiable execution engine
               </div>
             )}
           </div>

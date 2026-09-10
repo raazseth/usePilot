@@ -1,4 +1,4 @@
-// TaskScheduler — consumes Phase 2 DAG, never rebuilds the graph
+// TaskScheduler — consumes the blueprint dependency graph without rebuilding
 
 import type { ExecutionBlueprint, Task } from '@usepilot/planner-types'
 

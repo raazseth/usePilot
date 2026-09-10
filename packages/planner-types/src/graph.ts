@@ -65,7 +65,7 @@ export interface TaskGraph {
   parallelGroups: string[][]
   /**
    * Ordered task IDs along the longest dependency chain.
-   * Phase 3 uses this to estimate minimum sequential runtime.
+   * Used by the scheduler to estimate minimum sequential runtime.
    */
   criticalPath: string[]
   /** Total number of tasks */

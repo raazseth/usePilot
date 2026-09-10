@@ -13,7 +13,7 @@ describe('ArtifactStore & ArtifactManager (Deliverable 1)', () => {
   const executionId = 'run-art-101'
 
   it('initializes execution directory structure and saves text artifact with SHA-256', async () => {
-    const content = 'Hello usePilot Phase 4.1 Runtime Artifact Store'
+    const content = 'Hello usePilot Runtime Artifact Store'
     const meta = await store.save({
       executionId,
       taskId: 'task-1',
@@ -37,7 +37,7 @@ describe('ArtifactStore & ArtifactManager (Deliverable 1)', () => {
     expect(list.length).toBeGreaterThanOrEqual(1)
 
     const loaded = await store.load(`artifact://${executionId}/html/test.html`)
-    expect(loaded.buffer.toString('utf8')).toContain('Hello usePilot Phase 4.1')
+    expect(loaded.buffer.toString('utf8')).toContain('Hello usePilot Runtime Artifact Store')
     expect(loaded.metadata.id).toBe(list[0]?.id)
   })
 

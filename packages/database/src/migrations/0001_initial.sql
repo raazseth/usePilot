@@ -39,16 +39,16 @@ CREATE INDEX IF NOT EXISTS idx_conversations_created_at ON conversations(created
 CREATE INDEX IF NOT EXISTS idx_conversations_updated_at ON conversations(updated_at DESC);
 CREATE INDEX IF NOT EXISTS idx_conversations_deleted_at ON conversations(deleted_at);
 
--- Messages (future-proofed)
+-- Messages
 CREATE TABLE IF NOT EXISTS messages (
   id TEXT PRIMARY KEY,
   conversation_id TEXT NOT NULL REFERENCES conversations(id) ON DELETE CASCADE,
   role TEXT NOT NULL CHECK(role IN ('user', 'assistant', 'system', 'tool')),
   content TEXT,
   metadata TEXT,           -- JSON: MessageMetadata
-  attachments TEXT,        -- JSON: MessageAttachment[]  (Phase 2)
-  tool_calls TEXT,         -- JSON: ToolCall[]           (Phase 3)
-  tool_results TEXT,       -- JSON: ToolResult[]         (Phase 3)
+  attachments TEXT,        -- JSON: MessageAttachment[]
+  tool_calls TEXT,         -- JSON: ToolCall[]
+  tool_results TEXT,       -- JSON: ToolResult[]
   status TEXT NOT NULL DEFAULT 'pending'
     CHECK(status IN ('pending', 'streaming', 'complete', 'error', 'cancelled')),
   created_at INTEGER NOT NULL,

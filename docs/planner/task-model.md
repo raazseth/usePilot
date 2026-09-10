@@ -5,7 +5,7 @@
 Each `Task` represents a single atomic executable unit of work:
 **One Task = One Operation = One Tool.**
 
-Phase 3 never needs to infer tools or break down composite steps.
+The execution engine never needs to infer tools or break down composite steps.
 
 ## Schema
 

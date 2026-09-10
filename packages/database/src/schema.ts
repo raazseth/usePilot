@@ -35,7 +35,7 @@ export const conversations = sqliteTable('conversations', {
   deletedAt: integer('deleted_at', { mode: 'number' }),
 })
 
-// Messages — future-proofed for Phase 3+ AI workflows
+// Messages
 
 export const messages = sqliteTable('messages', {
   id: text('id').primaryKey(),
@@ -52,17 +52,14 @@ export const messages = sqliteTable('messages', {
   metadata: text('metadata'),
   /**
    * JSON: MessageAttachment[] — file/image attachments.
-   * Nullable in Phase 1, populated in Phase 2.
    */
   attachments: text('attachments'),
   /**
    * JSON: ToolCall[] — tool calls requested by the model.
-   * Nullable in Phase 1, populated in Phase 3.
    */
   toolCalls: text('tool_calls'),
   /**
    * JSON: ToolResult[] — results from tool execution.
-   * Nullable in Phase 1, populated in Phase 3.
    */
   toolResults: text('tool_results'),
   /** Message lifecycle status */
@@ -119,7 +116,7 @@ export type ProviderRow = typeof providers.$inferSelect
 export type NewProviderRow = typeof providers.$inferInsert
 export type ApplicationStateRow = typeof applicationState.$inferSelect
 
-// Phase 2: Planner Tables
+// Planner Tables
 
 export const goals = sqliteTable('goals', {
   id: text('id').primaryKey(),
@@ -255,7 +252,7 @@ export type NewPlanRow = typeof plans.$inferInsert
 export type PlanTaskRow = typeof planTasks.$inferSelect
 export type PlanValidationRow = typeof planValidations.$inferSelect
 
-// Phase 3: Execution Tables
+// Execution Tables
 
 export const executionRuns = sqliteTable('execution_runs', {
   id: text('id').primaryKey(),
@@ -410,9 +407,7 @@ export type ExecutionReportRow = typeof executionReports.$inferSelect
 export type ExecutionManifestRow = typeof executionManifests.$inferSelect
 export type NewExecutionManifestRow = typeof executionManifests.$inferInsert
 
-// ---------------------------------------------------------------------------
-// Phase 5 — Intelligence & Runtime Context Layer Tables
-// ---------------------------------------------------------------------------
+// Intelligence & Runtime Context Tables
 
 export const runtimeContext = sqliteTable('runtime_context', {
   id: text('id').primaryKey(),

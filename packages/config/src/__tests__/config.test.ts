@@ -19,7 +19,7 @@ describe('config schemas', () => {
     expect(env.LOG_LEVEL).toBe('info')
   })
 
-  it('validates feature flags defaults with all future flags false', () => {
+  it('validates default feature flags configuration', () => {
     const flags = FeatureFlagsSchema.parse(defaultFeatureFlags)
     expect(flags.experimental.streamingEnabled).toBe(true)
     expect(flags.ai.vision).toBe(false)

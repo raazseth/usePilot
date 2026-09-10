@@ -150,7 +150,7 @@ export function SettingsRoute() {
               <div className="settings-about-logo">✦</div>
               <div>
                 <p className="settings-about-name">usePilot</p>
-                <p className="settings-about-version">Version 0.1.0 — Phase 1</p>
+                <p className="settings-about-version">Version 0.1.0</p>
                 <p className="settings-about-desc">Privacy-first local AI assistant</p>
               </div>
             </div>

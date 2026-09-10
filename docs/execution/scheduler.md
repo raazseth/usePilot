@@ -1,6 +1,6 @@
 # Task Scheduler
 
-The `TaskScheduler` consumes the pre-computed `blueprint.graph` (DAG) produced by the Phase 2 Planner. The execution engine never recalculates or rebuilds the dependency graph at runtime.
+The `TaskScheduler` consumes the pre-computed `blueprint.graph` (DAG) produced by the Planner. The execution engine never recalculates or rebuilds the dependency graph at runtime.
 
 ## Batch Scheduling
 

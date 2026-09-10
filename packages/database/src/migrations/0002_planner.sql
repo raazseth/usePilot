@@ -1,8 +1,7 @@
 -- ─────────────────────────────────────────────────────────────────────────────
 -- Migration 0002: Planner Schema
 -- Created: 2026-09-04
--- Adds all Phase 2 planning tables.
--- Phase 1 tables are untouched.
+-- Adds planner tables.
 -- ─────────────────────────────────────────────────────────────────────────────
 
 -- Goals — the structured objective extracted from raw user input

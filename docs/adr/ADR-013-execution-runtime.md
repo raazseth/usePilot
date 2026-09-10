@@ -8,5 +8,5 @@ Build `ExecutionRunner` as a deterministic state machine consuming immutable `Ex
 
 ## Consequences
 - Predictable execution timelines and reproducible audit traces.
-- Clear separation between cognitive planning (Phase 2) and deterministic execution substrate (Phase 3).
+- Clear separation between cognitive planning and deterministic execution substrate.
 - Fast, local execution without recurring API round-trips.

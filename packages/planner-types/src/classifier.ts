@@ -2,9 +2,9 @@
 
 /**
  * All top-level request routing categories.
- * 'conversation' — handled by Phase 1 chat (unchanged)
- * 'planning'     — handed to the Phase 2 planner pipeline
- * 'execution'    — reserved for Phase 3 execution engine
+ * 'conversation' — conversational chat dialog
+ * 'planning'     — goal decomposition and planner pipeline
+ * 'execution'    — direct task and tool execution engine
  * 'unknown'      — classifier confidence too low; fall back to conversation
  */
 export type RequestType = 'conversation' | 'planning' | 'execution' | 'unknown'

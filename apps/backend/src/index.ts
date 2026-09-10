@@ -41,7 +41,7 @@ async function bootstrap() {
   const providerManager = new ProviderManager(db, eventBus, logger)
   await providerManager.initialize()
 
-  // Initialize planner service (Phase 2)
+  // Initialize planner service
   const plannerService = new PlannerService(db, providerManager, eventBus, logger)
   logger.info('PlannerService initialized')
 

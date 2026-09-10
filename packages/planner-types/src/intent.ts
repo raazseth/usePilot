@@ -40,7 +40,7 @@ export interface Intent {
   requiresHumanApproval: boolean
   /**
    * Information the planner would need but the user did not provide.
-   * If non-empty, the frontend should prompt for clarification (Phase 3+).
+   * If non-empty, prompt the user for clarification before proceeding.
    */
   missingInformation: string[]
   /** 0–1 confidence in the intent classification */

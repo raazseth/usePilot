@@ -28,6 +28,6 @@ export interface ICapabilityAdapter {
 4. **`cleanup()`**: Clean temporary workspace/artifacts.
 5. **`dispose()`**: Terminate background worker or native process.
 
-## Stub Adapters (Phase 3)
+## Stub Adapters
 
-Phase 3 ships stub adapters for all 17 capabilities. Each stub simulates successful execution with realistic latency, exercising all state transitions, verification hooks, checkpoints, and journals without external side effects.
+The runtime provides stub adapters for all 17 capabilities. Each stub simulates successful execution with realistic latency, exercising all state transitions, verification hooks, checkpoints, and journals without external side effects.

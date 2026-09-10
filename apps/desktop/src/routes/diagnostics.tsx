@@ -130,7 +130,7 @@ export function DiagnosticsRoute() {
           <div>
             <div className="diagnostics-title">Runtime Observability & Diagnostics</div>
             <div style={{ fontSize: '11px', color: '#94a3b8' }}>
-              Phase 4.1 Production Hardening • Subsystem Health & Diagnostics
+              Subsystem Health & Diagnostics
             </div>
           </div>
         </div>

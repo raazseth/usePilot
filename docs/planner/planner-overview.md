@@ -2,7 +2,7 @@
 
 ## 1. Role in usePilot
 
-Phase 2 introduces the **Intelligence Layer** of usePilot. Its responsibility is to reliably transform ambiguous natural language requests into deterministic, validated, and optimized **ExecutionBlueprints**.
+The **Intelligence Layer** of usePilot is responsible for reliably transforming ambiguous natural language requests into deterministic, validated, and optimized **ExecutionBlueprints**.
 
 The planner is **pure intelligence**:
 - No browser automation
@@ -10,7 +10,7 @@ The planner is **pure intelligence**:
 - No Playwright scripts
 - Zero execution logic
 
-Phase 2 produces blueprints; Phase 3 executes them.
+The planner produces blueprints; the execution engine executes them.
 
 ---
 

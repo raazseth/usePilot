@@ -18,7 +18,7 @@ import { ApprovalRequestRepository } from '../repositories/approval-requests'
 import { ExecutionReportRepository } from '../repositories/execution-reports'
 import { ExecutionManifestRepository } from '../repositories/execution-manifests'
 
-describe('Execution Repositories Integration Tests (Phase 3 Migration)', () => {
+describe('Execution Repositories Integration Tests', () => {
   const testDbPath = join(tmpdir(), `usepilot-exec-test-${generateId()}.db`)
   let db: ReturnType<typeof createDatabase>
   let planId: string

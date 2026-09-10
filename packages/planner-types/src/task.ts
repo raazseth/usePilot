@@ -4,7 +4,7 @@ import type { Complexity } from './intent'
 
 /**
  * Abstract capability required to execute this task.
- * The planner produces capabilities; Phase 3 maps capabilities to concrete tools/adapters.
+ * The planner produces capabilities mapped to concrete capability adapters.
  */
 export type TaskCapability =
   | 'navigate_website'      // Browser navigation / page opening
@@ -27,8 +27,8 @@ export type TaskCapability =
   | 'none'                  // No external capability needed
 
 /**
- * Legacy concrete tool category.
- * In Phase 2, tasks declare abstract TaskCapability. Phase 3 maps capabilities to tools.
+ * Concrete tool category.
+ * Tasks declare abstract TaskCapability mapped to concrete adapters.
  */
 export type TaskTool =
   | 'browser'      // Playwright / web automation
@@ -65,7 +65,7 @@ export type TaskCategory =
 export type ApprovalPolicy = 'automatic' | 'optional' | 'mandatory' | 'forbidden'
 
 /**
- * How the execution engine should retry a failed task (Phase 3).
+ * Retry policy definition for task execution.
  */
 export interface RetryPolicy {
   /** Maximum number of attempts (including the first) */
@@ -77,7 +77,7 @@ export interface RetryPolicy {
 }
 
 /**
- * What to do when this task fails (Phase 3).
+ * Failure recovery strategy for task execution.
  */
 export interface FailureStrategy {
   /** 'abort' stops the entire plan. 'skip' moves to the next task. 'fallback' executes the fallbackTaskId. */
@@ -104,10 +104,10 @@ export interface Task {
   category: TaskCategory
   /**
    * Abstract capability required to execute this task.
-   * Phase 3 execution engine maps capabilities to concrete tools/adapters.
+   * Execution engine maps capabilities to concrete capability adapters.
    */
   requiredCapability: TaskCapability
-  /** Suggested/inferred tool for UI display and Phase 3 hints */
+  /** Suggested tool category for UI display */
   requiredTool?: TaskTool | undefined
   /** Suggested concrete runner/adapter (e.g. 'playwright', 'chrome-extension') */
   suggestedTool?: string | undefined
@@ -139,9 +139,9 @@ export interface Task {
   approvalReason?: string | undefined
   /** Estimated subjective complexity */
   complexity: Complexity
-  /** Retry behavior on failure (Phase 3) */
+  /** Retry behavior on failure */
   retryPolicy: RetryPolicy
-  /** Failure behavior (Phase 3) */
+  /** Failure behavior */
   failureStrategy: FailureStrategy
   /** 0–1 confidence that this task is correct and complete */
   confidence: number

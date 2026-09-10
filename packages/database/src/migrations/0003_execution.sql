@@ -1,7 +1,7 @@
 -- ─────────────────────────────────────────────────────────────────────────────
 -- Migration 0003: Execution Schema
 -- Created: 2026-09-08
--- Adds all Phase 3 execution and capability tables.
+-- Adds execution and capability tables.
 -- ─────────────────────────────────────────────────────────────────────────────
 
 -- Execution Runs — orchestrates execution instances

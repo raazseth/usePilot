@@ -118,7 +118,7 @@ export function ContextRoute() {
     {
       id: 'idx-2',
       type: 'document',
-      title: 'Architecture Blueprint - Phase 5',
+      title: 'Architecture Blueprint',
       tags: ['planning', 'spec'],
       matchScore: 0.88,
     },

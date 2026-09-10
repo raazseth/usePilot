@@ -34,5 +34,5 @@ export interface TaskGraph {
 ## Topological Ordering & Parallelism
 
 - `layers`: Identifies topological depth for ordered sequencing.
-- `parallelGroups`: Groups of independent tasks with no shared ancestors or tool conflicts that can run concurrently in Phase 3.
+- `parallelGroups`: Groups of independent tasks with no shared ancestors or tool conflicts that can run concurrently.
 - `criticalPath`: The longest sequence of dependent tasks determining total plan completion path.

@@ -27,10 +27,10 @@ export type ClientEventType =
   | 'provider.setActive'
   | 'settings.update'
   | 'health.ping'
-  // Phase 2: Planner
+  // Planner
   | 'plan.create'
   | 'plan.get'
-  // Phase 3: Execution
+  // Execution
   | 'execution.start'
   | 'execution.pause'
   | 'execution.resume'
@@ -75,10 +75,10 @@ export type ClientEvent =
   | AppEvent<ProviderSetActivePayload> & { type: 'provider.setActive' }
   | AppEvent<SettingsUpdatePayload> & { type: 'settings.update' }
   | AppEvent<Record<string, never>> & { type: 'health.ping' }
-  // Phase 2: Planner
+  // Planner
   | AppEvent<{ conversationId: ID; text: string }> & { type: 'plan.create' }
   | AppEvent<{ planId: ID }> & { type: 'plan.get' }
-  // Phase 3: Execution
+  // Execution
   | AppEvent<{ planId: ID }> & { type: 'execution.start' }
   | AppEvent<{ runId: ID }> & { type: 'execution.pause' }
   | AppEvent<{ runId: ID }> & { type: 'execution.resume' }
@@ -101,11 +101,11 @@ export type ServerEventType =
   | 'settings.changed'
   | 'health.pong'
   | 'error'
-  // Phase 2: Planner
+  // Planner
   | 'plan.progress'
   | 'plan.ready'
   | 'plan.error'
-  // Phase 3: Execution
+  // Execution
   | 'execution.started'
   | 'execution.progress'
   | 'execution.task.started'
@@ -183,11 +183,11 @@ export type ServerEvent =
   | AppEvent<{ key: string; value: unknown }> & { type: 'settings.changed' }
   | AppEvent<HealthPongPayload> & { type: 'health.pong' }
   | AppEvent<ErrorPayload> & { type: 'error' }
-  // Phase 2: Planner
+  // Planner
   | AppEvent<{ runId: string; stage: string; progressPct: number; message: string }> & { type: 'plan.progress' }
   | AppEvent<{ runId: string; blueprint: unknown; planId: string; validation?: unknown }> & { type: 'plan.ready' }
   | AppEvent<{ runId: string; code: string; message: string; retries: number }> & { type: 'plan.error' }
-  // Phase 3: Execution
+  // Execution
   | AppEvent<{ runId: string; planId: string; traceId: string; taskCount: number }> & { type: 'execution.started' }
   | AppEvent<{ runId: string; traceId: string; completedCount: number; totalCount: number; currentTaskTitle: string }> & { type: 'execution.progress' }
   | AppEvent<{ runId: string; traceId: string; taskId: string; taskTitle: string; capability: string; attempt: number }> & { type: 'execution.task.started' }

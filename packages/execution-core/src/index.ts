@@ -27,7 +27,7 @@ export { ExecutionPolicyEngine, createDefaultExecutionPolicy } from './policy/en
 export { ManifestGenerator } from './manifest/generator'
 export { ExecutionTimelineBuilder } from './timeline'
 
-// Phase 4: Production Capability Runtimes
+// Capability Runtimes
 export { NativeFilesystemAdapter } from './adapters/filesystem/fs-adapter'
 export { NativeDesktopAdapter } from './adapters/desktop/desktop-adapter'
 export { PlaywrightBrowserAdapter } from './adapters/browser/browser-adapter'
@@ -38,7 +38,7 @@ export { SecretVault } from './security/vault'
 export { PermissionManager } from './security/permissions'
 export { BrowserStateVerifier, FilesystemVerifier, DesktopStateVerifier } from './verification/capability-verifiers'
 
-// Phase 4.1: Production Hardening & Observability
+// Observability & Diagnostics
 export { ArtifactStore } from './artifacts/artifact-store'
 export { ArtifactManager } from './artifacts/artifact-manager'
 export type { ArtifactType, ArtifactCategory, ArtifactMetadata, SaveArtifactOptions, ListArtifactFilter } from './artifacts/types'

@@ -27,8 +27,6 @@ function detectPlatform(): 'windows' | 'macos' | 'linux' {
 }
 
 function detectAvailableTools(): TaskTool[] {
-  // In Phase 2, tools are declared statically.
-  // Phase 3 will probe actual tool availability (playwright, etc.)
   const tools: TaskTool[] = ['api', 'clipboard', 'none']
   if (detectPlatform() !== 'linux') {
     // Non-linux platforms generally support all tools

@@ -6,7 +6,7 @@ export type MessageRole = 'user' | 'assistant' | 'system' | 'tool'
 /** Lifecycle status of a message */
 export type MessageStatus = 'pending' | 'streaming' | 'complete' | 'error' | 'cancelled'
 
-/** Metadata stored alongside a message — extensible for Phase 2+ */
+/** Metadata stored alongside a message */
 export interface MessageMetadata {
   /** The model that generated this response (assistant messages) */
   model?: string | undefined
@@ -26,7 +26,7 @@ export interface MessageMetadata {
   generationDurationMs?: number | undefined
 }
 
-/** Attachment reference — for Phase 2+ file/image support */
+/** Attachment reference for file and image support */
 export interface MessageAttachment {
   id: ID
   type: 'image' | 'file' | 'audio'
@@ -37,14 +37,14 @@ export interface MessageAttachment {
   url: string
 }
 
-/** Tool call request — for Phase 3+ agentic support */
+/** Tool call request for capability invocation */
 export interface ToolCall {
   id: string
   name: string
   arguments: Record<string, unknown>
 }
 
-/** Tool call result — for Phase 3+ agentic support */
+/** Tool call execution result */
 export interface ToolResult {
   toolCallId: string
   content: string
@@ -59,11 +59,11 @@ export interface Message {
   /** Text content — may be null for tool messages */
   content: Nullable<string>
   metadata: Nullable<MessageMetadata>
-  /** File and image attachments — nullable until Phase 2 */
+  /** File and image attachments */
   attachments: Nullable<MessageAttachment[]>
-  /** Tool calls made in this turn — nullable until Phase 3 */
+  /** Tool calls made in this turn */
   toolCalls: Nullable<ToolCall[]>
-  /** Results of tool calls — nullable until Phase 3 */
+  /** Results of tool calls */
   toolResults: Nullable<ToolResult[]>
   status: MessageStatus
   createdAt: Timestamp

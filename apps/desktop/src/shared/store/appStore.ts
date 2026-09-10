@@ -29,12 +29,12 @@ interface AppState {
   activeConversationId: string | null
   wsStatus: WebSocketStatus
 
-  // Phase 2: Planner state
+  // Planner state
   planningProgress: PlanningProgressState | null
   activeBlueprint: ExecutionBlueprint | null
   planningError: string | null
 
-  // Phase 3: Execution state
+  // Execution state
   executionStatus: ExecutionStatus | null
   executionRunId: string | null
   executionTraceId: string | null
@@ -46,7 +46,7 @@ interface AppState {
   executionMetrics: Partial<ExecutionMetrics> | null
   lastExecutionReport: ExecutionReport | null
 
-  // Phase 4: Capability Runtime state
+  // Capability Runtime state
   browserActivity: {
     url?: string
     title?: string
@@ -97,7 +97,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   activeBlueprint: null,
   planningError: null,
 
-  // Phase 3 initial state
+  // Execution initial state
   executionStatus: null,
   executionRunId: null,
   executionTraceId: null,
@@ -109,7 +109,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   executionMetrics: null,
   lastExecutionReport: null,
 
-  // Phase 4 initial state
+  // Capability Runtime initial state
   browserActivity: null,
   activeCapability: null,
   activeAdapterInfo: null,
@@ -137,7 +137,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       wsManager.connect(wsUrl)
       wsManager.onStatusChange((s) => get().setWsStatus(s))
 
-      // Register Phase 3 WS handlers
+      // Register execution WS handlers
       wsManager.on('execution.started', (event) => {
         const payload = event.payload
         set({

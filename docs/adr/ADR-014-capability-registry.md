@@ -8,4 +8,4 @@ Introduce `CapabilityRegistry` to resolve tasks by abstract `TaskCapability` rat
 
 ## Consequences
 - Plans remain portable across operating systems and execution engines.
-- Phase 3 operates completely with stub adapters while leaving Phase 4 free to register real automation adapters without modifying the planner or runner.
+- The runtime can operate with baseline stub adapters or register specialized automation adapters without modifying the planner or runner.

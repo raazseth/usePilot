@@ -221,7 +221,7 @@ export class WebSocketHandler {
       status: 'complete',
     })
 
-    // Phase 2: Route request through RequestClassifier
+    // Route request through RequestClassifier
     if (this.plannerService) {
       const classifier = new RequestClassifier(provider)
       const classification = await classifier.classify(content, targetModel)

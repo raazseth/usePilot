@@ -8,5 +8,5 @@ Introduce an explicit `TaskGraph` with `DAGNode[]`, `DAGEdge[]`, `parallelGroups
 
 ## Consequences
 - Guarantees acyclicity through compile-time and runtime validation.
-- Identifies parallel tasks upfront for concurrent execution in Phase 3.
-- Ready for graph-based visualization in future UI releases with zero schema changes.
+- Identifies parallel tasks upfront for concurrent execution.
+- Ready for graph-based visualization in UI releases with zero schema changes.
