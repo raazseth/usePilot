@@ -9,7 +9,7 @@ import { PerformanceMetricsCollector } from '../diagnostics/performance-collecto
 import { RuntimeLogger } from '../logging/runtime-logger'
 import { FailureBundleGenerator } from '../replay/failure-bundle'
 
-describe('Failure Bundle, Performance Metrics & Runtime Logger (Deliverables 6, 8, 9)', () => {
+describe('Failure Bundle, Performance Metrics & Runtime Logger', () => {
   const testDir = join(tmpdir(), `test-fail-bundle-${Date.now()}`)
   const store = new ArtifactStore(testDir)
   const manager = new ArtifactManager(store)

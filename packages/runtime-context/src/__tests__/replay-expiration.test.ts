@@ -7,7 +7,7 @@ import { KnowledgeStore } from '../knowledge/knowledge-store'
 import type { BrowserObservation, FilesystemObservation, Observation } from '../observations/types'
 import { ObservationReplayEngine } from '../replay/observation-replay'
 
-describe('Observation Replay & Context Expiration (Deliverables 8 & 9)', () => {
+describe('Observation Replay & Context Expiration', () => {
   it('ObservationReplayEngine steps through historical state perceptions deterministically', () => {
     const prov = createProvenance('browser')
 

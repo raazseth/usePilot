@@ -6,7 +6,7 @@ import { describe, it, expect } from 'vitest'
 import { ArtifactManager } from '../artifacts/artifact-manager'
 import { ArtifactStore } from '../artifacts/artifact-store'
 
-describe('ArtifactStore & ArtifactManager (Deliverable 1)', () => {
+describe('ArtifactStore & ArtifactManager', () => {
   const testBaseDir = join(tmpdir(), `test-artifacts-${Date.now()}`)
   const store = new ArtifactStore(testBaseDir)
   const manager = new ArtifactManager(store)

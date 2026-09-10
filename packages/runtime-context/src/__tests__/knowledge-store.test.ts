@@ -3,7 +3,7 @@ import { describe, it, expect } from 'vitest'
 import { createProvenance } from '../core/provenance'
 import { KnowledgeStore } from '../knowledge/knowledge-store'
 
-describe('KnowledgeStore & Browser Knowledge Graph (Deliverables 3, 4 & Requirement 1)', () => {
+describe('KnowledgeStore & Browser Knowledge Graph', () => {
   it('KnowledgeStore manages Cache layer, Persistent knowledge, and Documents', () => {
     const store = new KnowledgeStore({ maxCacheEntries: 5 })
     const prov = createProvenance('planner', { confidence: 0.9 })

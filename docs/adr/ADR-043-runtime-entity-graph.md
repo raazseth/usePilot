@@ -17,7 +17,7 @@ We implement:
 1. `RuntimeEntityGraph`:
    - Typed entities: `User`, `Website`, `Document`, `Window`, `Application`, `File`, `Folder`, `Form`, `Execution`, `Task`, `Adapter`, `Permission`
    - Typed relationships: `opened`, `downloaded`, `generated`, `depends_on`, `belongs_to`, `references`, `created_by`, `verified_by`
-   - High-performance bidirectional adjacency indexing (`outgoing`, `incoming`) for rapid path traversal (e.g. `amazon.in` -> `GST Invoice` -> `Downloaded PDF` -> `Execution #42` -> `Verification`).
+   - Bidirectional adjacency indexing (`outgoing`, `incoming`) for rapid path traversal (e.g. `amazon.in` -> `GST Invoice` -> `Downloaded PDF` -> `Execution #42` -> `Verification`).
    - Query engine integration via `RuntimeQueryEngine.entities()` and `RuntimeQueryEngine.entityNeighbors()`.
 
 2. `RuntimeContextHealthMonitor`:

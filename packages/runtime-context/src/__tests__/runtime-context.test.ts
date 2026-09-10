@@ -4,7 +4,7 @@ import { RuntimeContext } from '../core/context'
 import { createProvenance } from '../core/provenance'
 import { MemoryContextStore } from '../core/store'
 
-describe('RuntimeContext & Provenance (Deliverable 1 & Requirement 4)', () => {
+describe('RuntimeContext & Provenance', () => {
   it('initializes default state and tracks provenance', () => {
     const ctx = new RuntimeContext('session-100', '/workspace/app')
     const state = ctx.getState()

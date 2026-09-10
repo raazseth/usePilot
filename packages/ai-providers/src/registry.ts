@@ -14,8 +14,7 @@ interface ProviderConfig {
 }
 
 /**
- * Registry that manages all configured AI providers.
- * Provides lazy initialization and lifecycle management.
+ * Registry for configured AI providers with lifecycle management.
  */
 export class ProviderRegistry {
   private readonly providers = new Map<string, AIProvider>()

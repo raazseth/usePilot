@@ -5,7 +5,7 @@ import type { ArtifactMetadata } from '../artifacts/types'
 import { DiagnosticTimelineBuilder } from '../diagnostics/diagnostic-timeline'
 import { ExecutionReplayEngine } from '../replay/replay-engine'
 
-describe('Diagnostic Timeline & Execution Replay (Deliverables 4 & 5)', () => {
+describe('Diagnostic Timeline & Execution Replay', () => {
   const executionId = 'run-replay-999'
 
   const mockJournalEntries: JournalEntry[] = [

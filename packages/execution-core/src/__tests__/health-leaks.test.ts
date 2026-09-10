@@ -3,7 +3,7 @@ import { describe, it, expect } from 'vitest'
 import { RuntimeHealthMonitor } from '../diagnostics/health-monitor'
 import { ResourceLeakDetector } from '../diagnostics/leak-detector'
 
-describe('Runtime Health Monitoring & Resource Leak Detection (Deliverables 3 & 7)', () => {
+describe('Runtime Health Monitoring & Resource Leak Detection', () => {
   it('ResourceLeakDetector tracks resource allocations and cleans up leaks', async () => {
     const leakDetector = new ResourceLeakDetector()
     let disposalCalled = false

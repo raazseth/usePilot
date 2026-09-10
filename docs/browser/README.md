@@ -1,6 +1,6 @@
 # Browser Runtime
 
-The Browser Runtime delivers production-grade web automation for usePilot via Playwright, supporting Microsoft Edge, Google Chrome, Brave, and Mozilla Firefox.
+The Browser Runtime provides web automation for usePilot via Playwright, supporting Microsoft Edge, Google Chrome, Brave, and Mozilla Firefox.
 
 ## Key Capabilities
 
@@ -30,5 +30,5 @@ Independent Verification (DOM / Screenshot / HTTP Status)
 - **System Browser Channel Auto-Detection**: Probes and launches installed Microsoft Edge and Chrome on Windows, skipping large bundled browser downloads.
 - **Persistent Profiles**: Preserves user logins, local storage, and session cookies between runs.
 - **Multi-Tab Support**: Orchestrates actions across multiple tabs using tab indices.
-- **CDP Support**: Direct Chrome DevTools Protocol access for advanced automation.
+- **CDP Support**: Chrome DevTools Protocol access for low-level browser interaction.
 - **Session Reuse**: Browser contexts stay alive across related tasks in an execution run, eliminating startup latency.

@@ -266,7 +266,7 @@ export function ExecutionPanel({ report }: ExecutionPanelProps) {
         </div>
       )}
 
-      {/* Final report */}
+      {/* Execution report */}
       {isDone && displayReport && <ExecutionReport report={displayReport} />}
     </div>
   )

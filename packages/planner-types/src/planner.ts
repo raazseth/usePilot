@@ -34,7 +34,7 @@ export interface PlannerContext {
   conversationHistory: ConversationHistoryEntry[]
   /** Active user settings snapshot */
   settings: PlannerSettingsContext
-  /** Tools registered and available on this machine (legacy/adapter hint) */
+  /** Tools registered and available on this host */
   availableTools: TaskTool[]
   /** Abstract capabilities available on this system */
   availableCapabilities?: TaskCapability[] | undefined

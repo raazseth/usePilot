@@ -11,7 +11,7 @@ import { ObservationEngine } from '../observations/observation-engine'
 import type { BrowserObservation } from '../observations/types'
 import { RuntimeQueryEngine } from '../retrieval/query-engine'
 
-describe('Unified RuntimeQueryEngine & Execution Memory (Deliverables 6, 7 & Requirement 2)', () => {
+describe('Unified RuntimeQueryEngine & Execution Memory', () => {
   it('RuntimeQueryEngine unifies all runtime access through a single API', async () => {
     const contextStore = new MemoryContextStore()
     const observationEngine = new ObservationEngine()

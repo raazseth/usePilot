@@ -260,7 +260,6 @@ export class TaskGenerator {
   }
 
   private toTasks(data: TaskListResponse): Task[] {
-    // First pass: assign IDs, map title → ID for dependency resolution
     const titleToId = new Map<string, string>()
     const ids = data.tasks.map(() => generateId())
     data.tasks.forEach((t, i) => {

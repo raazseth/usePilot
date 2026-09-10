@@ -65,7 +65,6 @@ export class ExecutionMemoryStore {
   getBestPatternForIntent(intent: string): ExecutionMemoryRecord | undefined {
     const matching = this.query({ intent, successOnly: true })
     if (matching.length === 0) return undefined
-    // Return the successful execution with the lowest duration or most recent
     return matching[0]
   }
 

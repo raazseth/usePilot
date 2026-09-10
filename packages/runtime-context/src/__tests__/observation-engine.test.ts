@@ -5,7 +5,7 @@ import { createProvenance } from '../core/provenance'
 import { ObservationEngine } from '../observations/observation-engine'
 import type { BrowserObservation, FilesystemObservation, DesktopObservation } from '../observations/types'
 
-describe('Observation Engine & State Perception (Deliverable 2 & Requirement 3)', () => {
+describe('Observation Engine & State Perception', () => {
   it('emits state observations and separates them from temporal events', () => {
     const engine = new ObservationEngine()
     const prov = createProvenance('browser', { confidence: 0.98 })

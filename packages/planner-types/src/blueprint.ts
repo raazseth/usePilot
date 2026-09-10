@@ -64,8 +64,7 @@ export interface OptimizationResult {
 }
 
 /**
- * Explains why the planner formulated this blueprint.
- * Provides transparent reasoning, assumptions, and tradeoffs to the user.
+ * Explains the planner reasoning, assumptions, and tradeoffs for a blueprint.
  */
 export interface PlanExplanation {
   /** Concise summary of the chosen plan strategy */

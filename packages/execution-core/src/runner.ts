@@ -191,7 +191,6 @@ export class ExecutionRunner {
     const retryCounters: Record<string, number> = {}
     const taskSummaries: TaskSummary[] = []
 
-    // Initialize all tasks
     for (const task of blueprint.tasks) {
       stateMachine.initializeTask(task.id)
     }

@@ -4,7 +4,7 @@ import { createProvenance } from '../core/provenance'
 import { RuntimeIndexEngine } from '../index/runtime-index'
 import type { IndexDocument } from '../index/types'
 
-describe('Runtime Index & Hybrid Search (Deliverable 5)', () => {
+describe('Runtime Index & Hybrid Search', () => {
   it('indexes documents and performs keyword and entity type filtering', () => {
     const index = new RuntimeIndexEngine()
     const prov = createProvenance('filesystem')
