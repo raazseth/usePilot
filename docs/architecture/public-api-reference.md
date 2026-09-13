@@ -83,6 +83,22 @@ This document defines the formal public API surface of usePilot across its core 
 
 ---
 
+### `@usepilot/skill-types` & `@usepilot/skill-core`
+
+| Exported Symbol | Kind | Purpose | Documented Guide | ADR | Test Suite |
+|---|---|---|---|---|---|
+| `SkillRegistry` | Class | Registry validating and storing versioned skill manifests | [ADR-047](../adr/ADR-047-skill-system.md) | [ADR-047](../adr/ADR-047-skill-system.md) | `packages/skill-core/src/__tests__/registry.test.ts` |
+| `SkillDiscovery` | Class | Deterministic token-based skill candidate discovery | [ADR-047](../adr/ADR-047-skill-system.md) | [ADR-047](../adr/ADR-047-skill-system.md) | `packages/skill-core/src/__tests__/discovery.test.ts` |
+| `SkillResolver` | Class | Input validation, parameter deduction, and missing input detection | [ADR-047](../adr/ADR-047-skill-system.md) | [ADR-047](../adr/ADR-047-skill-system.md) | `packages/skill-core/src/__tests__/resolver.test.ts` |
+| `SkillWorkflowCompiler` | Class | Compiles configured skill into Workflow and immutable ExecutionBlueprint | [ADR-047](../adr/ADR-047-skill-system.md) | [ADR-047](../adr/ADR-047-skill-system.md) | `packages/skill-core/src/__tests__/compiler.test.ts` |
+| `SkillComposer` | Class | Chains multiple skills into composite sequential workflows with data binding | [ADR-047](../adr/ADR-047-skill-system.md) | [ADR-047](../adr/ADR-047-skill-system.md) | `packages/skill-core/src/__tests__/composition.test.ts` |
+| `SkillVerifier` | Class | Semantic post-execution outcome verification against skill contracts | [ADR-047](../adr/ADR-047-skill-system.md) | [ADR-047](../adr/ADR-047-skill-system.md) | `packages/skill-core/src/__tests__/verifier-and-telemetry.test.ts` |
+| `SkillTelemetryCollector` | Class | Records skill execution telemetry and metrics | [ADR-047](../adr/ADR-047-skill-system.md) | [ADR-047](../adr/ADR-047-skill-system.md) | `packages/skill-core/src/__tests__/verifier-and-telemetry.test.ts` |
+| `BUILTIN_SKILLS` | Const | 10 production-ready built-in skills (FS, Browser, Cross-Runtime) | [ADR-047](../adr/ADR-047-skill-system.md) | [ADR-047](../adr/ADR-047-skill-system.md) | `packages/skill-core/src/__tests__/builtin-skills.test.ts` |
+| `toSkillManifest` | Function | Converts rich runtime Skill into immutable, JSON-serializable SkillManifest | [ADR-047](../adr/ADR-047-skill-system.md) | [ADR-047](../adr/ADR-047-skill-system.md) | `packages/skill-core/src/__tests__/registry.test.ts` |
+
+---
+
 ## 2. Core Subsystem Code Examples
 
 ### A. Planner Subsystem: Generating a Blueprint
@@ -188,6 +204,47 @@ await facade.transaction(async (tx) => {
 // 3. Query knowledge across tiers
 const domainKnowledge = await facade.knowledge.getDomainKnowledge('portal.example.com')
 console.log(`Recorded pages: ${domainKnowledge?.pages.length}`)
+```
+
+### D. Skill Subsystem: Discovering, Resolving, and Compiling a Workflow
+
+```typescript
+import {
+  SkillRegistry,
+  SkillDiscovery,
+  SkillResolver,
+  SkillWorkflowCompiler,
+  BUILTIN_SKILLS,
+} from '@usepilot/skill-core'
+
+// 1. Initialize registry with built-in skills
+const registry = new SkillRegistry()
+for (const skill of BUILTIN_SKILLS) {
+  registry.register(skill)
+}
+
+// 2. Discover skill candidate from user intent
+const discovery = new SkillDiscovery(registry)
+const candidates = await discovery.discover({
+  userPrompt: 'Please organize my Downloads directory by file type',
+})
+const topSkill = registry.get(candidates[0].skillId)!
+
+// 3. Resolve skill configuration and validate parameters
+const resolver = new SkillResolver()
+const resolution = await resolver.resolve(topSkill, {
+  folder: 'C:/Users/User/Downloads',
+  groupBy: 'fileType',
+})
+
+if (resolution.status === 'resolved') {
+  // 4. Compile into an immutable ExecutionBlueprint via existing Planner
+  const compiler = new SkillWorkflowCompiler()
+  const { workflow, blueprint } = await compiler.compile(topSkill, resolution.inputs)
+
+  console.log(`Workflow compiled: ${workflow.name} (${workflow.tasks.length} tasks)`)
+  console.log(`Execution Blueprint sealed hash: ${blueprint.hash}`)
+}
 ```
 
 ---

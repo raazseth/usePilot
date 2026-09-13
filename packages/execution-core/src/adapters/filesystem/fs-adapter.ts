@@ -1,4 +1,4 @@
-import { createHash, randomBytes } from 'node:crypto'
+import { randomBytes } from 'node:crypto'
 import { promises as fs } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 
@@ -9,6 +9,9 @@ import type {
   VerificationResult,
 } from '@usepilot/execution-types'
 import type { TaskCapability } from '@usepilot/planner-types'
+import { WindowsPathNormalizer } from './windows-path'
+import { SafeFileOperations, type CollisionPolicy } from './file-operations'
+import { SafeBatchExecutor, type BatchFailureMode } from './batch-executor'
 
 export interface FilesystemAdapterOptions {
   workingDirectory?: string | undefined
@@ -21,10 +24,16 @@ export class NativeFilesystemAdapter implements ICapabilityAdapter {
   readonly name = 'NativeFilesystemAdapter'
 
   private readonly workingDirectory: string
+  private readonly normalizer: WindowsPathNormalizer
+  private readonly fileOps: SafeFileOperations
+  private readonly batchExecutor: SafeBatchExecutor
 
   constructor(capability: TaskCapability, options?: FilesystemAdapterOptions | undefined) {
     this.capability = capability
     this.workingDirectory = options?.workingDirectory ?? process.cwd()
+    this.normalizer = new WindowsPathNormalizer({ workingDirectory: this.workingDirectory })
+    this.fileOps = new SafeFileOperations(this.normalizer)
+    this.batchExecutor = new SafeBatchExecutor({ normalizer: this.normalizer, ops: this.fileOps })
   }
 
   async initialize(): Promise<void> {
@@ -44,12 +53,11 @@ export class NativeFilesystemAdapter implements ICapabilityAdapter {
   }
 
   private resolvePath(filePath: string): string {
-    return resolve(this.workingDirectory, filePath)
+    return this.normalizer.normalizePath(filePath)
   }
 
   private async computeHash(filePath: string): Promise<string> {
-    const data = await fs.readFile(filePath)
-    return createHash('sha256').update(data).digest('hex')
+    return this.fileOps.computeFileHash(this.resolvePath(filePath))
   }
 
   async execute(ctx: AdapterContext): Promise<AdapterResult> {
@@ -72,16 +80,36 @@ export class NativeFilesystemAdapter implements ICapabilityAdapter {
       switch (this.capability) {
         case 'read_file': {
           const target = this.resolvePath((params['path'] ?? params['filePath'] ?? task.title) as string)
-          const encoding = (params['encoding'] as BufferEncoding) ?? 'utf8'
-          const content = await fs.readFile(target, encoding)
           const stats = await fs.stat(target)
-          const hash = await this.computeHash(target)
-          output = { path: target, size: stats.size, hash, content }
+          if (stats.isDirectory()) {
+            const entries = await fs.readdir(target)
+            output = { path: target, size: stats.size, isDirectory: true, entries }
+          } else {
+            const encoding = (params['encoding'] as BufferEncoding) ?? 'utf8'
+            const content = await fs.readFile(target, encoding)
+            const hash = await this.computeHash(target)
+            output = { path: target, size: stats.size, hash, content }
+          }
           break
         }
 
         case 'write_file': {
+          if (params['operation'] === 'ensure_directories') {
+            const basePath = this.resolvePath((params['basePath'] ?? params['path'] ?? task.title) as string)
+            const categories = (params['categories'] ?? []) as string[]
+            for (const cat of categories) {
+              await fs.mkdir(resolve(basePath, cat), { recursive: true })
+            }
+            output = { path: basePath, created: true, categories }
+            break
+          }
+
           const target = this.resolvePath((params['path'] ?? params['filePath'] ?? task.title) as string)
+          const syntaxCheck = WindowsPathNormalizer.isValidPathSyntax(target)
+          if (!syntaxCheck.valid) {
+            throw new Error(`Invalid path: ${syntaxCheck.reason}`)
+          }
+
           const content = (params['content'] ?? '') as string
           const targetDir = dirname(target)
           await fs.mkdir(targetDir, { recursive: true })
@@ -103,21 +131,69 @@ export class NativeFilesystemAdapter implements ICapabilityAdapter {
         }
 
         case 'move_file': {
+          if (params['operation'] === 'move_batch') {
+            const src = this.resolvePath((params['sourcePath'] ?? params['source'] ?? params['folder']) as string)
+            const dest = this.resolvePath((params['destinationPath'] ?? params['destination'] ?? src) as string)
+            const mode = (params['mode'] as BatchFailureMode) ?? 'continue'
+            const collisionPolicy = (params['collisionPolicy'] as CollisionPolicy) ?? 'rename_with_counter'
+            const rawGroupBy = String(params['groupBy'] ?? 'category')
+            const groupBy = rawGroupBy === 'extension' ? 'extension' : 'category'
+
+            // Generate planned moves
+            const batchItems = await this.batchExecutor.planDirectoryOrganization(src, {
+              destinationDirectory: dest,
+              groupBy,
+            })
+
+            // Execute safe batch with verification and receipt
+            const receipt = await this.batchExecutor.executeBatch(batchItems, {
+              mode,
+              collisionPolicy,
+              computeHashes: true,
+            })
+
+            output = {
+              source: src,
+              destination: dest,
+              receipt: {
+                executionId: receipt.executionId,
+                organized: receipt.organized,
+                skipped: receipt.skipped,
+                locked: receipt.locked,
+                conflicts: receipt.conflicts,
+                failed: receipt.failed,
+                rolledBack: receipt.rolledBack,
+                verification: receipt.verification,
+                recoveryAvailable: receipt.recoveryAvailable,
+                formattedText: receipt.formatReceipt(),
+              },
+              movedCount: receipt.organized,
+              success: receipt.failed === 0,
+            }
+            break
+          }
+
           const source = this.resolvePath((params['source'] ?? params['sourcePath']) as string)
           const destination = this.resolvePath((params['destination'] ?? params['destinationPath'] ?? params['target']) as string)
-          await fs.mkdir(dirname(destination), { recursive: true })
-          try {
-            await fs.rename(source, destination)
-          } catch (err: unknown) {
-            const e = err as { code?: string }
-            if (e.code === 'EXDEV') {
-              await fs.copyFile(source, destination)
-              await fs.unlink(source)
-            } else {
-              throw err
-            }
+          const collisionPolicy = (params['collisionPolicy'] as CollisionPolicy) ?? 'rename_with_counter'
+
+          const moveResult = await this.fileOps.moveFile(source, destination, {
+            collisionPolicy,
+            computeHashes: true,
+          })
+
+          if (moveResult.status !== 'success') {
+            throw new Error(`File move failed [${moveResult.status}]: ${moveResult.error ?? 'Unknown error'}`)
           }
-          output = { source, destination, moved: true }
+
+          output = {
+            source: moveResult.sourcePath,
+            destination: moveResult.destinationPath,
+            sourceHash: moveResult.sourceHash,
+            destinationHash: moveResult.destinationHash,
+            verified: moveResult.verified,
+            moved: true,
+          }
           break
         }
 
@@ -176,15 +252,35 @@ export class NativeFilesystemAdapter implements ICapabilityAdapter {
     try {
       if (this.capability === 'write_file' && typeof output['path'] === 'string') {
         const stats = await fs.stat(output['path'])
-        if (stats.size >= 0) {
-          checkedConditions.push(`File exists at ${output['path']} with size ${stats.size}`)
+        if (stats.size >= 0 || stats.isDirectory()) {
+          checkedConditions.push(`Target exists at ${output['path']}`)
         } else {
-          failedConditions.push(`File at ${output['path']} has invalid size`)
+          failedConditions.push(`Target at ${output['path']} has invalid size`)
         }
-      } else if (this.capability === 'move_file' && typeof output['destination'] === 'string') {
-        const destStats = await fs.stat(output['destination'])
-        if (destStats.isFile() || destStats.isDirectory()) {
-          checkedConditions.push(`Destination exists at ${output['destination']}`)
+      } else if (this.capability === 'move_file') {
+        const receipt = output['receipt'] as
+          | { verification?: { allMatched?: boolean; verified?: number; total?: number } }
+          | undefined
+        if (receipt?.verification) {
+          if (receipt.verification.allMatched) {
+            checkedConditions.push(
+              `All ${receipt.verification.verified} operations verified via SHA-256 hash match`
+            )
+          } else {
+            failedConditions.push(
+              `Verification mismatch: ${receipt.verification.verified}/${receipt.verification.total} operations verified`
+            )
+          }
+        } else if (typeof output['destination'] === 'string') {
+          const destStats = await fs.stat(output['destination'])
+          if (destStats.isFile() || destStats.isDirectory()) {
+            checkedConditions.push(`Destination exists at ${output['destination']}`)
+          }
+        }
+      } else if (this.capability === 'read_file' && typeof output['path'] === 'string') {
+        const readStats = await fs.stat(output['path'])
+        if (readStats.isFile() || readStats.isDirectory()) {
+          checkedConditions.push(`Path verified at ${output['path']}`)
         }
       } else if (this.capability === 'delete_file' && typeof output['path'] === 'string') {
         try {

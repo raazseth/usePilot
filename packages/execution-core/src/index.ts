@@ -29,9 +29,20 @@ export { ExecutionTimelineBuilder } from './timeline'
 
 // Capability Runtimes
 export { NativeFilesystemAdapter } from './adapters/filesystem/fs-adapter'
+export { WindowsPathNormalizer, WINDOWS_RESERVED_NAMES, WINDOWS_ILLEGAL_CHAR_REGEX } from './adapters/filesystem/windows-path'
+export type { WindowsPathOptions } from './adapters/filesystem/windows-path'
+export { SafeFileOperations } from './adapters/filesystem/file-operations'
+export type { CollisionPolicy, OperationStatus, MoveFileOptions, MoveFileResult, OperationLogEntry } from './adapters/filesystem/file-operations'
+export { SafeBatchExecutor } from './adapters/filesystem/batch-executor'
+export type { BatchFailureMode, BatchItemSpec, BatchItemExecutionRecord, FilesystemReceipt, BatchExecutorOptions } from './adapters/filesystem/batch-executor'
 export { NativeDesktopAdapter } from './adapters/desktop/desktop-adapter'
 export { PlaywrightBrowserAdapter } from './adapters/browser/browser-adapter'
 export { PlaywrightBrowserSession } from './adapters/browser/browser-session'
+export { DomResilience } from './adapters/browser/dom-resilience'
+export type { DomRetryOptions } from './adapters/browser/dom-resilience'
+export { PopupGuard } from './adapters/browser/popup-guard'
+export { DownloadManager } from './adapters/browser/download-manager'
+export type { DownloadResult, CaptureDownloadOptions } from './adapters/browser/download-manager'
 export { VisionSubsystem } from './vision/vision-subsystem'
 export { SelfHealingPipeline } from './healing/self-healing'
 export { SecretVault } from './security/vault'
@@ -61,6 +72,7 @@ export type { RuntimeLogEntry, RuntimeLogLevel, SearchLogFilter } from './loggin
 import type { TaskCapability } from '@usepilot/planner-types'
 
 import { PlaywrightBrowserAdapter } from './adapters/browser/browser-adapter'
+import type { PlaywrightBrowserSession } from './adapters/browser/browser-session'
 import { NativeDesktopAdapter } from './adapters/desktop/desktop-adapter'
 import { NativeFilesystemAdapter } from './adapters/filesystem/fs-adapter'
 import { ALL_CAPABILITIES, createStubAdapterFactory } from './adapters/stub'
@@ -89,7 +101,9 @@ export function createDefaultRegistry(): CapabilityRegistry {
   return registry
 }
 
-export function createProductionRegistry(): CapabilityRegistry {
+export function createProductionRegistry(options?: {
+  browserSession?: PlaywrightBrowserSession | undefined
+}): CapabilityRegistry {
   const registry = createDefaultRegistry()
 
   // Register NativeFilesystemAdapter
@@ -124,9 +138,10 @@ export function createProductionRegistry(): CapabilityRegistry {
     'extract_web_data',
     'download_file',
   ]
+  const sharedSession = options?.browserSession
   for (const cap of browserCaps) {
     registry.register({
-      factory: () => new PlaywrightBrowserAdapter(cap),
+      factory: () => new PlaywrightBrowserAdapter(cap, sharedSession ? { session: sharedSession } : undefined),
       capability: cap,
       priority: 100,
       platformSupport: ['windows', 'macos', 'linux'],

@@ -8,6 +8,7 @@ import { ChatRoute } from './routes/chat'
 import { ContextRoute } from './routes/context'
 import { DiagnosticsRoute } from './routes/diagnostics'
 import { SettingsRoute } from './routes/settings'
+import { SkillsRoute } from './routes/skills'
 import { WelcomeRoute } from './routes/welcome'
 import { useAppStore } from './shared/store/appStore'
 
@@ -83,6 +84,7 @@ export default function App() {
             <Route path="/" element={<WelcomeRoute />} />
             <Route path="/chat/:conversationId" element={<ChatRoute />} />
             <Route path="/context" element={<ContextRoute />} />
+            <Route path="/skills" element={<SkillsRoute />} />
             <Route path="/diagnostics" element={<DiagnosticsRoute />} />
             <Route path="/settings" element={<SettingsRoute />} />
             <Route path="*" element={<Navigate to="/" replace />} />

@@ -8,6 +8,7 @@ import type { EventBus } from '../../events/bus'
 import type { Logger } from '../../logger'
 import type { PlannerService } from '../../planner/service'
 import type { ExecutionService } from '../../execution/service'
+import type { SkillService } from '../../skills/service'
 import { RequestClassifier } from '@usepilot/planner-core'
 
 type DB = ReturnType<typeof import('@usepilot/database').createDatabase>
@@ -37,7 +38,8 @@ export class WebSocketHandler {
     private readonly eventBus: EventBus,
     private readonly logger: Logger,
     private readonly plannerService?: PlannerService,
-    private readonly executionService?: ExecutionService
+    private readonly executionService?: ExecutionService,
+    private readonly skillService?: SkillService
   ) {
     this.convRepo = new ConversationRepository(this.db)
     this.msgRepo = new MessageRepository(this.db)
@@ -156,6 +158,54 @@ export class WebSocketHandler {
               payload: { status: 'ok', version: '0.1.0', uptime: process.uptime() },
             })
             break
+
+          case 'skill.list': {
+            const manifests = this.skillService ? this.skillService.listSkills() : []
+            this.send(ws, {
+              type: 'skill.list.result',
+              payload: { skills: manifests },
+            })
+            break
+          }
+
+          case 'skill.discover': {
+            const payload = (event.payload ?? {}) as { text?: string; userPrompt?: string }
+            const candidates = this.skillService
+              ? this.skillService.discover({ userPrompt: payload.userPrompt ?? payload.text ?? '' })
+              : []
+            this.send(ws, {
+              type: 'skill.discover.result',
+              payload: { candidates },
+            })
+            break
+          }
+
+          case 'skill.resolve': {
+            const payload = event.payload as { skillId: string; inputs: Record<string, unknown> }
+            if (!this.skillService) {
+              this.sendError(ws, { code: 'SKILL_UNAVAILABLE', message: 'Skill service not initialized' })
+              break
+            }
+            const resolution = this.skillService.resolve(payload.skillId, payload.inputs)
+            this.send(ws, {
+              type: 'skill.resolve.result',
+              payload: resolution,
+            })
+            break
+          }
+
+          case 'skill.execute': {
+            const payload = event.payload as { conversationId: string; skillId: string; inputs: Record<string, unknown> }
+            if (!this.skillService) {
+              this.sendError(ws, { code: 'SKILL_UNAVAILABLE', message: 'Skill service not initialized' })
+              break
+            }
+            void this.skillService.executeSkill(ws, payload.conversationId, payload.skillId, payload.inputs)
+              .catch((err: unknown) => {
+                childLogger.error({ err }, 'SkillService.executeSkill threw')
+              })
+            break
+          }
 
           default:
             this.sendError(ws, { code: 'UNKNOWN_EVENT', message: `Unknown event type: ${event.type}` })

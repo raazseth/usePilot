@@ -38,6 +38,11 @@ export type ClientEventType =
   | 'execution.approve'
   | 'execution.reject'
   | 'execution.status'
+  // Skills
+  | 'skill.list'
+  | 'skill.discover'
+  | 'skill.resolve'
+  | 'skill.execute'
 
 export interface ConversationCreatePayload {
   title?: string
@@ -86,6 +91,11 @@ export type ClientEvent =
   | AppEvent<{ runId: ID; taskId: ID; comment?: string }> & { type: 'execution.approve' }
   | AppEvent<{ runId: ID; taskId: ID; comment?: string }> & { type: 'execution.reject' }
   | AppEvent<{ runId: ID }> & { type: 'execution.status' }
+  // Skills
+  | AppEvent<Record<string, never>> & { type: 'skill.list' }
+  | AppEvent<{ text?: string; userPrompt?: string; category?: string }> & { type: 'skill.discover' }
+  | AppEvent<{ skillId: string; inputs: Record<string, unknown> }> & { type: 'skill.resolve' }
+  | AppEvent<{ conversationId: string; skillId: string; inputs: Record<string, unknown> }> & { type: 'skill.execute' }
 
 // Server → Client Events
 
@@ -120,6 +130,14 @@ export type ServerEventType =
   | 'execution.completed'
   | 'execution.failed'
   | 'execution.cancelled'
+  // Skills
+  | 'skill.list.result'
+  | 'skill.discover.result'
+  | 'skill.resolve.result'
+  | 'skill.resolve.required'
+  | 'skill.compiled'
+  | 'skill.executing'
+  | 'skill.error'
 
 export interface ConversationCreatedPayload {
   conversationId: ID

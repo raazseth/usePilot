@@ -24,6 +24,8 @@
     "@usepilot/planner-types": "workspace:*",
     "@usepilot/execution-core": "workspace:*",
     "@usepilot/execution-types": "workspace:*",
+    "@usepilot/skill-types": "workspace:*",
+    "@usepilot/skill-core": "workspace:*",
     "@usepilot/runtime-context": "workspace:*"
   },
   "devDependencies": {

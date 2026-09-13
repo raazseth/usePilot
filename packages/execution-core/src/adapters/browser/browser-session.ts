@@ -92,15 +92,46 @@ export class PlaywrightBrowserSession {
       throw new Error('Failed to create browser context')
     }
 
+    this.setupTabTracking(this.context)
     this.activePage = await this.context.newPage()
     this.pages.push(this.activePage)
   }
 
+  private setupTabTracking(context: BrowserContext): void {
+    context.on('page', (newPage) => {
+      if (!this.pages.includes(newPage)) {
+        this.pages.push(newPage)
+        this.activePage = newPage
+      }
+      newPage.on('close', () => {
+        const idx = this.pages.indexOf(newPage)
+        if (idx !== -1) {
+          this.pages.splice(idx, 1)
+        }
+        if (this.activePage === newPage) {
+          this.activePage = this.pages[this.pages.length - 1] ?? null
+        }
+      })
+    })
+  }
+
   getPage(): Page {
+    if (this.activePage && this.activePage.url() !== 'about:blank') {
+      return this.activePage
+    }
+    const nonBlank = this.pages.find((p) => p.url() && p.url() !== 'about:blank')
+    if (nonBlank) {
+      this.activePage = nonBlank
+      return nonBlank
+    }
     if (!this.activePage) {
       throw new Error('Browser session not initialized. Call initialize() first.')
     }
     return this.activePage
+  }
+
+  getActivePage(): Page {
+    return this.getPage()
   }
 
   getContext(): BrowserContext {
@@ -110,10 +141,16 @@ export class PlaywrightBrowserSession {
     return this.context
   }
 
+  getPages(): Page[] {
+    return [...this.pages]
+  }
+
   async newTab(url?: string | undefined): Promise<Page> {
     const ctx = this.getContext()
     const page = await ctx.newPage()
-    this.pages.push(page)
+    if (!this.pages.includes(page)) {
+      this.pages.push(page)
+    }
     this.activePage = page
     if (url) {
       await page.goto(url, { waitUntil: 'domcontentloaded' })
@@ -121,9 +158,20 @@ export class PlaywrightBrowserSession {
     return page
   }
 
+  async closeTab(index?: number | undefined): Promise<void> {
+    const targetIdx = index ?? this.pages.indexOf(this.activePage!)
+    if (targetIdx >= 0 && targetIdx < this.pages.length) {
+      const pageToClose = this.pages[targetIdx]!
+      await pageToClose.close().catch(() => {})
+      return
+    }
+    throw new Error(`Invalid tab index ${targetIdx} (total: ${this.pages.length})`)
+  }
+
   async switchTab(index: number): Promise<Page> {
     if (index >= 0 && index < this.pages.length) {
       this.activePage = this.pages[index]!
+      await this.activePage.bringToFront().catch(() => {})
       return this.activePage
     }
     throw new Error(`Tab index ${index} out of bounds (total tabs: ${this.pages.length})`)
@@ -164,5 +212,9 @@ export class PlaywrightBrowserSession {
       await this.browser.close().catch(() => {})
       this.browser = null
     }
+  }
+
+  async dispose(): Promise<void> {
+    await this.close()
   }
 }

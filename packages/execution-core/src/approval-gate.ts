@@ -13,6 +13,7 @@ interface PendingApproval {
 
 export class ApprovalGate {
   private readonly pending = new Map<string, PendingApproval>()
+  private readonly preResolved = new Map<string, ApprovalResponse>()
   private readonly defaultTimeoutMs: number
 
   constructor(options: { timeoutMs?: number } = {}) {
@@ -20,6 +21,12 @@ export class ApprovalGate {
   }
 
   async requestApproval(runId: string, traceId: string, task: Task): Promise<ApprovalResponse> {
+    const pre = this.preResolved.get(task.id)
+    if (pre) {
+      this.preResolved.delete(task.id)
+      return pre
+    }
+
     return new Promise<ApprovalResponse>((resolve, reject) => {
       const requestId = generateId()
       const requestedAt = Date.now()
@@ -53,7 +60,10 @@ export class ApprovalGate {
 
   resolve(taskId: string, response: ApprovalResponse): boolean {
     const pending = this.pending.get(taskId)
-    if (!pending) return false
+    if (!pending) {
+      this.preResolved.set(taskId, response)
+      return true
+    }
 
     if (pending.timeoutHandle) {
       clearTimeout(pending.timeoutHandle)
@@ -95,5 +105,6 @@ export class ApprovalGate {
       pending.reject(new Error('ApprovalGate cleared'))
     }
     this.pending.clear()
+    this.preResolved.clear()
   }
 }

@@ -23,6 +23,8 @@ This document defines the definitive ownership, mutability, lifecycle, and persi
 | **`Artifact`** | `@usepilot/execution-core` | Written once by adapters/subsystems via `ArtifactStore.save()` | Execution run or permanent | Local filesystem (`.usepilot/artifacts/<executionId>/...`) | Large binary assets (screenshots, DOM dumps, traces, downloads) offloaded from SQLite. Virtual URI addressing. |
 | **`AdapterSession`** | `@usepilot/execution-core` | `SessionManager` | Scoped to `capability`, `run`, or `task` | In-memory runtime resource | Pooled active process/handle wrapper. Guaranteed cleanup and disposal via `IResourceManager` on run completion. |
 | **`ReplaySession`** | `@usepilot/execution-core` & `@usepilot/runtime-context` | Replay runner during step-through | Ephemeral debugging session | Transient memory | Read-only execution simulation. Zero physical side effects dispatched to external OS or network targets. |
+| **`SkillManifest`** | `@usepilot/skill-core` | Immutable after registration | Process lifetime | In-memory `SkillRegistry` / static definition | Sealed capability contract, input/output schemas, verification definitions. Versioned (`@1.0.0`). |
+| **`Workflow`** | `@usepilot/skill-core` | `SkillWorkflowCompiler` | Execution lifecycle | Ephemeral; compiled into immutable `ExecutionBlueprint` | Intermediate DAG task structure linking resolved skill parameters directly to the deterministic planner. |
 
 ---
 

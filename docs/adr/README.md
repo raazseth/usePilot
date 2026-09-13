@@ -136,3 +136,4 @@ flowchart TD
 | [ADR-044](ADR-044-context-invalidation-and-diff-engine.md) | Invalidation & Diff Engine | Accepted | Context | Fine-grained cache invalidation, snapshot diffing |
 | [ADR-045](ADR-045-runtime-context-facade-and-tiered-storage.md) | Facade & Tiered Storage | Accepted | Context | Unified public API boundary; hot/warm/cold memory model |
 | [ADR-046](ADR-046-context-transactions-and-schema-versioning.md) | Transactions & Versioning | Accepted | Context | Multi-subsystem atomic transactions with rollback |
+| [ADR-047](ADR-047-skill-system.md) | Skill System & Reusable Workflows | Accepted | Skills | Product capability layer, workflow compilation, deterministic resolution |

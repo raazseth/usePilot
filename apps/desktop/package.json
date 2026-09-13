@@ -20,6 +20,7 @@
     "@usepilot/config": "workspace:*",
     "@usepilot/execution-types": "workspace:*",
     "@usepilot/planner-types": "workspace:*",
+    "@usepilot/skill-types": "workspace:*",
     "@usepilot/types": "workspace:*",
     "@usepilot/utils": "workspace:*",
     "@usepilot/runtime-context": "workspace:*",
