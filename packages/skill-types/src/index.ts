@@ -42,6 +42,14 @@ export type {
 export type {
   SkillComposition,
   SkillCompositionStep,
+  StepCompletionEvent,
+  CompositionValidationError,
+  CompositionValidationResult,
+  StepExecutionReceipt,
+  ComposedExecutionReceipt,
+  WorkflowRouteRequest,
+  WorkflowRouteStatus,
+  WorkflowRouteResult,
 } from './composition'
 
 export type {

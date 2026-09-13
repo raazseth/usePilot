@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest'
 import { SkillRegistry } from '../registry/skill-registry'
 import { SkillComposer } from '../composition/composer'
 import { BUILTIN_SKILLS } from '../skills/builtin'
+import { ResearchDownloadAndOrganizeComposition } from '../skills/builtin-compositions'
 import type { SkillComposition } from '@usepilot/skill-types'
 
 describe('SkillComposer', () => {
@@ -80,5 +81,41 @@ describe('SkillComposer', () => {
     await expect(composer.compose(brokenComposition, {})).rejects.toThrowError(
       /skill "non-existent-skill-id" not found/i
     )
+  })
+
+  it('compiles research-download-and-organize builtin composition with tasks from all 3 steps in dependency order', async () => {
+    // research-website (2 tasks) → download-documents (2 tasks) → organize-downloads (3 tasks) = 7 total
+    const { workflow, blueprint } = await composer.compose(
+      ResearchDownloadAndOrganizeComposition,
+      {
+        url: 'https://docs.usepilot.dev',
+        topic: 'architecture',
+        destinationFolder: '/tmp/test-reports',
+        fileExtension: '.pdf',
+        groupBy: 'extension',
+      }
+    )
+
+    expect(workflow.tasks.length).toBe(7)
+    expect(blueprint.tasks.length).toBe(7)
+
+    // Identify tasks by step prefix
+    const step1Tasks = workflow.tasks.filter((t) => t.id.includes('research-page'))
+    const step2Tasks = workflow.tasks.filter((t) => t.id.includes('download-docs'))
+    const step3Tasks = workflow.tasks.filter((t) => t.id.includes('organize-docs'))
+
+    expect(step1Tasks.length).toBe(2) // research-website has 2 tasks
+    expect(step2Tasks.length).toBe(2) // download-documents has 2 tasks
+    expect(step3Tasks.length).toBe(3) // organize-downloads has 3 tasks
+
+    // First task of step 2 must depend on last task of step 1
+    const lastStep1Task = step1Tasks[step1Tasks.length - 1]!
+    const firstStep2Task = step2Tasks[0]!
+    expect(firstStep2Task.dependsOn).toContain(lastStep1Task.id)
+
+    // First task of step 3 must depend on last task of step 2
+    const lastStep2Task = step2Tasks[step2Tasks.length - 1]!
+    const firstStep3Task = step3Tasks[0]!
+    expect(firstStep3Task.dependsOn).toContain(lastStep2Task.id)
   })
 })
