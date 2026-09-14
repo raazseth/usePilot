@@ -13,6 +13,7 @@ export { CompositionValidator } from './composition/composition-validator'
 export { OutputCollector } from './composition/output-collector'
 export { ComposedWorkflowOrchestrator, type OrchestrationOptions } from './composition/orchestrator'
 export { GoalWorkflowRouter } from './composition/workflow-router'
+export { extractPromptSignals, tokenizeNormalized, type PromptSignals } from './discovery/nlp-matcher'
 
 // Built-in Skills
 export {

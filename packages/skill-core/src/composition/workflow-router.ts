@@ -132,7 +132,7 @@ export class GoalWorkflowRouter {
     const conflicts: string[] = []
 
     if (
-      (/\b(?:clean up|delete|remove)\b/i.test(lower) && /\bdon'?t\s+delete\s+(?:any\s+)?(?:files|thing)\b/i.test(lower)) ||
+      (/\b(?:clean up|delete|remove)\b/i.test(lower) && /\b(?:don'?t|do\s+not)\s+delete\s+(?:any\s+)?(?:files|thing)?\b/i.test(lower)) ||
       (/\bdelete\s+everything\b/i.test(lower) && /\bkeep\s+all\b/i.test(lower))
     ) {
       conflicts.push('Request asks to clean up/delete while explicitly forbidding deleting any files.')
@@ -366,7 +366,19 @@ export class GoalWorkflowRouter {
         steps: skillIds.map((id, idx) => ({
           stepId: `step-${idx + 1}-${id}`,
           skillId: id,
-          inputBindings: {},
+          inputBindings: {
+            url: { source: 'workflow_input', key: 'url' },
+            folder: { source: 'workflow_input', key: 'folder' },
+            directory: { source: 'workflow_input', key: 'folder' },
+            targetDirectory: { source: 'workflow_input', key: 'destinationFolder' },
+            destinationFolder: { source: 'workflow_input', key: 'destinationFolder' },
+            pattern: { source: 'workflow_input', key: 'pattern' },
+            renamePattern: { source: 'workflow_input', key: 'renamePattern' },
+            replacement: { source: 'workflow_input', key: 'replacement' },
+            extension: { source: 'workflow_input', key: 'extension' },
+            extensionFilter: { source: 'workflow_input', key: 'extension' },
+            groupBy: { source: 'workflow_input', key: 'groupBy' },
+          },
         })),
       }
 

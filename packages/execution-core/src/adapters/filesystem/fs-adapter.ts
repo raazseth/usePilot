@@ -79,7 +79,7 @@ export class NativeFilesystemAdapter implements ICapabilityAdapter {
 
       switch (this.capability) {
         case 'read_file': {
-          const target = this.resolvePath((params['path'] ?? params['filePath'] ?? task.title) as string)
+          const target = this.resolvePath((params['path'] ?? params['filePath'] ?? params['folder'] ?? params['directory'] ?? task.title) as string)
           const stats = await fs.stat(target)
           if (stats.isDirectory()) {
             const entries = await fs.readdir(target)
@@ -95,7 +95,7 @@ export class NativeFilesystemAdapter implements ICapabilityAdapter {
 
         case 'write_file': {
           if (params['operation'] === 'ensure_directories') {
-            const basePath = this.resolvePath((params['basePath'] ?? params['path'] ?? task.title) as string)
+            const basePath = this.resolvePath((params['basePath'] ?? params['path'] ?? params['folder'] ?? params['directory'] ?? task.title) as string)
             const categories = (params['categories'] ?? []) as string[]
             for (const cat of categories) {
               await fs.mkdir(resolve(basePath, cat), { recursive: true })
@@ -169,6 +169,30 @@ export class NativeFilesystemAdapter implements ICapabilityAdapter {
               },
               movedCount: receipt.organized,
               success: receipt.failed === 0,
+            }
+            break
+          }
+
+          if (params['operation'] === 'rename_batch') {
+            const folder = this.resolvePath((params['folder'] ?? params['path'] ?? params['sourcePath']) as string)
+            const replacement = (params['replacement'] ?? 'renamed_') as string
+            const entries = await fs.readdir(folder)
+            const renamed: Array<{ from: string; to: string }> = []
+            for (const file of entries) {
+              const fullSource = resolve(folder, file)
+              const stat = await fs.stat(fullSource)
+              if (stat.isFile() && !file.startsWith(replacement)) {
+                const targetName = `${replacement}${file}`
+                const fullDest = resolve(folder, targetName)
+                await fs.rename(fullSource, fullDest)
+                renamed.push({ from: file, to: targetName })
+              }
+            }
+            output = {
+              folder,
+              renamedCount: renamed.length,
+              renamedFiles: renamed,
+              success: true,
             }
             break
           }

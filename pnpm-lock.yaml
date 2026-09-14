@@ -126,6 +126,9 @@ importers:
       '@usepilot/runtime-context':
         specifier: workspace:*
         version: link:../../packages/runtime-context
+      '@usepilot/skill-types':
+        specifier: workspace:*
+        version: link:../../packages/skill-types
       '@usepilot/types':
         specifier: workspace:*
         version: link:../../packages/types
@@ -208,6 +211,89 @@ importers:
       vitest:
         specifier: ^2.1.8
         version: 2.1.9(@types/node@26.4.1)(jsdom@30.0.1)
+
+  packages/agent-core:
+    dependencies:
+      '@usepilot/agent-types':
+        specifier: workspace:*
+        version: link:../agent-types
+      '@usepilot/ai-core':
+        specifier: workspace:*
+        version: link:../ai-core
+      '@usepilot/execution-core':
+        specifier: workspace:*
+        version: link:../execution-core
+      '@usepilot/execution-types':
+        specifier: workspace:*
+        version: link:../execution-types
+      '@usepilot/planner-core':
+        specifier: workspace:*
+        version: link:../planner-core
+      '@usepilot/planner-types':
+        specifier: workspace:*
+        version: link:../planner-types
+      '@usepilot/runtime-context':
+        specifier: workspace:*
+        version: link:../runtime-context
+      '@usepilot/skill-core':
+        specifier: workspace:*
+        version: link:../skill-core
+      '@usepilot/skill-types':
+        specifier: workspace:*
+        version: link:../skill-types
+      '@usepilot/types':
+        specifier: workspace:*
+        version: link:../types
+      '@usepilot/utils':
+        specifier: workspace:*
+        version: link:../utils
+      zod:
+        specifier: ^3.24.2
+        version: 3.25.76
+    devDependencies:
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.20.1
+      '@usepilot/typescript-config':
+        specifier: workspace:*
+        version: link:../../tooling/typescript-config
+      rimraf:
+        specifier: ^6.0.1
+        version: 6.1.3
+      typescript:
+        specifier: ^5.7.3
+        version: 5.8.3
+      vitest:
+        specifier: ^2.1.8
+        version: 2.1.9(@types/node@22.20.1)(jsdom@30.0.1)
+
+  packages/agent-types:
+    dependencies:
+      '@usepilot/execution-types':
+        specifier: workspace:*
+        version: link:../execution-types
+      '@usepilot/planner-types':
+        specifier: workspace:*
+        version: link:../planner-types
+      '@usepilot/skill-types':
+        specifier: workspace:*
+        version: link:../skill-types
+      '@usepilot/types':
+        specifier: workspace:*
+        version: link:../types
+      zod:
+        specifier: ^3.24.2
+        version: 3.25.76
+    devDependencies:
+      '@usepilot/typescript-config':
+        specifier: workspace:*
+        version: link:../../tooling/typescript-config
+      rimraf:
+        specifier: ^6.0.1
+        version: 6.1.3
+      typescript:
+        specifier: ^5.7.3
+        version: 5.8.3
 
   packages/ai-core:
     dependencies:
