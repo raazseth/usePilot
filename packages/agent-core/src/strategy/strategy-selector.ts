@@ -13,9 +13,19 @@ import type { SkillComposition } from '@usepilot/skill-types'
 
 import type { RetrievedAgentContext } from '../context/agent-context-facade'
 
+export interface IReliabilityProvider {
+  recommendPreferredWorkflow(workflowA: string, workflowB: string): { selectedWorkflow: string; reason: string }
+}
+
+export interface IPreferenceProvider {
+  resolve(context: { key: string; explicitInput?: unknown; systemSafetyPermitted: boolean; currentRuntimeValid: boolean; safeDefault: unknown }): { resolvedValue: unknown; resolvedSource: string; reason: string }
+}
+
 export interface StrategySelectorOptions {
   skillRegistry: SkillRegistry
   compositionRegistry: SkillCompositionRegistry
+  reliabilityProvider?: IReliabilityProvider | undefined
+  preferenceProvider?: IPreferenceProvider | undefined
 }
 
 /**
@@ -34,8 +44,10 @@ export class AgentStrategySelector {
   private readonly router: GoalWorkflowRouter
   private readonly validator: CompositionValidator
   private readonly compositionRegistry: SkillCompositionRegistry
+  private readonly options: StrategySelectorOptions
 
   constructor(options: StrategySelectorOptions) {
+    this.options = options
     this.compositionRegistry = options.compositionRegistry
     this.router = new GoalWorkflowRouter(options.skillRegistry, options.compositionRegistry)
     this.validator = new CompositionValidator(options.skillRegistry)
@@ -78,8 +90,20 @@ export class AgentStrategySelector {
       effectiveGoal = effectiveGoal.replace(/\b(?:this\s+(?:website|site|page)|current\s+page|here)\b/gi, context.hot.activeUrl)
     }
     const coldReportsFolder = context?.cold.userPreferences['defaultReportsFolder'] as string | undefined
-    if (coldReportsFolder && /\b(?:my\s+reports?\s+folder|reports?\s+folder)\b/i.test(effectiveGoal)) {
-      effectiveGoal = effectiveGoal.replace(/\b(?:my\s+reports?\s+folder|reports?\s+folder)\b/gi, coldReportsFolder)
+    let preferredReportsFolder = coldReportsFolder
+    if (!preferredReportsFolder && this.options.preferenceProvider) {
+      const resolved = this.options.preferenceProvider.resolve({
+        key: 'defaultReportsFolder',
+        systemSafetyPermitted: true,
+        currentRuntimeValid: true,
+        safeDefault: undefined,
+      })
+      if (typeof resolved.resolvedValue === 'string') {
+        preferredReportsFolder = resolved.resolvedValue
+      }
+    }
+    if (preferredReportsFolder && /\b(?:my\s+reports?\s+folder|reports?\s+folder)\b/i.test(effectiveGoal)) {
+      effectiveGoal = effectiveGoal.replace(/\b(?:my\s+reports?\s+folder|reports?\s+folder)\b/gi, preferredReportsFolder)
     }
     const hotFolder = context?.hot.currentFolder
     if (hotFolder && /\bhere\b/i.test(effectiveGoal)) {
@@ -150,7 +174,20 @@ export class AgentStrategySelector {
 
     // 4. Predefined Workflow Reuse (Preferred over Dynamic Composition)
     if (routeResult.status === 'matched_composition' && routeResult.composition) {
-      const comp = routeResult.composition
+      let comp = routeResult.composition
+      if (this.options.reliabilityProvider) {
+        const otherComps = this.compositionRegistry.list().filter((c) => c.id !== comp.id)
+        for (const candidate of otherComps) {
+          const sharesSkill = candidate.steps.some((s) => comp.steps.some((cs) => cs.skillId === s.skillId))
+          if (sharesSkill) {
+            const comparison = this.options.reliabilityProvider.recommendPreferredWorkflow(comp.id, candidate.id)
+            if (comparison.selectedWorkflow === candidate.id) {
+              comp = candidate
+              break
+            }
+          }
+        }
+      }
       const skills = comp.steps.map((s) => s.skillId)
 
       return {
