@@ -276,8 +276,11 @@ export class NativeFilesystemAdapter implements ICapabilityAdapter {
     try {
       if (this.capability === 'write_file' && typeof output['path'] === 'string') {
         const stats = await fs.stat(output['path'])
-        if (stats.size >= 0 || stats.isDirectory()) {
-          checkedConditions.push(`Target exists at ${output['path']}`)
+        const expectedBytes = typeof output['bytesWritten'] === 'number' ? output['bytesWritten'] : 0
+        if (expectedBytes > 0 && stats.size === 0) {
+          failedConditions.push(`Target at ${output['path']} is unexpectedly empty (0 bytes, expected ${expectedBytes})`)
+        } else if (stats.size >= 0 || stats.isDirectory()) {
+          checkedConditions.push(`Target exists at ${output['path']} (${stats.size} bytes)`)
         } else {
           failedConditions.push(`Target at ${output['path']} has invalid size`)
         }
@@ -313,8 +316,10 @@ export class NativeFilesystemAdapter implements ICapabilityAdapter {
         } catch {
           checkedConditions.push(`File confirmed deleted at ${output['path']}`)
         }
+      } else if (output && output['executed'] === true) {
+        checkedConditions.push(`Filesystem operation "${this.capability}" verified`)
       } else {
-        checkedConditions.push(...ctx.task.successConditions)
+        failedConditions.push(`Condition cannot be verified on actual state`)
       }
 
       return {

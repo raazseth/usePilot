@@ -109,4 +109,6 @@ export interface ExecutionResult {
   durationMs: number
   report: ExecutionReport
   manifest?: import('./manifest').ExecutionManifest | undefined
+  taskOutputs?: Record<string, unknown> | undefined
 }
+

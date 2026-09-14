@@ -54,14 +54,20 @@ export class CompositionValidator {
     for (let i = 0; i < steps.length; i++) {
       const step = steps[i]!
       for (const [inputKey, binding] of Object.entries(step.inputBindings)) {
-        if (typeof binding !== 'string') continue
+        let referencedStepId: string | undefined = undefined
 
-        // Handle $steps.<stepId>.<key> references
-        if (binding.startsWith('$steps.')) {
-          const parts = binding.slice('$steps.'.length).split('.')
-          const referencedStepId = parts[0]
-          if (referencedStepId === undefined) continue
+        if (typeof binding === 'string' && binding.startsWith('$steps.')) {
+          referencedStepId = binding.slice('$steps.'.length).split('.')[0]
+        } else if (
+          binding !== null &&
+          typeof binding === 'object' &&
+          'source' in binding &&
+          (binding as { source: string }).source !== 'workflow_input'
+        ) {
+          referencedStepId = (binding as { source: string }).source
+        }
 
+        if (referencedStepId) {
           const referencedPos = stepIndex.get(referencedStepId)
           if (referencedPos === undefined) {
             errors.push({
@@ -112,14 +118,22 @@ export class CompositionValidator {
       if (!graph.has(step.stepId)) graph.set(step.stepId, new Set())
 
       for (const binding of Object.values(step.inputBindings)) {
+        let referencedStepId: string | undefined = undefined
         if (typeof binding === 'string' && binding.startsWith('$steps.')) {
-          const parts = binding.slice('$steps.'.length).split('.')
-          const referencedStepId = parts[0]
-          if (referencedStepId) {
-            // Edge: referencedStepId → step.stepId (producer → consumer)
-            if (!graph.has(referencedStepId)) graph.set(referencedStepId, new Set())
-            graph.get(referencedStepId)!.add(step.stepId)
-          }
+          referencedStepId = binding.slice('$steps.'.length).split('.')[0]
+        } else if (
+          binding !== null &&
+          typeof binding === 'object' &&
+          'source' in binding &&
+          (binding as { source: string }).source !== 'workflow_input'
+        ) {
+          referencedStepId = (binding as { source: string }).source
+        }
+
+        if (referencedStepId) {
+          // Edge: referencedStepId → step.stepId (producer → consumer)
+          if (!graph.has(referencedStepId)) graph.set(referencedStepId, new Set())
+          graph.get(referencedStepId)!.add(step.stepId)
         }
       }
     }

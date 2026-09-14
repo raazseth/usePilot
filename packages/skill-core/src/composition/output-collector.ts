@@ -45,7 +45,7 @@ export class OutputCollector {
       }
       // Treat source as a stepId
       const stepOut = this.stepOutputs.get(b.source)
-      if (stepOut !== undefined) {
+      if (stepOut !== undefined && stepOut[b.key] !== undefined) {
         return stepOut[b.key]
       }
       // Fallback to initial inputs

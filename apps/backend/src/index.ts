@@ -7,6 +7,7 @@ import { ProviderManager } from './infrastructure/ai/provider-manager'
 import { PlannerService } from './planner/service'
 import { ExecutionService } from './execution/service'
 import { SkillService } from './skills/service'
+import { AgentService } from './agent/service'
 import { EventBus } from './events/bus'
 import { migrate } from '@usepilot/database'
 import { seed } from '@usepilot/database'
@@ -52,6 +53,14 @@ async function bootstrap() {
   const skillService = new SkillService(db, eventBus, logger, plannerService, executionService)
   logger.info('SkillService initialized')
 
+  const agentService = new AgentService({
+    db,
+    eventBus,
+    logger,
+    dataDir: config.dataDir,
+  })
+  logger.info('AgentService initialized')
+
   // Create WebSocket handler
   const wsHandler = new WebSocketHandler(
     db,
@@ -60,7 +69,8 @@ async function bootstrap() {
     logger,
     plannerService,
     executionService,
-    skillService
+    skillService,
+    agentService
   )
 
   // Create HTTP router

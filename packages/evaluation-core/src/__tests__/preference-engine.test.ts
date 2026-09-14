@@ -1,3 +1,5 @@
+import { existsSync, unlinkSync } from 'node:fs'
+
 import { describe, it, expect } from 'vitest'
 
 import { PreferenceEngine } from '../personalization/preference-engine'
@@ -118,5 +120,33 @@ describe('PreferenceEngine — Personalization & Strict Precedence Hierarchy', (
     expect(changed.confidence).toBe('LOW')
     expect(changed.observationCount).toBe(1)
     expect(changed.value).toBe('firefox')
+  })
+
+  it('persists validated preferences to disk and reloads on restart', () => {
+    const tempFile = `C:/Users/Raaz/AppData/Local/Temp/usepilot-pref-test-${Date.now()}.json`
+    const engine1 = new PreferenceEngine({ storagePath: tempFile })
+    engine1.validateExplicitly('editor', 'code', 'user_setting')
+    engine1.observe('theme', 'dark', 'user_execution')
+
+    // Simulate process restart with a fresh engine instance pointing to the same file
+    const engine2 = new PreferenceEngine({ storagePath: tempFile })
+    const prefEditor = engine2.getPreference('editor')
+    expect(prefEditor).toBeDefined()
+    expect(prefEditor?.value).toBe('code')
+    expect(prefEditor?.status).toBe('VALIDATED')
+
+    const prefTheme = engine2.getPreference('theme')
+    expect(prefTheme).toBeDefined()
+    expect(prefTheme?.value).toBe('dark')
+    expect(prefTheme?.status).toBe('CANDIDATE')
+
+    // Clean up
+    try {
+      if (existsSync(tempFile)) {
+        unlinkSync(tempFile)
+      }
+    } catch {
+      // ignore
+    }
   })
 })

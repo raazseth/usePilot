@@ -38,6 +38,10 @@ export class SkillEvaluator {
     this.outcomes.push(...outcomes)
   }
 
+  getOutcomes(): ExecutionOutcome[] {
+    return [...this.outcomes]
+  }
+
   getMetrics(skillId: string, version?: string): SkillEvaluationMetrics {
     const relevant = this.outcomes.filter(
       (o) => o.skillIds.includes(skillId) && (!version || o.skillVersions[skillId] === version)

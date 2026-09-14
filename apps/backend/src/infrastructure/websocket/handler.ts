@@ -9,6 +9,7 @@ import type { Logger } from '../../logger'
 import type { PlannerService } from '../../planner/service'
 import type { ExecutionService } from '../../execution/service'
 import type { SkillService } from '../../skills/service'
+import type { AgentService } from '../../agent/service'
 import { RequestClassifier } from '@usepilot/planner-core'
 
 type DB = ReturnType<typeof import('@usepilot/database').createDatabase>
@@ -39,7 +40,8 @@ export class WebSocketHandler {
     private readonly logger: Logger,
     private readonly plannerService?: PlannerService,
     private readonly executionService?: ExecutionService,
-    private readonly skillService?: SkillService
+    private readonly skillService?: SkillService,
+    private readonly agentService?: AgentService
   ) {
     this.convRepo = new ConversationRepository(this.db)
     this.msgRepo = new MessageRepository(this.db)
@@ -207,6 +209,57 @@ export class WebSocketHandler {
             break
           }
 
+          case 'agent.goal': {
+            const payload = event.payload as { conversationId: string; prompt: string; autoApprove?: boolean }
+            if (!this.agentService) {
+              this.sendError(ws, { code: 'AGENT_UNAVAILABLE', message: 'Agent service not initialized' })
+              break
+            }
+            void this.agentService.handleGoal(
+              payload.conversationId,
+              payload.prompt,
+              (evt) => this.send(ws, evt),
+              { autoApprove: payload.autoApprove }
+            ).catch((err: unknown) => {
+              childLogger.error({ err }, 'AgentService.handleGoal threw')
+            })
+            break
+          }
+
+          case 'agent.clarification.respond': {
+            const payload = event.payload as { conversationId: string; goalId: string; clarification: string }
+            if (!this.agentService) {
+              this.sendError(ws, { code: 'AGENT_UNAVAILABLE', message: 'Agent service not initialized' })
+              break
+            }
+            void this.agentService.respondToClarification(
+              payload.conversationId,
+              payload.goalId,
+              payload.clarification,
+              (evt) => this.send(ws, evt)
+            ).catch((err: unknown) => {
+              childLogger.error({ err }, 'AgentService.respondToClarification threw')
+            })
+            break
+          }
+
+          case 'agent.approval.respond': {
+            const payload = event.payload as { conversationId: string; goalId: string; approved: boolean }
+            if (!this.agentService) {
+              this.sendError(ws, { code: 'AGENT_UNAVAILABLE', message: 'Agent service not initialized' })
+              break
+            }
+            void this.agentService.respondToApproval(
+              payload.conversationId,
+              payload.goalId,
+              payload.approved,
+              (evt) => this.send(ws, evt)
+            ).catch((err: unknown) => {
+              childLogger.error({ err }, 'AgentService.respondToApproval threw')
+            })
+            break
+          }
+
           default:
             this.sendError(ws, { code: 'UNKNOWN_EVENT', message: `Unknown event type: ${event.type}` })
         }
@@ -277,6 +330,18 @@ export class WebSocketHandler {
       const classification = await classifier.classify(content, targetModel)
 
       if (classification.type === 'planning') {
+        if (this.agentService) {
+          logger.info(
+            { signals: classification.signals, reason: classification.reason },
+            'Goal detected — dispatching to AgentService for reasoning, composition, execution, and learning'
+          )
+          void this.agentService.handleGoal(conversationId, content, (evt) => this.send(ws, evt))
+            .catch((err: unknown) => {
+              logger.error({ err }, 'AgentService.handleGoal threw')
+            })
+          return
+        }
+
         logger.info(
           { signals: classification.signals, reason: classification.reason, confidence: classification.confidence },
           'Natural language input classified as planning — dispatching to PlannerService'

@@ -43,6 +43,10 @@ export type ClientEventType =
   | 'skill.discover'
   | 'skill.resolve'
   | 'skill.execute'
+  // Agent
+  | 'agent.goal'
+  | 'agent.clarification.respond'
+  | 'agent.approval.respond'
 
 export interface ConversationCreatePayload {
   title?: string
@@ -96,6 +100,10 @@ export type ClientEvent =
   | AppEvent<{ text?: string; userPrompt?: string; category?: string }> & { type: 'skill.discover' }
   | AppEvent<{ skillId: string; inputs: Record<string, unknown> }> & { type: 'skill.resolve' }
   | AppEvent<{ conversationId: string; skillId: string; inputs: Record<string, unknown> }> & { type: 'skill.execute' }
+  // Agent
+  | AppEvent<{ conversationId: string; prompt: string; autoApprove?: boolean | undefined }> & { type: 'agent.goal' }
+  | AppEvent<{ conversationId: string; goalId: string; clarification: string }> & { type: 'agent.clarification.respond' }
+  | AppEvent<{ conversationId: string; goalId: string; approved: boolean }> & { type: 'agent.approval.respond' }
 
 // Server → Client Events
 

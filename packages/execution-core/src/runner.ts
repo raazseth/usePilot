@@ -190,6 +190,7 @@ export class ExecutionRunner {
     const skippedTaskIds = new Set<string>()
     const retryCounters: Record<string, number> = {}
     const taskSummaries: TaskSummary[] = []
+    const consolidatedTaskOutputs: Record<string, unknown> = {}
 
     for (const task of blueprint.tasks) {
       stateMachine.initializeTask(task.id)
@@ -428,6 +429,12 @@ export class ExecutionRunner {
           stateMachine.transitionTask(task.id, 'completed')
           completedTaskIds.add(task.id)
           currentCompleted++
+          if (retryResult.adapterResult.output) {
+            if (typeof retryResult.adapterResult.output === 'object' && retryResult.adapterResult.output !== null) {
+              Object.assign(consolidatedTaskOutputs, retryResult.adapterResult.output)
+            }
+            consolidatedTaskOutputs[task.id] = retryResult.adapterResult.output
+          }
           taskSummaries.push({
             taskId: task.id, taskTitle: task.title,
             capability: task.requiredCapability, status: 'completed',
@@ -541,6 +548,7 @@ export class ExecutionRunner {
             durationMs: finalMetrics.totalDurationMs,
             report,
             manifest,
+            taskOutputs: consolidatedTaskOutputs,
           }
         }
 
@@ -590,6 +598,7 @@ export class ExecutionRunner {
           durationMs: finalMetrics.totalDurationMs,
           report,
           manifest,
+          taskOutputs: consolidatedTaskOutputs,
         }
       }
 
@@ -650,6 +659,7 @@ export class ExecutionRunner {
         durationMs: finalMetrics.totalDurationMs,
         report,
         manifest,
+        taskOutputs: consolidatedTaskOutputs,
       }
     }
 
@@ -704,6 +714,7 @@ export class ExecutionRunner {
       durationMs: finalMetrics.totalDurationMs,
       report,
       manifest,
+      taskOutputs: consolidatedTaskOutputs,
     }
 
     await callbacks.onCompleted?.(result)

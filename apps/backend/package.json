@@ -9,7 +9,7 @@
     "build": "bun build src/index.ts --compile --outfile bun-backend --target bun --external playwright --external tesseract.js",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src --ext .ts",
-    "test": "vitest run",
+    "test": "bun test",
     "test:watch": "vitest",
     "clean": "rimraf dist bun-backend bun-backend.exe"
   },
@@ -26,7 +26,11 @@
     "@usepilot/execution-types": "workspace:*",
     "@usepilot/skill-types": "workspace:*",
     "@usepilot/skill-core": "workspace:*",
-    "@usepilot/runtime-context": "workspace:*"
+    "@usepilot/runtime-context": "workspace:*",
+    "@usepilot/agent-types": "workspace:*",
+    "@usepilot/agent-core": "workspace:*",
+    "@usepilot/evaluation-types": "workspace:*",
+    "@usepilot/evaluation-core": "workspace:*"
   },
   "devDependencies": {
     "@usepilot/typescript-config": "workspace:*",

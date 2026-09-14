@@ -85,44 +85,42 @@ export class VisionSubsystem {
     }
 
     // Check multi-word phrase
-    const idx = ocr.fullText.toLowerCase().indexOf(normalizedTarget)
-    if (idx !== -1 && ocr.words.length > 0) {
-      return ocr.words[0]!.bbox
+    const targetWords = normalizedTarget.split(/\s+/).filter(Boolean)
+    if (targetWords.length > 1) {
+      const firstWord = targetWords[0]!
+      for (let i = 0; i < ocr.words.length; i++) {
+        if (ocr.words[i]!.text.toLowerCase().includes(firstWord)) {
+          let allMatch = true
+          for (let j = 1; j < targetWords.length; j++) {
+            if (!ocr.words[i + j] || !ocr.words[i + j]!.text.toLowerCase().includes(targetWords[j]!)) {
+              allMatch = false
+              break
+            }
+          }
+          if (allMatch) {
+            const startBox = ocr.words[i]!.bbox
+            const endBox = ocr.words[i + targetWords.length - 1]!.bbox
+            return {
+              x: startBox.x,
+              y: Math.min(startBox.y, endBox.y),
+              width: Math.max(startBox.width, (endBox.x + endBox.width) - startBox.x),
+              height: Math.max(startBox.height, endBox.height),
+            }
+          }
+        }
+      }
     }
 
     return undefined
   }
 
   findTemplate(
-    sourceBuffer: Buffer,
-    templateBuffer: Buffer,
+    _sourceBuffer: Buffer,
+    _templateBuffer: Buffer,
     _threshold = 0.8
   ): TemplateMatchResult {
-    // Template matching check
-    if (sourceBuffer.length === 0 || templateBuffer.length === 0) {
-      return { found: false, confidence: 0 }
-    }
-
-    // Check size validity
-    if (templateBuffer.length > sourceBuffer.length) {
-      return { found: false, confidence: 0 }
-    }
-
-    // Perceptual / structural match approximation
-    const idx = sourceBuffer.indexOf(templateBuffer.subarray(0, Math.min(64, templateBuffer.length)))
-    if (idx !== -1) {
-      return {
-        found: true,
-        confidence: 0.95,
-        bbox: {
-          x: (idx % 800),
-          y: Math.floor(idx / 800),
-          width: 50,
-          height: 20,
-        },
-      }
-    }
-
+    // Visual template matching is safely disabled to prevent arbitrary coordinate hallucination.
+    // Deterministic DOM selectors and OCR recognition are used for reliable element location.
     return { found: false, confidence: 0 }
   }
 

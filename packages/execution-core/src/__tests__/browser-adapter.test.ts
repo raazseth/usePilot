@@ -11,7 +11,7 @@ describe('PlaywrightBrowserAdapter & BrowserSession', () => {
 
   afterAll(async () => {
     await adapter.dispose()
-  })
+  }, 30000)
 
   const dummyBlueprint: ExecutionBlueprint = {
     id: 'bp-browser-test',

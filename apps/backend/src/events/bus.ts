@@ -49,6 +49,9 @@ export type DomainEventMap = {
   'execution.completed':         { runId: string; traceId: string; tasksCompleted: number; tasksFailed: number; tasksSkipped: number; durationMs: number }
   'execution.failed':            { runId: string; traceId: string; errorCode: string; failedTaskId?: string | undefined; failureCategory?: string | undefined }
   'execution.cancelled':         { runId: string; traceId: string }
+
+  // Agent events
+  'agent.event':                 { type: string; agentId: string; goalId: string; state: string; payload?: Record<string, unknown> | undefined }
 }
 
 export type DomainEventType = keyof DomainEventMap

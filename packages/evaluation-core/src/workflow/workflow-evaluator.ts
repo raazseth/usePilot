@@ -41,6 +41,10 @@ export class WorkflowEvaluator {
     }
   }
 
+  getOutcomes(): ExecutionOutcome[] {
+    return [...this.outcomes]
+  }
+
   getMetrics(workflowId: string, version?: string): WorkflowEvaluationMetrics {
     const relevant = this.outcomes.filter(
       (o) => o.workflowId === workflowId && (!version || o.workflowVersion === version)

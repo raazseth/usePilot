@@ -138,8 +138,15 @@ export class NativeDesktopAdapter implements ICapabilityAdapter {
         }
 
         case 'execute_command': {
-          const command = (params['command'] ?? params['cmd'] ?? task.title) as string
-          const { stdout, stderr } = await execAsync(command, {
+          const command = (params['command'] ?? params['cmd']) as string | undefined
+          if (!command || typeof command !== 'string' || !command.trim()) {
+            throw new Error(`execute_command requires an explicit 'command' or 'cmd' parameter. Executing arbitrary task.title is blocked for safety.`)
+          }
+          const trimmed = command.trim()
+          if (/[\r\n]/.test(trimmed) || /[;&|]/.test(trimmed)) {
+            throw new Error(`Command contains prohibited metacharacters or command chaining characters not allowed: ${trimmed}`)
+          }
+          const { stdout, stderr } = await execAsync(trimmed, {
             signal: ctx.signal,
             timeout: 60000,
           })
@@ -189,6 +196,7 @@ export class NativeDesktopAdapter implements ICapabilityAdapter {
       }
     }
 
+    const output = (result.output ?? {}) as Record<string, unknown>
     const checkedConditions: string[] = []
     const failedConditions: string[] = []
 
@@ -199,11 +207,28 @@ export class NativeDesktopAdapter implements ICapabilityAdapter {
         const expected = (params['text'] ?? params['content'] ?? '') as string
         if (expected && readBack.includes(expected)) {
           checkedConditions.push(`Clipboard confirmed contains written text`)
+        } else if (expected) {
+          failedConditions.push(`Clipboard does not contain expected text "${expected}"`)
         } else {
           checkedConditions.push(`Clipboard write operation verified`)
         }
+      } else if (this.capability === 'execute_command') {
+        const out = output as { exitCode?: number; stderr?: string; stdout?: string }
+        if (out.exitCode === 0) {
+          checkedConditions.push(`Command exited with status code 0`)
+        } else {
+          failedConditions.push(`Command exited with error code ${out.exitCode}`)
+        }
+      } else if (typeof output['launched'] === 'boolean') {
+        if (output['launched'] && output['pid']) {
+          checkedConditions.push(`Application launched with PID ${output['pid']}`)
+        } else {
+          failedConditions.push(`Application failed to launch`)
+        }
+      } else if (output['executed'] === true) {
+        checkedConditions.push(`Capability "${this.capability}" execution verified`)
       } else {
-        checkedConditions.push(...ctx.task.successConditions)
+        failedConditions.push(`Condition cannot be verified on actual state`)
       }
 
       return {

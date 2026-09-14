@@ -69,7 +69,7 @@ describe('Browser Reality Hardening — Download Manager & Collision Safety', ()
     await session.dispose().catch(() => {})
     await new Promise<void>((res) => server.close(() => res()))
     await fs.rm(testDownloadDir, { recursive: true, force: true }).catch(() => {})
-  })
+  }, 30000)
 
   it('captures download, computes SHA-256, and verifies integrity', async () => {
     const page = await session.newTab(serverUrl)

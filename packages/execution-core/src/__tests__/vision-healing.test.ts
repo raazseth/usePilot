@@ -27,15 +27,14 @@ describe('VisionSubsystem & SelfHealingPipeline', () => {
     expect(aboveCoord).toEqual({ x: 140, y: 180 })
   })
 
-  it('performs template matching on image buffers', () => {
+  it('safely marks visual template matching as disabled to prevent fake coordinates', () => {
     const vision = new VisionSubsystem()
     const sourceBuffer = Buffer.from('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.repeat(50))
     const templateBuffer = Buffer.from('MNOPQRST')
 
     const match = vision.findTemplate(sourceBuffer, templateBuffer)
-    expect(match.found).toBe(true)
-    expect(match.confidence).toBeGreaterThanOrEqual(0.8)
-    expect(match.bbox).toBeDefined()
+    expect(match.found).toBe(false)
+    expect(match.confidence).toBe(0)
   })
 
   it('cascades through self-healing recovery and records journal events', async () => {

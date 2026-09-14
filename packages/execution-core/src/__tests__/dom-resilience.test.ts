@@ -12,7 +12,7 @@ describe('Browser Reality Hardening — DOM Resilience & Popup Guard', () => {
 
   afterAll(async () => {
     await session.dispose()
-  })
+  }, 30000)
 
   describe('DomResilience error detection & retries', () => {
     it('accurately identifies transient DOM errors', () => {

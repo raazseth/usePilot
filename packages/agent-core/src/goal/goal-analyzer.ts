@@ -13,6 +13,7 @@ const INJECTION_PATTERNS = [
   /disregard\s+(?:all\s+)?(?:safety|system|user)\s+(?:rules|policies|instructions)/i,
   /system\s+update\s*:\s*(?:delete|override|format|execute)/i,
   /you\s+are\s+now\s+(?:an?\s+)?(?:unrestricted\s+assistant|unrestricted|in\s+developer\s+mode|dan)/i,
+  /(?:pretend|act\s+as\s+if)\s+you\s+are\s+(?:an?\s+)?(?:unrestricted|root|admin|developer|dan)/i,
   /override\s+(?:user\s+)?(?:instruction|goal|intent)/i,
   /new\s+system\s+directive\s*:/i,
 ]

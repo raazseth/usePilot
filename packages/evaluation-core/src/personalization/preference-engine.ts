@@ -1,9 +1,17 @@
+import fs from 'node:fs'
+import path from 'node:path'
+
 import type {
   UserPreference,
   PreferenceResolutionContext,
   PreferenceResolutionResult,
 } from '@usepilot/evaluation-types'
 import type { ExecutionMemoryStore } from '@usepilot/runtime-context'
+
+export interface PreferenceEngineOptions {
+  storagePath?: string | undefined
+  memoryStore?: ExecutionMemoryStore | undefined
+}
 
 /**
  * PreferenceEngine — Manages user preferences through repeated observation and validation.
@@ -14,11 +22,44 @@ import type { ExecutionMemoryStore } from '@usepilot/runtime-context'
  * 3. Precedence hierarchy:
  *    Explicit Current User Input > System Safety > Current Runtime State > Validated Preference > Historical Execution > Safe Default
  * 4. Integrates with existing ExecutionMemoryStore without duplicating memory.
+ * 5. Supports local-first persistence across restarts via storagePath.
  */
 export class PreferenceEngine {
   private readonly preferences = new Map<string, UserPreference>()
+  private readonly storagePath?: string | undefined
+  private readonly memoryStore?: ExecutionMemoryStore | undefined
 
-  constructor(private readonly memoryStore?: ExecutionMemoryStore | undefined) {}
+  constructor(memoryStoreOrOptions?: ExecutionMemoryStore | PreferenceEngineOptions) {
+    if (memoryStoreOrOptions && 'storagePath' in memoryStoreOrOptions) {
+      this.storagePath = memoryStoreOrOptions.storagePath
+      this.memoryStore = memoryStoreOrOptions.memoryStore
+    } else {
+      this.memoryStore = memoryStoreOrOptions as ExecutionMemoryStore | undefined
+    }
+
+    if (this.storagePath && fs.existsSync(this.storagePath)) {
+      try {
+        const raw = fs.readFileSync(this.storagePath, 'utf8')
+        const items = JSON.parse(raw) as UserPreference[]
+        for (const item of items) {
+          this.preferences.set(item.key, item)
+        }
+      } catch {
+        // Fallback gracefully on unreadable file
+      }
+    }
+  }
+
+  private persist(): void {
+    if (!this.storagePath) return
+    try {
+      const dir = path.dirname(this.storagePath)
+      if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true })
+      fs.writeFileSync(this.storagePath, JSON.stringify(Array.from(this.preferences.values()), null, 2), 'utf8')
+    } catch {
+      // Best-effort local persistence
+    }
+  }
 
   /**
    * Observe a user choice or parameter value.
@@ -39,6 +80,7 @@ export class PreferenceEngine {
         lastValidatedAt: Date.now(),
       }
       this.preferences.set(key, initial)
+      this.persist()
       return initial
     }
 
@@ -57,6 +99,7 @@ export class PreferenceEngine {
       }
 
       this.preferences.set(key, existing)
+      this.persist()
       return existing
     }
 
@@ -67,6 +110,7 @@ export class PreferenceEngine {
     existing.confidence = 'LOW'
     existing.lastObservedAt = Date.now()
     this.preferences.set(key, existing)
+    this.persist()
     return existing
   }
 
@@ -86,6 +130,7 @@ export class PreferenceEngine {
       lastValidatedAt: Date.now(),
     }
     this.preferences.set(key, pref)
+    this.persist()
     return pref
   }
 
@@ -169,5 +214,6 @@ export class PreferenceEngine {
 
   clear(): void {
     this.preferences.clear()
+    this.persist()
   }
 }

@@ -173,12 +173,12 @@ export class ComposedWorkflowOrchestrator {
       totalTasksExecuted += executionResult.tasksCompleted
 
       // 7. Collect step outputs for subsequent steps.
-      // Since ExecutionResult does not expose per-task structured outputs, we record
-      // the resolved and validated inputs of this step (configuredInputs) as the step's
-      // "outputs". This is correct for the vast majority of compositions: the next step
-      // needs the same values (e.g. a folder path, URL) that the current step operated on.
-      // Future phases may extend this with adapter-level output capture.
-      const stepOutputs: Record<string, unknown> = { ...resolution.configuredInputs }
+      // Merges resolved inputs with actual runtime task outputs produced by ExecutionRunner.
+      // Real outputs (e.g. downloaded files, savedPath, extracted text, hash) take precedence.
+      const stepOutputs: Record<string, unknown> = {
+        ...resolution.configuredInputs,
+        ...(executionResult.taskOutputs ?? {}),
+      }
       collector.record(step.stepId, stepOutputs)
 
 

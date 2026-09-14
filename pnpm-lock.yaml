@@ -50,6 +50,12 @@ importers:
 
   apps/backend:
     dependencies:
+      '@usepilot/agent-core':
+        specifier: workspace:*
+        version: link:../../packages/agent-core
+      '@usepilot/agent-types':
+        specifier: workspace:*
+        version: link:../../packages/agent-types
       '@usepilot/ai-core':
         specifier: workspace:*
         version: link:../../packages/ai-core
@@ -62,6 +68,12 @@ importers:
       '@usepilot/database':
         specifier: workspace:*
         version: link:../../packages/database
+      '@usepilot/evaluation-core':
+        specifier: workspace:*
+        version: link:../../packages/evaluation-core
+      '@usepilot/evaluation-types':
+        specifier: workspace:*
+        version: link:../../packages/evaluation-types
       '@usepilot/execution-core':
         specifier: workspace:*
         version: link:../../packages/execution-core
